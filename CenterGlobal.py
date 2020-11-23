@@ -558,6 +558,7 @@ def getCheckStateFromFile(index):
 	mSimpleModel = JTAG_STATE_NONE
 	mMsg = ""
 	mProgress = 0
+	mProgressAry = []
 	mTaskId = ""
 	mRatio = ""
 	mStateStr = "{"
@@ -600,13 +601,15 @@ def getCheckStateFromFile(index):
 			if(JTAG_TASKTYPE in tmpObj.keys()):
 				mTaskType = tmpObj[JTAG_TASKTYPE]
 			if(JTAG_PROGRESS in tmpObj.keys()):
+				#记录所有的progress，最后算平均数
+				mProgressAry.append(tmpObj[JTAG_PROGRESS])
 				#第一个progress直接赋值
-				if mIndex == 0:
-					mProgress = tmpObj[JTAG_PROGRESS]
-				else:
-					#找最小的那个progress
-					if mProgress > tmpObj[JTAG_PROGRESS]:
-						mProgress = tmpObj[JTAG_PROGRESS]
+				# if mIndex == 0:
+				# 	mProgress = tmpObj[JTAG_PROGRESS]
+				# else:
+				# 	#找最小的那个progress
+				# 	if mProgress > tmpObj[JTAG_PROGRESS]:
+				# 		mProgress = tmpObj[JTAG_PROGRESS]
 			#获取taskId 和 ratio
 			if mIndex == 0:
 				if JTAG_TASKID in tmpObj.keys() :
@@ -646,6 +649,18 @@ def getCheckStateFromFile(index):
 		else:
 			#log.info("inprogressing~~~")
 			mState = JTAG_STATE_INPROGRESS
+
+		#求progress平均数
+		lenProgressAry =  len(mProgressAry)
+		if lenProgressAry <= 0:
+			log.info("len progressAry <= 0 get average progress error!!!")
+		else:
+			sumProgress = 0
+			for progress in mProgressAry:
+				sumProgress += progress
+			mProgress = round(sumProgress / lenProgressAry)
+		# log.info("------------> progressary:" + str(mProgressAry))
+
 		#log.info("aryName:" + str(aryName) + " aryState:" + str(aryState) + " name:" + mName + " taskType:" + mTaskType + " state:" + mState + " countDone:" + str(countDone) + " countEmpty:" + str(countEmpty) + " countError:" + str(countError))
 		mStateStr = "{"
 		mStateStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
