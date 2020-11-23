@@ -6,6 +6,7 @@ import urllib.request
 import sys, os, time, random, threading, multiprocessing
 from multiprocessing import Process, Queue
 from CenterGlobal import *
+from light import *
 from Logger import *
 ###########
 gStartSer = 0
@@ -239,7 +240,7 @@ def handle_CheckStatePreSec_lightitem(index, ip):
 
 #handle accept socket request
 def handle_client(client_socket, server_socket):
-	request_data = client_socket.recv(1024)
+	request_data = client_socket.recv(10240)
 	request_data_str = request_data.decode('utf-8')
 	strAry = request_data_str.split('\r\n')
 	#log.info("strAry:\n" + str(strAry))
@@ -258,8 +259,45 @@ def handle_client(client_socket, server_socket):
 	if mPath != URL_PATH_CHECK:
 		log.info("request_data:\n" + request_data_str)
 
+	# if-else 处理各种请求
+	if mPath == URL_PATH_GETLIGHTINFO:
+		#get data from http req header content
+		mContent = ""
+		mIndex = -1
+		isFindCntData = 0
+		cntStrAry = len(strAry)
+		for tmp in strAry:
+			mIndex += 1
+			#print("rptest[" + str(mIndex) + "]" + tmp)
+			# find empty then next one is the last one , the next one is json data
+			if tmp == "":
+				if (mIndex + 1) < cntStrAry:
+					nxtStr = strAry[mIndex + 1]
+					nxtStrLen = len(nxtStr)
+					#print("rptest nxtStr:" + nxtStr + " len:" + str(nxtStrLen) + " [0]:" + nxtStr[0])
+					if nxtStrLen >= 1 and nxtStr[0] == "{":
+						isFindCntData = 1
+						#log.info("strary[" + str(mIndex) + "]" + tmp + " find contentdata")
+						continue
+			if isFindCntData == 1:
+				mContent += tmp
+		log.info("handle_client() recv 'getLightInfo' contentdata:" + mContent)
+		isRightParams = 1
+		resultStr = ""
+		try:
+			deploy = LightingDeploy()
+			resultStr = deploy.deploy(mContent)
+			log.info("getLightInfo() succ rtn:" + resultStr)
+		except:
+			log.info("handle_client() recv 'getLightInfo' --- run deploy error!!!!!!")
+			isRightParams = 0
+
+		if isRightParams == 1:
+			response_body = "{\"" + JTAG_NAME + "\":\""+ mPath + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_DONE + "\",\"" + JTAG_MSG + "\":" + resultStr + "}"
+		else:
+			response_body = "{\"" + JTAG_NAME + "\":\""+ mPath + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 	#req history
-	if mPath == URL_PATH_HISTORY:
+	elif mPath == URL_PATH_HISTORY:
 		response_body = readHistoryReqPro()
 	#req check
 	elif mPath == URL_PATH_CHECK:
