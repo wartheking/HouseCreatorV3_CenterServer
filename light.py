@@ -42,7 +42,7 @@ class LightingDeploy:
 
     def deploy(self,PolygonJson):
         lightIndex = 0
-        rtnStr = "["
+        rtnStr = "{\"PreLight\":["
         # with open("/Users/4dage-imac2/Downloads/testLight.json","r") as f:
         #     PolygonJson = f.read()
         p = json.loads(PolygonJson)
@@ -330,22 +330,29 @@ class LightingDeploy:
             for x in range(0, col_count):
                 for y in range(0, row_count):
 
-                    if rtnStr == "[":
+                    if rtnStr == "{\"PreLight\":[":
                         pass
                     else:
                         rtnStr += ","
 
                     lightIndex = lightIndex + 1
                     point_light_pos = Vector2(start_pos.x + x * spacing_x, start_pos.y + y * spacing_y)
-                    print("第" + str(lightIndex) + "灯的x:" + str(point_light_pos.x))
-                    print("第" + str(lightIndex) + "灯的y:" + str(point_light_pos.y))
-                    print("第" + str(lightIndex) + "灯的z:" + str(160))
+                    print("第" + str(lightIndex) + "灯的x:" + str(point_light_pos.x/-100))
+                    print("第" + str(lightIndex) + "灯的y:" + str(-3))
+                    print("第" + str(lightIndex) + "灯的z:" + str(point_light_pos.y/-100))
 
-                    tmpStr = "{" 
-                    tmpStr += "\"lightIndex\"" + ":" + str(lightIndex)        + "," 
-                    tmpStr += "\"x\""          + ":" + str(point_light_pos.x) + ","
-                    tmpStr += "\"y\""          + ":" + str(point_light_pos.y) + ","
-                    tmpStr += "\"z\""          + ":" + str(160)
+                    tmpStr = "{"
+                    tmpStr += "\"type\""       + ":"   + "\"pointLight\""                         + ","
+                    tmpStr += "\"color\""      + ":"   + "\"#FFFFFF\""                            + ","
+                    tmpStr += "\"intensity\""  + ":"   + "2"                                      + ","
+                    tmpStr += "\"state\""      + ":"   + "1"                                      + ","
+                    tmpStr += "\"other\""      + ":"   + "{\"radius\":0.5}"                       + ","
+                    tmpStr += "\"id\""         + ":"   + "\"PointLight" + str(lightIndex) + "\""  + ","
+                    tmpStr += "\"position\""   + ":"   + "{"
+                    tmpStr += "\"x\""          + ":"   + str(point_light_pos.x/-100) + ","
+                    tmpStr += "\"y\""          + ":"   + str(-3) + ","
+                    tmpStr += "\"z\""          + ":"   + str(point_light_pos.y/-100)
+                    tmpStr += "}"
                     tmpStr += "}"
 
                     rtnStr += tmpStr
@@ -355,7 +362,7 @@ class LightingDeploy:
                     #     point_light_spawn(FVector(-1 * point_light_pos.x, -1 * point_light_pos.y, height_ceil - 130), FRotator(0, 0, 0), FColor(255, 242, 232), 150000, 500, 0)                  
                     # else:
                     #     point_light_spawn(FVector(-1 * point_light_pos.x, -1 * point_light_pos.y, height_ceil - 130), FRotator(0, 0, 0), FColor(255, 255, 255), 200000, 500, 0)
-        rtnStr += "]"
+        rtnStr += "]}"
         print("rtnStr:" + rtnStr)
         return rtnStr      
 
