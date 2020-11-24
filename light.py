@@ -43,9 +43,10 @@ class LightingDeploy:
     def deploy(self,PolygonJson):
         lightIndex = 0
         rtnStr = "{\"PreLight\":["
-        # with open("/Users/4dage-imac2/Downloads/testLight.json","r") as f:
+        # with open("/Users/4dage-imac2/Documents/python_files/ue4pro/CenterServer/testLight.json","r") as f:
         #     PolygonJson = f.read()
         p = json.loads(PolygonJson)
+        mMap = p["map"]
         p_array = p["Polygon"]
 
 
