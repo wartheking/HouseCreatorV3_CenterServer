@@ -46,8 +46,11 @@ class LightingDeploy:
         # with open("/Users/4dage-imac2/Documents/python_files/ue4pro/CenterServer/testLight.json","r") as f:
         #     PolygonJson = f.read()
         p = json.loads(PolygonJson)
-        mMap = p["map"]
-        p_array = p["Polygon"]
+        pStr = p["obj"]
+        # print("pStr:" + pStr)
+        pObj = json.loads(pStr)
+        mMap = pObj["map"]
+        p_array = pObj["Polygon"]
 
 
         polygons = []
