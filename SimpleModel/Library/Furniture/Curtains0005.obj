@@ -1,9 +1,9 @@
 mtllib Curtains0005.mtl
-# File exported by Houdini 18.0.499 (www.sidefx.com)
+# File exported by Houdini 18.5.351 (www.sidefx.com)
 # 414 points
 # 2271 vertices
 # 757 primitives
-# Bounds: [-0.094815284, -0.308944434, -0.55420661] to [0.0789440125, 0.318737298, 0.55420661]
+# Bounds: [-0.0949999988, -0.308999956, -0.55400002] to [0.0790000036, 0.319000006, 0.55400002]
 g 
 usemtl Curtains0005
 v 0.030 -0.281 -0.426
