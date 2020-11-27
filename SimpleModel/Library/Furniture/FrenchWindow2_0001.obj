@@ -1,9 +1,9 @@
 mtllib FrenchWindow2_0001.mtl
-# File exported by Houdini 18.0.499 (www.sidefx.com)
+# File exported by Houdini 18.5.351 (www.sidefx.com)
 # 51 points
 # 306 vertices
 # 102 primitives
-# Bounds: [-0.0221037287, -1.24941814, -1.22040522] to [0.0221037287, 1.24941814, 1.22040522]
+# Bounds: [-0.0219999999, -1.24899995, -1.22000003] to [0.0219999999, 1.24899995, 1.22000003]
 g 
 usemtl FrenchWindow2_0001
 v 0.007 -1.245 -0.032

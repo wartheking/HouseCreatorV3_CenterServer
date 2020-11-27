@@ -1,9 +1,9 @@
 mtllib LightTop0003.mtl
-# File exported by Houdini 18.0.499 (www.sidefx.com)
+# File exported by Houdini 18.5.351 (www.sidefx.com)
 # 196 points
 # 1164 vertices
 # 388 primitives
-# Bounds: [-0.0504921861, -0.0206658058, -0.0509271994] to [0.0504921861, 0.0205899607, 0.0504921861]
+# Bounds: [-0.049999997, -0.0209999979, -0.050999999] to [0.049999997, 0.0209999979, 0.049999997]
 g 
 usemtl LightTop0003
 v -0.029 -0.019 0.007
