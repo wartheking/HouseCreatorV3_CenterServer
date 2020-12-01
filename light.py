@@ -353,9 +353,9 @@ class LightingDeploy:
                     tmpStr += "\"other\""      + ":"   + "{\"radius\":0.5}"                       + ","
                     tmpStr += "\"id\""         + ":"   + "\"PointLight" + str(lightIndex) + "\""  + ","
                     tmpStr += "\"position\""   + ":"   + "{"
-                    tmpStr += "\"x\""          + ":"   + str(point_light_pos.x/-100) + ","
+                    tmpStr += "\"x\""          + ":"   + str(point_light_pos.x/100) + ","
                     tmpStr += "\"y\""          + ":"   + str(-3) + ","
-                    tmpStr += "\"z\""          + ":"   + str(point_light_pos.y/-100)
+                    tmpStr += "\"z\""          + ":"   + str(point_light_pos.y/100)
                     tmpStr += "}"
                     tmpStr += "}"
 
