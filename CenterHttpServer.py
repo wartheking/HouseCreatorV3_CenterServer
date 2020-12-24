@@ -27,11 +27,6 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 
 	jConfigAll = jConfig[JTAG_TASKTYPE_ALL]
 	jConfigAllLen = len(jConfigAll)
-	jConfigLight = jConfig[JTAG_TASKTYPE_LIGHT]
-	jConfigLightLen = len(jConfigLight)
-	jConfigDatafactory = jConfig[JTAG_TASKTYPE_DATAFACTORY]
-	jConfigDatafactoryLen = len(jConfigDatafactory)
-	
 	mIndex = 0
 
 	if mTaskType == JTAG_TASKTYPE_ALL:
@@ -63,6 +58,8 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 	elif mTaskType == JTAG_TASKTYPE_LIGHT:
 		#要加上all的数量
 		mIndex = jConfigAllLen
+		jConfigLight = jConfig[JTAG_TASKTYPE_LIGHT]
+		jConfigLightLen = len(jConfigLight)
 		#遍历 light 群
 		for ipStr in jConfigLight:
 			tName, tTaskType, tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
@@ -79,32 +76,6 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 				else:
 					log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
 					return handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio)
-			else:
-				mIndex += 1
-				continue
-
-		#如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
-		return rtnMsg
-
-	elif mTaskType == JTAG_TASKTYPE_DATAFACTORY:
-		#要加上all + light的数量
-		mIndex = jConfigAllLen + jConfigLightLen
-		#遍历 datafactory 群
-		for ipStr in jConfigDatafactory:
-			tName, tTaskType, tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
-			if tState == JTAG_STATE_DONE or tState == "":
-				#done状态或者初始化状态就可以开始任务
-				log.info("handle_SendReqToServers() find 'datafactory' machine is ok index:" + str(mIndex))
-				return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio)
-			elif tState == JTAG_STATE_ERROR:
-				#错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
-				if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
-					#server err, 跳过吧
-					mIndex += 1
-					continue
-				else:
-					log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
-					return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio)
 			else:
 				mIndex += 1
 				continue
@@ -162,27 +133,6 @@ def handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolut
 				
 	return rtnMsg
 
-#send 'datafactory' request to server
-def handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio):
-	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
-	try:
-		#log.info("handle_SendReqToServers_light() ip:" + ipStr)
-		dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio)
-		dataStrBytes = dataStr.encode('utf-8')
-		#log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
-		url = ipStr + URL_PATH_PRO
-		f = urllib.request.urlopen(url, dataStrBytes)
-		rtnMsg = f.read().decode('utf-8')
-		#log.info("handle_SendReqToServers_light() rtn:" + rtnMsg)
-		f.close()
-		if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
-			log.info("handle_SendReqToServers_datafactory():" + "ip:" + ipStr + "[" + rtnMsg + "] find rtn error!!!!")
-			
-	except Exception:
-		log.info("handle_SendReqToServers_datafactory():" + "ip:" + ipStr + " request error!!!!")
-				
-	return rtnMsg
-
 def handle_CheckState():
 	jConfigStr = getSerConfigsStr()
 	jConfig = json.loads(jConfigStr)
@@ -199,12 +149,6 @@ def handle_CheckState():
 	jConfigLightLen = len(jConfigLight)
 	for ipStr in jConfigLight:
 		handle_CheckStatePreSec_lightitem(mIndex, ipStr)
-		mIndex += 1
-	
-	jConfigDatafactory = jConfig[JTAG_TASKTYPE_DATAFACTORY]
-	jConfigDatafactoryLen = len(jConfigDatafactory)
-	for ipStr in jConfigDatafactory:
-		handle_CheckStatePreSec_datafactoryitem(mIndex, ipStr)
 		mIndex += 1
 
 # when get req pro 
@@ -292,32 +236,6 @@ def handle_CheckStatePreSec_lightitem(index, ip):
 		mStateStr += "]"
 
 	log.info("light>>>[" + str(index) + "]combine str:" + mStateStr)
-	setStausStrToStatusAry(index, mStateStr)
-
-def handle_CheckStatePreSec_datafactoryitem(index, ip):
-	#log.info("handle_CheckStatePreSec_lightitem() [" + str(index) +"]")
-	mStateStr = "["
-	try:
-		url = ip + URL_PATH_CHECK
-		f = urllib.request.urlopen(url)
-		mTmpStr =  f.read().decode('utf-8')
-		log.info("[" + str(index) + "]:" + mTmpStr)
-		mStateStr += mTmpStr
-		mStateStr += "]"
-		f.close()
-	except urllib.error.URLError:
-		log.info("[" + str(index) + "]: check state error!!!!")
-		# server err, will fill err info into state info
-		errMsg = "{\"" + JTAG_NAME + "\":\"\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
-		mStateStr += errMsg
-		mStateStr += "]"
-	except Exception:
-		log.info("[" + str(index) + "]: check state other error!!!!")
-		errMsg = "{\"" + JTAG_NAME + "\":\"\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
-		mStateStr += errMsg
-		mStateStr += "]"
-
-	log.info("datafactory>>>[" + str(index) + "]combine str:" + mStateStr)
 	setStausStrToStatusAry(index, mStateStr)
 
 #handle accept socket request
