@@ -51,6 +51,7 @@ JTAG_NAME  = "name"
 JTAG_TASKTYPE = "taskType"
 JTAG_TASKTYPE_ALL = "all"
 JTAG_TASKTYPE_LIGHT = "light"
+JTAG_TASKTYPE_DATAFACTORY = "datafactory"
 JTAG_MAP   = "map"
 JTAG_ANGLE = "angle"
 JTAG_IDS = "ids"
@@ -232,49 +233,63 @@ def getInfosFromJContent(jContent):
 					log.info("content json data ratio not find error!!!")
 					result = -1
 					break
-
-			#check map
-			if(JTAG_MAP in jobj.keys()):
-				mMap  = jobj[JTAG_MAP]
-				mMap, result = checkMap(mMap)
-				if result < 0:
+			
+			#if taskType == datafactory
+			# taskId必须有
+			if mTaskType == JTAG_TASKTYPE_DATAFACTORY:
+				#check taskId
+				if (JTAG_TASKID in jobj.keys()):
+					mTaskId = jobj[JTAG_TASKID]
+					mTaskId, result = checkTaskId(mTaskId)
+					if result < 0:
+						break
+				else:
+					log.info("content json data taskId not find error!!!")
+					result = -1
 					break
-			else:
-				log.info("content json data map not find error!!!")
-				result = -1
-				break
-			#check quality
-			if(JTAG_QUALITY in jobj.keys()):
-				mQuality  = jobj[JTAG_QUALITY]
-				mQuality, result = checkQuality(mQuality)
-				if result < 0:
+			if mTaskType != JTAG_TASKTYPE_DATAFACTORY:
+				#check map
+				if(JTAG_MAP in jobj.keys()):
+					mMap  = jobj[JTAG_MAP]
+					mMap, result = checkMap(mMap)
+					if result < 0:
+						break
+				else:
+					log.info("content json data map not find error!!!")
+					result = -1
 					break
-			#check ids
-			if(JTAG_IDS in jobj.keys()):
-				mIds = jobj[JTAG_IDS]
-				mIds, result = checkIds(mIds)
-				if result < 0:
+				#check quality
+				if(JTAG_QUALITY in jobj.keys()):
+					mQuality  = jobj[JTAG_QUALITY]
+					mQuality, result = checkQuality(mQuality)
+					if result < 0:
+						break
+				#check ids
+				if(JTAG_IDS in jobj.keys()):
+					mIds = jobj[JTAG_IDS]
+					mIds, result = checkIds(mIds)
+					if result < 0:
+						break
+				else:
+					log.info("content json data position not find error!!!")
+					result = -1
 					break
-			else:
-				log.info("content json data position not find error!!!")
-				result = -1
-				break
-			#check angle
-			if(JTAG_ANGLE in jobj.keys()):
-				mAngle  = jobj[JTAG_ANGLE]
-				mAngle, result = checkAngle(mAngle)
-				if result < 0:
+				#check angle
+				if(JTAG_ANGLE in jobj.keys()):
+					mAngle  = jobj[JTAG_ANGLE]
+					mAngle, result = checkAngle(mAngle)
+					if result < 0:
+						break
+				#check resolution
+				if(JTAG_RESOLUTION in jobj.keys()):
+					mResolution  = jobj[JTAG_RESOLUTION]
+					mResolution, result = checkResolution(mResolution)
+					if result < 0:
+						break
+				else:
+					log.info("content json data resolution not find error!!!")
+					result = -1
 					break
-			#check resolution
-			if(JTAG_RESOLUTION in jobj.keys()):
-				mResolution  = jobj[JTAG_RESOLUTION]
-				mResolution, result = checkResolution(mResolution)
-				if result < 0:
-					break
-			else:
-				log.info("content json data resolution not find error!!!")
-				result = -1
-				break
 			#check end break while
 			break
 		except json.decoder.JSONDecodeError:
@@ -391,7 +406,7 @@ def checkTaskType(taskType):
 	if not isinstance(taskType, str):
 		log.info("taskType is not str error!!!")
 		result = -1
-	elif taskType != JTAG_TASKTYPE_ALL and taskType != JTAG_TASKTYPE_LIGHT:
+	elif taskType != JTAG_TASKTYPE_ALL and taskType != JTAG_TASKTYPE_LIGHT and taskType != JTAG_TASKTYPE_DATAFACTORY:
 		log.info("taskType not right error!!!")
 		result = -1
 	else:
@@ -459,20 +474,22 @@ def getCheckState(jContentStr):
 				if JTAG_NAME in jobj.keys():
 					mName = jobj[JTAG_NAME]
 					#tasktype all 才要判断 name有没有问题
-					if mTaskType == JTAG_TASKTYPE_ALL :
+					#tasktype datafactory 也要判断name有没有问题，敬然说name是标识，taskId只是存个文件夹
+					if mTaskType == JTAG_TASKTYPE_ALL or mTaskType == JTAG_TASKTYPE_DATAFACTORY :
 						mName, result = checkName(mName)
 						if result < 0:
 							log.info("getCheckState() read json name error!!!")
 							break
 				else:
 					#tasktype all 才要判断 name是否是空
-					if mTaskType == JTAG_TASKTYPE_ALL :
+					#tasktype datafactory 也要判断name有没有问题，敬然说name是标识，taskId只是存个文件夹
+					if mTaskType == JTAG_TASKTYPE_ALL or mTaskType == JTAG_TASKTYPE_DATAFACTORY :
 						log.info("getCheckState() read json not find name!!!")
 						result = -1
 						break
 				
 				#check taskid 是否存在
-				if mTaskType == JTAG_TASKTYPE_LIGHT :
+				if mTaskType == JTAG_TASKTYPE_LIGHT:
 					if JTAG_TASKID in jobj.keys():
 						mTaskId = jobj[JTAG_TASKID]
 						mTaskId, result = checkTaskId(mTaskId)
@@ -507,6 +524,9 @@ def getCheckState(jContentStr):
 	jConfigLight = jConfig[JTAG_TASKTYPE_LIGHT]
 	jConfigLightLen = len(jConfigLight)
 
+	jConfigDatafactory = jConfig[JTAG_TASKTYPE_DATAFACTORY]
+	jConfigDatafactoryLen = len(jConfigDatafactory)
+
 	#计数每个status文件
 	mIndex = 0
 	#遍历 all 群
@@ -535,13 +555,29 @@ def getCheckState(jContentStr):
 				resultStr += ","
 		mIndex += 1
 	
+	#遍历 datafactory 群
+	for ipStr in jConfigDatafactory:
+		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		#修复原本是light，显示all，因默认都是all，这里将all转化成datafactory，好看一点
+		if tTaskType == JTAG_TASKTYPE_ALL:
+			tStateStr = tStateStr.replace(JTAG_TASKTYPE_ALL, JTAG_TASKTYPE_DATAFACTORY)
+		if isShowAll:
+			resultStr += tStateStr
+			resultStr += ","
+		else:
+			if mTaskType == JTAG_TASKTYPE_DATAFACTORY and tName == mName and tTaskType == mTaskType:
+				resultStr += tStateStr
+				resultStr += ","
+		mIndex += 1
 	
+	log.info("getCheckState() -- tmp result str["+ resultStr +"]")
 	#去掉最后一个逗号
 	totalLen = len(resultStr)
 	if not isShowAll and totalLen <= 1:
 		log.info("getCheckState() -- can not find["+ mName +"]["+ mTaskType +"]" + " state!!!")
 	else:
-		resultStr = resultStr[0:(totalLen-1)]
+		if totalLen > 1:
+			resultStr = resultStr[0:(totalLen-1)]
 	#完成整个返回数据的封装	
 	resultStr += "]"
 
@@ -699,13 +735,13 @@ def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQualit
 
 #get configs file content
 def getSerConfigsStr():
-	rtnStr = "{\"" + JTAG_TASKTYPE_ALL + "\":[], \"" + JTAG_TASKTYPE_LIGHT + "\":[]}"
+	rtnStr = "{\"" + JTAG_TASKTYPE_ALL + "\":[], \"" + JTAG_TASKTYPE_LIGHT + "\":[], \""+ JTAG_TASKTYPE_DATAFACTORY + "\":[]}"
 	try:
 		file = open(FILE_CFG_PATH, "r")
-		tmpStr = file.read(1024)
+		tmpStr = file.read()
 		#log.info('config file content:' + tmpStr + ' len:' + str(len(tmpStr)))
 		jobj = json.loads(tmpStr)
-		if(JTAG_TASKTYPE_ALL in jobj.keys()) and (JTAG_TASKTYPE_LIGHT in jobj.keys()):
+		if(JTAG_TASKTYPE_ALL in jobj.keys()) and (JTAG_TASKTYPE_LIGHT in jobj.keys()) and (JTAG_TASKTYPE_DATAFACTORY in jobj.keys()):
 			rtnStr = tmpStr
 		file.close()
 	except IOError :
@@ -783,6 +819,31 @@ def setConfigsFromJContent(jContent):
 					break
 			else:
 				log.info("config json data 'light' not find or not list error!!!")
+				result = -1
+				break
+			#check 'datafactory'
+			if(JTAG_TASKTYPE_DATAFACTORY in jobj.keys() and isinstance(jobj[JTAG_TASKTYPE_DATAFACTORY], list)):
+				aryDatafactory = jobj[JTAG_TASKTYPE_DATAFACTORY]
+				aryDatafactoryLen = len(aryDatafactory)
+				#允许置空吧
+				# if aryLightLen <= 0:
+				# 	log.info("config json data 'light' ary len < 0 error!!!")
+				# 	result = -1
+				# 	break
+				for tmpObj in aryDatafactory:
+					if isinstance(tmpObj, str):
+						result = checkConfigIp(tmpObj)
+						if result < 0:
+							result = -1
+							break
+					else:
+						log.info("config json data 'datafactory' 's IP  is not str error!!!")
+						result = -1
+						break
+				if result < 0:
+					break
+			else:
+				log.info("config json data 'datafactory' not find or not list error!!!")
 				result = -1
 				break
 			break
@@ -932,6 +993,16 @@ def checkHasServerBusy():
 	jConfigLightLen = len(jConfigLight)
 	#遍历 light 群
 	for ipStr in jConfigLight:
+		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
+			result = 1
+			return result
+		mIndex += 1
+	
+	jConfigDatafactory = jConfig[JTAG_TASKTYPE_DATAFACTORY]
+	jConfigDatafactoryLen = len(jConfigDatafactory)
+	#遍历 datafactory 群
+	for ipStr in jConfigDatafactory:
 		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
