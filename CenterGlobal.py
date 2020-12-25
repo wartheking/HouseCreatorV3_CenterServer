@@ -61,6 +61,7 @@ JTAG_RESOLUTION = "resolution"
 JTAG_QUALITY = "quality"
 JTAG_RATIO = "ratio"
 JTAG_TASKID = "taskId"
+JTAG_POSTFIX = "postfix"
 JTAG_SERIPS  = "SER_IPS"
 JTAG_SERANGLES = "SER_ANGLES"
 JTAG_SIMPLEMODEL = "simpleModel"
@@ -185,6 +186,7 @@ def getInfosFromJContent(jContent):
 	mQuality = 0
 	mTaskId = ""
 	mRatio = ""
+	mPostfix = ""
 	result = 0
 	while(1):
 		try:
@@ -235,7 +237,7 @@ def getInfosFromJContent(jContent):
 					break
 			
 			#if taskType == datafactory
-			# taskId必须有
+			# taskId,postfix必须有
 			if mTaskType == JTAG_TASKTYPE_DATAFACTORY:
 				#check taskId
 				if (JTAG_TASKID in jobj.keys()):
@@ -247,6 +249,17 @@ def getInfosFromJContent(jContent):
 					log.info("content json data taskId not find error!!!")
 					result = -1
 					break
+				#check postfix
+				if (JTAG_POSTFIX in jobj.keys()):
+					mPostfix = jobj[JTAG_POSTFIX]
+					mPostfix, result = checkPostfix(mPostfix)
+					if result < 0:
+						break
+				else:
+					log.info("content json data postfix not find error!!!")
+					result = -1
+					break
+
 			if mTaskType != JTAG_TASKTYPE_DATAFACTORY:
 				#check map
 				if(JTAG_MAP in jobj.keys()):
@@ -296,8 +309,8 @@ def getInfosFromJContent(jContent):
 			result = -1
 			log.info("conntent json data error!!!")
 			break
-	log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " result:" + str(result))
-	return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, result
+	log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix)  + " result:" + str(result))
+	return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, result
 
 def checkName(name):
 	result = -1
@@ -437,6 +450,18 @@ def checkRatio(ratio):
 		result = 0
 	return ratio, result
 
+def checkPostfix(postfix):
+	result = -1
+	if not isinstance(postfix, str):
+		log.info("postfix is not string error!!!")
+		result = -1
+	elif postfix == "":
+		log.info("postfix is empty error!!!")
+		result = -1
+	else:
+		result = 0
+	return postfix, result
+
 #检查状态， 返回多个或单个状态
 #如果jContentStr 不为空，及包含 name 和 taskType 就返回对应的状态回去（如果多个 name 和 taskType 相同，会返回多个）
 #如果jContentStr 为空，就会返回所有状态文件的状态回去
@@ -531,7 +556,7 @@ def getCheckState(jContentStr):
 	mIndex = 0
 	#遍历 all 群
 	for jobj in jConfigAll:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		if isShowAll:
 			resultStr += tStateStr
 			resultStr += ","
@@ -542,7 +567,7 @@ def getCheckState(jContentStr):
 		mIndex += 1
 	#遍历 light 群
 	for ipStr in jConfigLight:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		#修复原本是light，显示all，因默认都是all，这里将all转化成light，好看一点
 		if tTaskType == JTAG_TASKTYPE_ALL:
 			tStateStr = tStateStr.replace(JTAG_TASKTYPE_ALL, JTAG_TASKTYPE_LIGHT)
@@ -557,7 +582,7 @@ def getCheckState(jContentStr):
 	
 	#遍历 datafactory 群
 	for ipStr in jConfigDatafactory:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		#修复原本是light，显示all，因默认都是all，这里将all转化成datafactory，好看一点
 		if tTaskType == JTAG_TASKTYPE_ALL:
 			tStateStr = tStateStr.replace(JTAG_TASKTYPE_ALL, JTAG_TASKTYPE_DATAFACTORY)
@@ -597,6 +622,7 @@ def getCheckStateFromFile(index):
 	mProgressAry = []
 	mTaskId = ""
 	mRatio = ""
+	mPostfix = ""
 	mStateStr = "{"
 	mStateStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
 	mStateStr += "\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\","
@@ -604,6 +630,7 @@ def getCheckStateFromFile(index):
 	mStateStr += "\"" + JTAG_PROGRESS + "\":" + str(mProgress) + ","
 	mStateStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
 	mStateStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
+	mStateStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
 	mStateStr += "\"" + JTAG_MSG + "\":\"" + mMsg + "\","
 	mStateStr += "\"" + JTAG_SIMPLEMODEL + "\":\"" + JTAG_STATE_NONE + "\","
 	mStateStr += "\"" + JTAG_PARAMS + "\":[]"
@@ -646,12 +673,14 @@ def getCheckStateFromFile(index):
 				# 	#找最小的那个progress
 				# 	if mProgress > tmpObj[JTAG_PROGRESS]:
 				# 		mProgress = tmpObj[JTAG_PROGRESS]
-			#获取taskId 和 ratio
+			#获取taskId 和 ratio 和 postfix
 			if mIndex == 0:
 				if JTAG_TASKID in tmpObj.keys() :
 					mTaskId = tmpObj[JTAG_TASKID]
 				if JTAG_RATIO in tmpObj.keys() :
 					mRatio = tmpObj[JTAG_RATIO]
+				if JTAG_POSTFIX in tmpObj.keys():
+					mPostfix = tmpObj[JTAG_POSTFIX]
 
 
 		cntAryName = len(aryName)
@@ -705,6 +734,7 @@ def getCheckStateFromFile(index):
 		mStateStr += "\"" + JTAG_PROGRESS + "\":" + str(mProgress) + ","
 		mStateStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
 		mStateStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
+		mStateStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
 		mStateStr += "\"" + JTAG_MSG + "\":\"" + mMsg + "\","
 		mStateStr += "\"" + JTAG_SIMPLEMODEL + "\":\"" + mSimpleModel + "\","
 		mStateStr += "\"" + JTAG_PARAMS + "\":" + tmpStr
@@ -715,11 +745,11 @@ def getCheckStateFromFile(index):
 		log.info("state file does not contain json data!!!")
 	#except Exception :
 	#	log.info("state file data error!!!")
-	#log.info("getCheckStateFromFile -- name:" + mName + " taskType:" + mTaskType + " state:" + mState + " progress:" + str(mProgress) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " mStateStr:" + mStateStr)
-	return mName, mTaskType ,mState, mTaskId, mRatio, mStateStr
+	#log.info("getCheckStateFromFile -- name:" + mName + " taskType:" + mTaskType + " state:" + mState + " progress:" + str(mProgress) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix) + " mStateStr:" + mStateStr)
+	return mName, mTaskType ,mState, mTaskId, mRatio, mPostfix, mStateStr
 
 #get jsonstr with all params
-def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio):
+def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix):
 	rtnStr = "{"
 	rtnStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
 	rtnStr += "\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\","
@@ -729,7 +759,8 @@ def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQualit
 	rtnStr += "\"" + JTAG_RESOLUTION + "\":" + str(mResolution) + ","
 	rtnStr += "\"" + JTAG_QUALITY + "\":" + str(mQuality) + ","
 	rtnStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
-	rtnStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\""
+	rtnStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
+	rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\""
 	rtnStr += "}"
 	return rtnStr
 
@@ -983,7 +1014,7 @@ def checkHasServerBusy():
 	mIndex = 0
 	#遍历 all 群
 	for jobj in jConfigAll:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
@@ -993,7 +1024,7 @@ def checkHasServerBusy():
 	jConfigLightLen = len(jConfigLight)
 	#遍历 light 群
 	for ipStr in jConfigLight:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
@@ -1003,7 +1034,7 @@ def checkHasServerBusy():
 	jConfigDatafactoryLen = len(jConfigDatafactory)
 	#遍历 datafactory 群
 	for ipStr in jConfigDatafactory:
-		tName, tTaskType ,tState, tTaskId, tRatio, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
