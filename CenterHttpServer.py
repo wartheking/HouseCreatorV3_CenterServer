@@ -553,7 +553,7 @@ def handle_client(client_socket, server_socket):
 		log.info("fixmodel contentdata:" + mContent)
 		mName, mTaskId, result = getFixModelInfosFromJContent(mContent)
 		if result < 0:
-			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \""  + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
+			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 		else:
 			response_body = handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent)
 	#unknow
