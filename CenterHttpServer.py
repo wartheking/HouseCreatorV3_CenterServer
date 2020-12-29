@@ -183,6 +183,29 @@ def handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mR
 				
 	return rtnMsg
 
+def handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent):
+	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \""  + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
+	try:
+		jConfigStr = getSerConfigsStr()
+		jConfig = json.loads(jConfigStr)
+		jConfigDatafactory = jConfig[JTAG_TASKTYPE_DATAFACTORY]
+		jConfigDatafactoryLen = len(jConfigDatafactory)
+		if jConfigDatafactoryLen <= 0:
+			log.info("handle_SendReqToServers_datafactory_fixmodel() error!!! no config datafactory server")
+		else:
+			#取第一个来做model
+			ipStr = jConfigDatafactory[0]
+			dataStrBytes = mContent.encode('utf-8')
+			url = ipStr + URL_PATH_FIXMODEL
+			f = urllib.request.urlopen(url, dataStrBytes, timeout=90)
+			rtnMsg = f.read().decode('utf-8')
+			log.info("handle_SendReqToServers_datafactory_fixmodel() rtn:" + rtnMsg)
+			f.close()
+	except Exception:
+		log.info("handle_SendReqToServers_datafactory_fixmodel() request error!!!!")
+				
+	return rtnMsg
+
 def handle_CheckState():
 	jConfigStr = getSerConfigsStr()
 	jConfig = json.loads(jConfigStr)
@@ -506,6 +529,33 @@ def handle_client(client_socket, server_socket):
 					handle_CheckState()
 					gIsHandlingPro = 0
 					writeHistoryReqPro(mContent)
+	elif mPath == URL_PATH_FIXMODEL:
+		#get data from http req header content
+		mContent = ""
+		mIndex = -1
+		isFindCntData = 0
+		cntStrAry = len(strAry)
+		for tmp in strAry:
+			mIndex += 1
+			#print("rptest[" + str(mIndex) + "]" + tmp)
+			# find empty then next one is the last one , the next one is json data
+			if tmp == "":
+				if (mIndex + 1) < cntStrAry:
+					nxtStr = strAry[mIndex + 1]
+					nxtStrLen = len(nxtStr)
+					#print("rptest nxtStr:" + nxtStr + " len:" + str(nxtStrLen) + " [0]:" + nxtStr[0])
+					if nxtStrLen >= 1 and nxtStr[0] == "{":
+						isFindCntData = 1
+						#log.info("strary[" + str(mIndex) + "]" + tmp + " find contentdata")
+						continue
+			if isFindCntData == 1:
+				mContent += tmp
+		log.info("fixmodel contentdata:" + mContent)
+		mName, mTaskId, result = getFixModelInfosFromJContent(mContent)
+		if result < 0:
+			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \""  + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
+		else:
+			response_body = handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent)
 	#unknow
 	else:
 		response_body = "{\"" + JTAG_NAME + "\":\""+ mPath + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_UNKNOWN + "\"}"

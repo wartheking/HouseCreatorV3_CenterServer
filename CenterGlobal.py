@@ -47,11 +47,13 @@ URL_PATH_CFG   = "/config"
 URL_PATH_GETCFG   = "/getConfig"
 URL_PATH_HISTORY = "/history"
 URL_PATH_GETLIGHTINFO = "/getLightInfo"
+URL_PATH_FIXMODEL = "/fixmodel"
 JTAG_NAME  = "name"
 JTAG_TASKTYPE = "taskType"
 JTAG_TASKTYPE_ALL = "all"
 JTAG_TASKTYPE_LIGHT = "light"
 JTAG_TASKTYPE_DATAFACTORY = "datafactory"
+JTAG_TASKTYPE_FIXMODEL = "fixmodel"
 JTAG_MAP   = "map"
 JTAG_ANGLE = "angle"
 JTAG_IDS = "ids"
@@ -1082,3 +1084,45 @@ def readHistoryReqPro():
 	result += "]"
 	#log.info("readHistoryReqPro() --- " + result)
 	return result
+
+
+############################################################################
+# Fix model part
+############################################################################
+
+#get FixModel infos from request content json string
+def getFixModelInfosFromJContent(jContent):
+	mName = ""
+	mTaskId = ""
+	result = 0
+	while(1):
+		try:
+			jobj = json.loads(jContent)
+			#check name
+			if(JTAG_NAME in jobj.keys()):
+				mName  = jobj[JTAG_NAME]
+				mName, result = checkName(mName)
+				if result < 0:
+					break
+			else:
+				log.info("content json data name not find error!!!")
+				result = -1
+				break
+			#check taskId
+			if(JTAG_TASKID in jobj.keys()):
+				mTaskId  = jobj[JTAG_TASKID]
+				mTaskId, result = checkTaskId(mTaskId)
+				if result < 0:
+					break
+			else:
+				log.info("content json data taskid not find error!!!")
+				result = -1
+				break
+			#check end break while
+			break
+		except json.decoder.JSONDecodeError:
+			result = -1
+			log.info("conntent json data error!!!")
+			break
+	log.info("getFixModelInfosFromJContent -- name:" + str(mName) + " taskId:" + str(mTaskId) + " result:" + str(result))
+	return mName, mTaskId, result
