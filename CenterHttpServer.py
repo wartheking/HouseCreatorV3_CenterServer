@@ -206,9 +206,8 @@ def handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent):
 				
 	return rtnMsg
 
-def newthread_SendReqToServers_syncmodel(aryResults, index, ip, mContent):
-	log.info("newthread_SendReqToServers_syncmodel() index:" + str(index) + " ip:" + str(ip) + "mContent:" + str(mContent))
-	dataStrBytes = mContent.encode('utf-8')
+def newthread_SendReqToServers_syncmodel(aryResults, index, ip, dataStrBytes):
+	log.info("newthread_SendReqToServers_syncmodel() index:" + str(index) + " ip:" + str(ip) + "dataStrBytes:" + str(dataStrBytes))
 	url = ip + URL_PATH_DOWNLOADMODEL
 	f = urllib.request.urlopen(url, dataStrBytes, timeout=90)
 	rtnMsg = f.read().decode('utf-8')
@@ -250,10 +249,12 @@ def handle_SendReqToServers_syncmodel(version, mContent):
 		aryResults.append("")
 
 	mIndex = 0
+	dataStrBytes = mContent.encode('utf-8')
 	for tmpIP in aryIPs:
-		t = threading.Thread(target=newthread_SendReqToServers_syncmodel, args=(aryResults, mIndex, tmpIP, mContent))
+		t = threading.Thread(target=newthread_SendReqToServers_syncmodel, args=(aryResults, mIndex, tmpIP, dataStrBytes))
 		t.start()
 		mIndex += 1
+		time.sleep(0.1)
 	
 	cntError = 0
 	isRtnEnd = 0
