@@ -48,6 +48,8 @@ URL_PATH_GETCFG   = "/getConfig"
 URL_PATH_HISTORY = "/history"
 URL_PATH_GETLIGHTINFO = "/getLightInfo"
 URL_PATH_FIXMODEL = "/fixmodel"
+URL_PATH_SYNCMODEL = "/syncmodel"
+URL_PATH_DOWNLOADMODEL = "/downloadmodel"
 JTAG_NAME  = "name"
 JTAG_TASKTYPE = "taskType"
 JTAG_TASKTYPE_ALL = "all"
@@ -68,6 +70,7 @@ JTAG_SERIPS  = "SER_IPS"
 JTAG_SERANGLES = "SER_ANGLES"
 JTAG_SIMPLEMODEL = "simpleModel"
 JTAG_PROGRESS = "progress"
+JTAG_VERSION = "version"
 JTAG_MSG   = "msg"
 JTAG_MSG_BUSY = "isBusy"
 JTAG_MSG_BYE  = "byebye"
@@ -1126,3 +1129,44 @@ def getFixModelInfosFromJContent(jContent):
 			break
 	log.info("getFixModelInfosFromJContent -- name:" + str(mName) + " taskId:" + str(mTaskId) + " result:" + str(result))
 	return mName, mTaskId, result
+
+############################################################################
+# sync model part
+############################################################################
+
+def checkVersion(version):
+	result = -1
+	if not isinstance(version, str):
+		log.info("version is not string error!!!")
+		result = -1
+	elif version == "":
+		log.info("version is empty error!!!")
+		result = -1
+	else:
+		result = 0
+	return version, result
+
+#get syncmodel infos from request content json string
+def getSyncmodelInfosFromJContent(jContent):
+	mVersion = ""
+	result = 0
+	while(1):
+		# try:
+		jobj = json.loads(jContent)
+		#check name
+		if(JTAG_VERSION in jobj.keys()):
+			mVersion  = jobj[JTAG_VERSION]
+			mVersion, result = checkVersion(mVersion)
+			if result < 0:
+				break
+		else:
+			log.info("content json data name not find error!!!")
+			result = -1
+			break
+		break
+		# except json.decoder.JSONDecodeError:
+		# 	result = -1
+		# 	log.info("conntent json data error!!!")
+		# 	break
+	log.info("getSyncmodelInfosFromJContent -- version:" + str(mVersion))
+	return mVersion, result

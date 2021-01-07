@@ -206,6 +206,79 @@ def handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent):
 				
 	return rtnMsg
 
+def newthread_SendReqToServers_syncmodel(aryResults, index, ip, mContent):
+	log.info("newthread_SendReqToServers_syncmodel() index:" + str(index) + " ip:" + str(ip) + "mContent:" + str(mContent))
+	dataStrBytes = mContent.encode('utf-8')
+	url = ip + URL_PATH_DOWNLOADMODEL
+	f = urllib.request.urlopen(url, dataStrBytes, timeout=90)
+	rtnMsg = f.read().decode('utf-8')
+	f.close()
+	log.info("newthread_SendReqToServers_syncmodel() index:" + str(index) + " rtn:" + rtnMsg)
+	if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
+		aryResults[index] = "error"
+	else:
+		aryResults[index] = "done"
+	
+def handle_SendReqToServers_syncmodel(version, mContent):
+	log.info("handle_SendReqToServers_syncmodel() version:" + str(version) + " content:" + str(mContent) )
+	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + URL_PATH_SYNCMODEL + "\", \"" + JTAG_VERSION + "\":\"" + version + "\", \""  + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
+	# try:
+	jConfigStr = getSerConfigsStr()
+	jConfig = json.loads(jConfigStr)
+	jConfigAll = jConfig[JTAG_TASKTYPE_ALL]
+	jConfigAllLen = len(jConfigAll)
+
+	jConfigLight = jConfig[JTAG_TASKTYPE_LIGHT]
+	jConfigLightLen = len(jConfigLight)
+
+	aryIPs = []
+	#添加all 机群的所有IP
+	for tmpObj in jConfigAll:
+		arySerIPs = tmpObj["SER_IPS"]
+		for tmpIP in arySerIPs:
+			aryIPs.append(tmpIP)
+	#添加light 机群的所有IP
+	for tmpIP in jConfigLight:
+		aryIPs.append(tmpIP)
+
+	log.info("handle_SendReqToServers_syncmodel() IPs:" + str(aryIPs))
+
+	lenIPs = len(aryIPs)
+	aryResults = []
+	#全部状态清空
+	for tmpIP in aryIPs:
+		aryResults.append("")
+
+	mIndex = 0
+	for tmpIP in aryIPs:
+		t = threading.Thread(target=newthread_SendReqToServers_syncmodel, args=(aryResults, mIndex, tmpIP, mContent))
+		t.start()
+		mIndex += 1
+	
+	cntError = 0
+	isRtnEnd = 0
+	while isRtnEnd == 0:
+		log.info("handle_SendReqToServers_syncmodel() check:" + str(aryResults))
+		cntError = 0
+		mIndex = 0
+		for tmpResult in aryResults:
+			if tmpResult == "":
+				break
+			if tmpResult == "error":
+				cntError += 1
+				log.info("handle_SendReqToServers_syncmodel() index:" + str(mIndex) + " find error!!!")
+			mIndex += 1
+			if mIndex >= lenIPs:
+				isRtnEnd = 1
+		time.sleep(1)
+	if cntError <= 0:
+		rtnMsg = "{\"" + JTAG_NAME + "\":\"" + URL_PATH_SYNCMODEL + "\", \"" + JTAG_VERSION + "\":\"" + version + "\", \""  + JTAG_STATE + "\":\"" + JTAG_STATE_DONE + "\",\"" + JTAG_MSG + "\":\"" + "\"}"
+		
+	# except Exception:
+	# 	log.info("handle_SendReqToServers_syncmodel() request error!!!!")
+				
+	return rtnMsg
+
 def handle_CheckState():
 	jConfigStr = getSerConfigsStr()
 	jConfig = json.loads(jConfigStr)
@@ -288,7 +361,7 @@ def handle_CheckStatePreSec_allitem(index, jobj):
 				mStateStr += errMsg
 				mStateStr += ","
 
-	log.info("all>>>[" + str(index) + "]combine str:" + mStateStr)
+	#log.info("all>>>[" + str(index) + "]combine str:" + mStateStr)
 	setStausStrToStatusAry(index, mStateStr)
 
 def handle_CheckStatePreSec_lightitem(index, ip):
@@ -298,7 +371,7 @@ def handle_CheckStatePreSec_lightitem(index, ip):
 		url = ip + URL_PATH_CHECK
 		f = urllib.request.urlopen(url)
 		mTmpStr =  f.read().decode('utf-8')
-		log.info("[" + str(index) + "]:" + mTmpStr)
+		#log.info("[" + str(index) + "]:" + mTmpStr)
 		mStateStr += mTmpStr
 		mStateStr += "]"
 		f.close()
@@ -314,7 +387,7 @@ def handle_CheckStatePreSec_lightitem(index, ip):
 		mStateStr += errMsg
 		mStateStr += "]"
 
-	log.info("light>>>[" + str(index) + "]combine str:" + mStateStr)
+	#log.info("light>>>[" + str(index) + "]combine str:" + mStateStr)
 	setStausStrToStatusAry(index, mStateStr)
 
 def handle_CheckStatePreSec_datafactoryitem(index, ip):
@@ -324,7 +397,7 @@ def handle_CheckStatePreSec_datafactoryitem(index, ip):
 		url = ip + URL_PATH_CHECK
 		f = urllib.request.urlopen(url)
 		mTmpStr =  f.read().decode('utf-8')
-		log.info("[" + str(index) + "]:" + mTmpStr)
+		#log.info("[" + str(index) + "]:" + mTmpStr)
 		mStateStr += mTmpStr
 		mStateStr += "]"
 		f.close()
@@ -340,7 +413,7 @@ def handle_CheckStatePreSec_datafactoryitem(index, ip):
 		mStateStr += errMsg
 		mStateStr += "]"
 
-	log.info("datafactory>>>[" + str(index) + "]combine str:" + mStateStr)
+	#log.info("datafactory>>>[" + str(index) + "]combine str:" + mStateStr)
 	setStausStrToStatusAry(index, mStateStr)
 
 #handle accept socket request
@@ -556,6 +629,33 @@ def handle_client(client_socket, server_socket):
 			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 		else:
 			response_body = handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent)
+	elif mPath == URL_PATH_SYNCMODEL:
+		#get data from http req header content
+		mContent = ""
+		mIndex = -1
+		isFindCntData = 0
+		cntStrAry = len(strAry)
+		for tmp in strAry:
+			mIndex += 1
+			#print("rptest[" + str(mIndex) + "]" + tmp)
+			# find empty then next one is the last one , the next one is json data
+			if tmp == "":
+				if (mIndex + 1) < cntStrAry:
+					nxtStr = strAry[mIndex + 1]
+					nxtStrLen = len(nxtStr)
+					#print("rptest nxtStr:" + nxtStr + " len:" + str(nxtStrLen) + " [0]:" + nxtStr[0])
+					if nxtStrLen >= 1 and nxtStr[0] == "{":
+						isFindCntData = 1
+						#log.info("strary[" + str(mIndex) + "]" + tmp + " find contentdata")
+						continue
+			if isFindCntData == 1:
+				mContent += tmp
+		log.info("syncmodel contentdata:" + mContent)
+		mVersion, result = getSyncmodelInfosFromJContent(mContent)
+		if result < 0:
+			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mPath) + "\", \"" + JTAG_VERSION + "\":\"" + mVersion + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
+		else:
+			response_body = handle_SendReqToServers_syncmodel(mVersion, mContent)
 	#unknow
 	else:
 		response_body = "{\"" + JTAG_NAME + "\":\""+ mPath + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_UNKNOWN + "\"}"
