@@ -77,6 +77,7 @@ JTAG_MSG_BYE  = "byebye"
 JTAG_MSG_UNKNOWN  = "unknown"
 JTAG_MSG_PARAMSERR = "params error"
 JTAG_MSG_SERVERERR = "server error"
+JTAG_MSG_OVERTMERR = "overtime error"
 JTAG_STATE            = "state"
 JTAG_PARAMS           = "params"
 JTAG_STATE_DONE       = "done"
@@ -1131,7 +1132,7 @@ def getFixModelInfosFromJContent(jContent):
 	return mName, mTaskId, result
 
 ############################################################################
-# sync model part
+# sync download model part
 ############################################################################
 
 def checkVersion(version):
@@ -1146,8 +1147,8 @@ def checkVersion(version):
 		result = 0
 	return version, result
 
-#get syncmodel infos from request content json string
-def getSyncmodelInfosFromJContent(jContent):
+#get sync download model infos from request content json string
+def getSyncDownloadModelInfosFromJContent(jContent):
 	mVersion = ""
 	result = 0
 	while(1):
@@ -1168,5 +1169,5 @@ def getSyncmodelInfosFromJContent(jContent):
 		# 	result = -1
 		# 	log.info("conntent json data error!!!")
 		# 	break
-	log.info("getSyncmodelInfosFromJContent -- version:" + str(mVersion))
+	log.info("getSyncDownloadModelInfosFromJContent -- version:" + str(mVersion))
 	return mVersion, result
