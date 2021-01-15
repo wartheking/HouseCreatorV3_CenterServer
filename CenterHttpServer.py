@@ -3,7 +3,7 @@
 # coding:utf-8
 import socket, json
 import urllib.request
-import sys, os, time, random, threading, multiprocessing
+import sys, os, time, random, threading, multiprocessing, traceback
 from multiprocessing import Process, Queue
 from CenterGlobal import *
 from light import *
@@ -16,7 +16,7 @@ gIsHandlingSyncDownloadModel = 0
 log = getLogger()
 
 #find non-busy servers and send req
-def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix):
+def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo):
 
 	log.info("handle_SendReqToServers()")
 	
@@ -37,12 +37,12 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 	if mTaskType == JTAG_TASKTYPE_ALL:
 		#遍历 all 群
 		for jobj in jConfigAll:
-			tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+			tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 			if tState == JTAG_STATE_DONE or tState == "":
 				#done状态或者初始化状态就可以开始任务
 				log.info("handle_SendReqToServers() find 'all' machine is ok index:" + str(mIndex))
 				mSerIps, mSerAngles = getSerIpsAndSerAngles(jobj)
-				return handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix)
+				return handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mVideo)
 			elif tState == JTAG_STATE_ERROR:
 				#错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
 				if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -52,7 +52,7 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 				else:
 					log.info("handle_SendReqToServers() find 'all' machine is error, but is ok index:" + str(mIndex))
 					mSerIps, mSerAngles = getSerIpsAndSerAngles(jobj)
-					return handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix)
+					return handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mVideo)
 			else:
 				mIndex += 1
 				continue
@@ -65,11 +65,11 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 		mIndex = jConfigAllLen
 		#遍历 light 群
 		for ipStr in jConfigLight:
-			tName, tTaskType, tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+			tName, tTaskType, tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 			if tState == JTAG_STATE_DONE or tState == "":
 				#done状态或者初始化状态就可以开始任务
 				log.info("handle_SendReqToServers() find 'light' machine is ok index:" + str(mIndex))
-				return handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+				return handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo)
 			elif tState == JTAG_STATE_ERROR:
 				#错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
 				if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -78,7 +78,7 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 					continue
 				else:
 					log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
-					return handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+					return handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo)
 			else:
 				mIndex += 1
 				continue
@@ -91,11 +91,11 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 		mIndex = jConfigAllLen + jConfigLightLen
 		#遍历 datafactory 群
 		for ipStr in jConfigDatafactory:
-			tName, tTaskType, tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+			tName, tTaskType, tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 			if tState == JTAG_STATE_DONE or tState == "":
 				#done状态或者初始化状态就可以开始任务
 				log.info("handle_SendReqToServers() find 'datafactory' machine is ok index:" + str(mIndex))
-				return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+				return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo)
 			elif tState == JTAG_STATE_ERROR:
 				#错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
 				if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -104,7 +104,7 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 					continue
 				else:
 					log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
-					return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+					return handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo)
 			else:
 				mIndex += 1
 				continue
@@ -113,7 +113,7 @@ def handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, m
 		return rtnMsg
 	
 #send 'all' request to servers one by one
-def handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix):
+def handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mVideo):
 	cntServs = len(mSerIps)
 	mIndex = -1
 	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
@@ -125,7 +125,7 @@ def handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolutio
 				mIndex += 1
 				#log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + " position:" + str(mSerAngles[mIndex]))
 				mAngle = mSerAngles[mIndex]
-				dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+				dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo)
 				dataStrBytes = dataStr.encode('utf-8')
 				#log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]--dataStr:" + dataStr)
 				url = ipStr + URL_PATH_PRO
@@ -136,17 +136,18 @@ def handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolutio
 				if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
 					log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + "[" + rtnMsg + "] find rtn error!!!!")
 					break
-			except Exception:
+			except Exception:	
 				log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + " request error!!!!")
+				log.info(traceback.format_exc())
 				break
 	return rtnMsg
 
 #send 'light' request to server
-def handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix):
+def handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo):
 	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
 	try:
 		#log.info("handle_SendReqToServers_light() ip:" + ipStr)
-		dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+		dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo)
 		dataStrBytes = dataStr.encode('utf-8')
 		#log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
 		url = ipStr + URL_PATH_PRO
@@ -163,11 +164,11 @@ def handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolut
 	return rtnMsg
 
 #send 'datafactory' request to server
-def handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix):
+def handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mVideo):
 	rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
 	try:
 		#log.info("handle_SendReqToServers_light() ip:" + ipStr)
-		dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+		dataStr = getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo)
 		dataStrBytes = dataStr.encode('utf-8')
 		#log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
 		url = ipStr + URL_PATH_PRO
@@ -348,7 +349,7 @@ def handle_CheckStatePreSec_allitem(index, jobj):
 			url = ipStr + URL_PATH_CHECK
 			f = urllib.request.urlopen(url)
 			mTmpStr =  f.read().decode('utf-8')
-			#log.info("[" + str(mIndex) + "]:" + mTmpStr)
+			log.info("[" + str(mIndex) + "]:" + mTmpStr)
 			if mIndex == (cntServs - 1):
 				mStateStr += mTmpStr
 				mStateStr += "]"
@@ -446,7 +447,7 @@ def handle_client(client_socket, server_socket):
 	mPath   = headerAry[1]
 	#log.info("req method:" + mMethod + " path:" + mPath)
 	#header
-	response_start_line = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n"
+	response_start_line = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n"
 	response_headers = "Server: 4Dage Center\r\n"
 	
 	#不是check的命令才打印完整的http请求信息
@@ -602,13 +603,13 @@ def handle_client(client_socket, server_socket):
 				if isFindCntData == 1:
 					mContent += tmp
 			#log.info("contentdata:" + mContent)
-			mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, result = getInfosFromJContent(mContent)
+			mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo, result = getInfosFromJContent(mContent)
 			#params error
 			if result != 0:
 				response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\",\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 				gIsHandlingPro = 0
 			else:
-				response_body = handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+				response_body = handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo)
 				if response_body.find(JTAG_STATE_ERROR) >= 0:
 					#包含错误的话，直接返回吧
 					gIsHandlingPro = 0

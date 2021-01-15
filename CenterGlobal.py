@@ -66,6 +66,7 @@ JTAG_QUALITY = "quality"
 JTAG_RATIO = "ratio"
 JTAG_TASKID = "taskId"
 JTAG_POSTFIX = "postfix"
+JTAG_VIDEO = "video"
 JTAG_SERIPS  = "SER_IPS"
 JTAG_SERANGLES = "SER_ANGLES"
 JTAG_SIMPLEMODEL = "simpleModel"
@@ -193,6 +194,7 @@ def getInfosFromJContent(jContent):
 	mTaskId = ""
 	mRatio = ""
 	mPostfix = ""
+	mVideo = 0
 	result = 0
 	while(1):
 		try:
@@ -309,14 +311,22 @@ def getInfosFromJContent(jContent):
 					log.info("content json data resolution not find error!!!")
 					result = -1
 					break
+				
+				#check video (all 才用到，不过默认是0， 可有可无)
+				if (JTAG_VIDEO in jobj.keys()):
+					mVideo = jobj[JTAG_VIDEO]
+					mVideo, result = checkVideo(mVideo)
+					if result < 0:
+						break
+
 			#check end break while
 			break
 		except json.decoder.JSONDecodeError:
 			result = -1
 			log.info("conntent json data error!!!")
 			break
-	log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix)  + " result:" + str(result))
-	return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, result
+	log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix) + " video:" + str(mVideo)  + " result:" + str(result))
+	return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo, result
 
 def checkName(name):
 	result = -1
@@ -468,6 +478,18 @@ def checkPostfix(postfix):
 		result = 0
 	return postfix, result
 
+def checkVideo(video):
+	result = -1
+	if not isinstance(video, int):
+		log.info("video is not int error!!!")
+		result = -1
+	elif video != 0 and video != 1:
+		log.info("video is not 0 , 1 error!!!")
+		result = -1
+	else:
+		result = 0
+	return video, result
+
 #检查状态， 返回多个或单个状态
 #如果jContentStr 不为空，及包含 name 和 taskType 就返回对应的状态回去（如果多个 name 和 taskType 相同，会返回多个）
 #如果jContentStr 为空，就会返回所有状态文件的状态回去
@@ -562,7 +584,7 @@ def getCheckState(jContentStr):
 	mIndex = 0
 	#遍历 all 群
 	for jobj in jConfigAll:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		if isShowAll:
 			resultStr += tStateStr
 			resultStr += ","
@@ -573,7 +595,7 @@ def getCheckState(jContentStr):
 		mIndex += 1
 	#遍历 light 群
 	for ipStr in jConfigLight:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		#修复原本是light，显示all，因默认都是all，这里将all转化成light，好看一点
 		if tTaskType == JTAG_TASKTYPE_ALL:
 			tStateStr = tStateStr.replace(JTAG_TASKTYPE_ALL, JTAG_TASKTYPE_LIGHT)
@@ -588,7 +610,7 @@ def getCheckState(jContentStr):
 	
 	#遍历 datafactory 群
 	for ipStr in jConfigDatafactory:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		#修复原本是light，显示all，因默认都是all，这里将all转化成datafactory，好看一点
 		if tTaskType == JTAG_TASKTYPE_ALL:
 			tStateStr = tStateStr.replace(JTAG_TASKTYPE_ALL, JTAG_TASKTYPE_DATAFACTORY)
@@ -629,6 +651,7 @@ def getCheckStateFromFile(index):
 	mTaskId = ""
 	mRatio = ""
 	mPostfix = ""
+	mVideo = ""
 	mStateStr = "{"
 	mStateStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
 	mStateStr += "\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\","
@@ -679,6 +702,11 @@ def getCheckStateFromFile(index):
 				# 	#找最小的那个progress
 				# 	if mProgress > tmpObj[JTAG_PROGRESS]:
 				# 		mProgress = tmpObj[JTAG_PROGRESS]
+			if(JTAG_VIDEO in tmpObj.keys()):
+				#MARK "simpleModel":{"name":"xxx", "simpleModel":"done"}
+				tVideoObj = tmpObj[JTAG_VIDEO]
+				if tVideoObj != None and (JTAG_VIDEO in tVideoObj.keys()):
+					mVideo = tVideoObj[JTAG_VIDEO]
 			#获取taskId 和 ratio 和 postfix
 			if mIndex == 0:
 				if JTAG_TASKID in tmpObj.keys() :
@@ -743,6 +771,8 @@ def getCheckStateFromFile(index):
 		mStateStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
 		mStateStr += "\"" + JTAG_MSG + "\":\"" + mMsg + "\","
 		mStateStr += "\"" + JTAG_SIMPLEMODEL + "\":\"" + mSimpleModel + "\","
+		if mVideo != "":
+			mStateStr += "\"" + JTAG_VIDEO + "\":\"" + mVideo + "\","
 		mStateStr += "\"" + JTAG_PARAMS + "\":" + tmpStr
 		mStateStr += "}"
 	except IOError :
@@ -752,10 +782,10 @@ def getCheckStateFromFile(index):
 	#except Exception :
 	#	log.info("state file data error!!!")
 	#log.info("getCheckStateFromFile -- name:" + mName + " taskType:" + mTaskType + " state:" + mState + " progress:" + str(mProgress) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix) + " mStateStr:" + mStateStr)
-	return mName, mTaskType ,mState, mTaskId, mRatio, mPostfix, mStateStr
+	return mName, mTaskType ,mState, mTaskId, mRatio, mPostfix, mVideo, mStateStr
 
 #get jsonstr with all params
-def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix):
+def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mVideo):
 	rtnStr = "{"
 	rtnStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
 	rtnStr += "\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\","
@@ -766,7 +796,8 @@ def getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQualit
 	rtnStr += "\"" + JTAG_QUALITY + "\":" + str(mQuality) + ","
 	rtnStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
 	rtnStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
-	rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\""
+	rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
+	rtnStr += "\"" + JTAG_VIDEO + "\":" + str(mVideo)
 	rtnStr += "}"
 	return rtnStr
 
@@ -1020,7 +1051,7 @@ def checkHasServerBusy():
 	mIndex = 0
 	#遍历 all 群
 	for jobj in jConfigAll:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
@@ -1030,7 +1061,7 @@ def checkHasServerBusy():
 	jConfigLightLen = len(jConfigLight)
 	#遍历 light 群
 	for ipStr in jConfigLight:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
@@ -1040,7 +1071,7 @@ def checkHasServerBusy():
 	jConfigDatafactoryLen = len(jConfigDatafactory)
 	#遍历 datafactory 群
 	for ipStr in jConfigDatafactory:
-		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = getCheckStateFromFile(mIndex)
+		tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tVideo, tStateStr = getCheckStateFromFile(mIndex)
 		if tState != JTAG_STATE_DONE and tState != "" and tState != JTAG_STATE_ERROR:
 			result = 1
 			return result
