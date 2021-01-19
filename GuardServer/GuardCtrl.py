@@ -156,7 +156,7 @@ class GuardCtrl:
             if "cmd.exe" in str(tmpPro.name()):
                 aryPidCmd.append(tmpPro.pid)
                 mIndex += 1
-        #log.info("getAllPidCmd():" + str(aryPidCmd))
+        log.info("getAllPidCmd():" + str(aryPidCmd))
         return aryPidCmd
 
     def getAllPidPy(self):
@@ -168,7 +168,7 @@ class GuardCtrl:
             if "python.exe" in str(tmpPro.name()):
                 aryPidPy.append(tmpPro.pid)
                 mIndex += 1
-        #log.info("getAllPidPy():" + str(aryPidPy))
+        log.info("getAllPidPy():" + str(aryPidPy))
         return aryPidPy
 
     def keyboardInput(self, strEnter):
@@ -414,6 +414,8 @@ class GuardCtrl:
                 return self.genRtnMsg(path, JTAG_STATE_ERROR, JTAG_MSG_PIDNOTFOUND)
 
     def handleGetAllTasks(self, path, contentData):
+        aryCmds = self.getAllPidCmd()
+        aryPys = self.getAllPidPy()
         strTasks =  "["
         for tmpObj in self.gAryPids:
             tmpStr = str(tmpObj)
@@ -475,14 +477,36 @@ class GuardCtrl:
             #log.info("newthread_checkPreSec()")
             time.sleep(1)
             self.updateAryPids()
+    
+    def getAllAryPids(self):
+        aryPidsNow = []
+        for tmpObj in self.gAryPids:
+            mCmd = tmpObj[JTAG_PID_CMD]
+            mPy = tmpObj[JTAG_PID_PY]
+            aryPidsNow.append(mCmd)
+            aryPidsNow.append(mPy)
+        return aryPidsNow
 
     def updateAryPids(self):
+        if not self.gIsRunningPyFile:
+            aryCmds = self.getAllPidCmd()
+            aryPys = self.getAllPidPy()
+            aryPidsNow = self.getAllAryPids()
+            aryDontKnowPid = []
+            for pid in aryCmds:
+                if not pid in aryPidsNow:
+                    aryDontKnowPid.append(pid)
+            for pid in aryPys:
+                if not pid in aryPidsNow:
+                    aryDontKnowPid.append(pid)
+            if len(aryDontKnowPid) > 0:
+                log.info("find dont know pid!!! - " + str(aryDontKnowPid))
+                self.killCmds(aryDontKnowPid)
+
         if len(self.gAryPids) <= 1:
             #无事退朝
             pass
         else:
-            aryCmds = self.getAllPidCmd()
-            aryPys = self.getAllPidPy()
             isHasKill = 0
             for tmpObj in self.gAryPids:
                 if TAG_GUARD == tmpObj[JTAG_PID_NAME]:

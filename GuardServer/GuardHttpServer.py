@@ -139,7 +139,7 @@ class GuardHttpServer:
 					break
 			except socket.timeout:
 				ret = -1
-				log.info("sock:" + str(sock.fileno()) + " getline time out exception!!!")
+				# log.info("sock:" + str(sock.fileno()) + " getline time out exception!!!")
 				break
 			except:
 				ret = -1
@@ -638,7 +638,8 @@ class GuardHttpServer:
 					except:
 						log.info("sock:" + str(sock.fileno()) + " contentLen(" + str(strContentLen) + ") to int error!!!")
 		if contentLen <= 0:
-			log.info("sock:" + str(sock.fileno()) + " contentLen <= 0")
+			# log.info("sock:" + str(sock.fileno()) + " contentLen <= 0")
+			pass
 		else:
 			sock.settimeout(1)
 			try:

@@ -228,7 +228,6 @@ class UE4Ctrl:
     def __init__(self, name=__name__):
         log.info('init UE4Ctrl()')
         self.findAndKillUE4()
-        time.sleep(1)
         RUNEND(JTAG_PID_STATUS_FINISHED)
 
 try:

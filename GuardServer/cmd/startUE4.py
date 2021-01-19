@@ -298,20 +298,18 @@ class UE4Ctrl:
                 if ret < 0:
                     log.info("cmdOpenUE4Editor() config file error!!!")
                 else:
-                    RUNEND(JTAG_PID_STATUS_BACKGROUND)
                     os.system("\"" + ue4editor + "\" " + project + " " + mapfile)
             except:
                 log.info("open software cmd run error!!!")
                 log.info(traceback.format_exc())
-                RUNEND(JTAG_PID_STATUS_ERROR)
         else:
             log.info("not windows platform open software error!!!")
-            RUNEND(JTAG_PID_STATUS_ERROR)
     
     def __init__(self, name=__name__):
         log.info('init UE4Ctrl()')
         self.findAndKillUE4()
-        self.cmdOpenUE4Editor()
+        t = threading.Thread(target=self.cmdOpenUE4Editor)
+        t.start()
         log.info('init UE4Ctrl()----------- end!!!')
         RUNEND(JTAG_PID_STATUS_FINISHED)
 try:
