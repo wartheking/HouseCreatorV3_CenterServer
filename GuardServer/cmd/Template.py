@@ -89,7 +89,7 @@ class Logger:
         print("logger init start~~~")
         # 创建一个loggger
         self.__name = name
-        self.fileName = __file__
+        self.fileName = sys.argv[0]
         self.pid = pid
         self.logger = logging.getLogger(self.__name)
         self.logger.setLevel(logging.DEBUG)

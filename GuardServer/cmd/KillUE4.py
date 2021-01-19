@@ -228,10 +228,11 @@ class UE4Ctrl:
     def __init__(self, name=__name__):
         log.info('init UE4Ctrl()')
         self.findAndKillUE4()
+        time.sleep(1)
+        RUNEND(JTAG_PID_STATUS_FINISHED)
 
 try:
     tmp = UE4Ctrl()
-    RUNEND(JTAG_PID_STATUS_FINISHED)
 except:
     log.info("contain exception")
     log.info(traceback.format_exc())
