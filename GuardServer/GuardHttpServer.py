@@ -3,10 +3,10 @@
 # coding:utf-8
 import socket, json
 import urllib.request
-import sys, os, time, threading
+import sys, os, time, threading, traceback
 from Logger import *
-from UE4Ctrl import *
 from Util import *
+from GuardCtrl import *
 
 log = getLogger()
 
@@ -19,10 +19,31 @@ SER_TAG_OPTIONS = "OPTIONS"
 SER_TAG_UPLOAD  = "/upload"
 SER_DIR_DATA    = "data"
 SER_DIR_WEB     = "web"
+SER_DIR_CMD     = "cmd"
+
+SER_RTN_PATH = "path"
+SER_RTN_STATE = "state"
+SER_RTN_STATE_DONE = "done"
+SER_RTN_STATE_ERROR = "error"
+
+SER_RTN_MSG = "msg"
+SER_RTN_MSG_PARAMSERR = "params error"
+SER_RTN_MSG_NOTPERMIT = "not permit"
+SER_RTN_MSG_PATHNOTFOUND = "path not found"
+SER_RTN_MSG_FILENOTFOUND = "file not found"
+SER_RTN_MSG_REQUESTERR = "request error"
+SER_RTN_MSG_TIMEOUT = "time out"
+SER_RTN_DATA = "data"
+
+SER_FILE_PATH  = "path"
+SER_FILE_FILES = "files"
+SER_FILE_SIZE  = "size"
+SER_FILE_NAME  = "name"
 
 SER_CONTYPE_CSS  = "text/css"
 SER_CONTYPE_GIF  = "image/gif"
 SER_CONTYPE_HTML = "text/html"
+SER_CONTYPE_LOG  = "text/html"
 SER_CONTYPE_ICO  = "image/x-icon"
 SER_CONTYPE_JPG  = "image/jpeg"
 SER_CONTYPE_JPEG = "image/jpeg"
@@ -74,10 +95,9 @@ SER_TYPE_PPT  = ".ppt"
 SER_TYPE_XLS  = ".xls"
 SER_TYPE_APK  = ".apk"
 SER_TYPE_IPA  = ".ipa"
+SER_TYPE_LOG  = ".log"
 
 class GuardHttpServer:
-
-	ue4Ctrl = UE4Ctrl()
 
 	gRootPath = os.path.abspath(os.path.join(sys.argv[0], ".."))
 
@@ -91,7 +111,7 @@ class GuardHttpServer:
 		fileSize = os.path.getsize(path)
 		return fileSize
 
-	def getline(self, sock, timeout=1, overtime=1):
+	def getline(self, sock, timeout=0.5, overtime=1):
 		ret = 0
 		rtnStr = b''
 		tmpByte = b''
@@ -113,7 +133,7 @@ class GuardHttpServer:
 					rtnStr += tmpByte
 				#检查是不是获取太久了
 				e_time = time.time()
-				if e_time - s_time >= 1:
+				if e_time - s_time >= overtime:
 					ret = -1
 					log.info("sock:" + str(sock.fileno()) + " getline overtime!!!")
 					break
@@ -132,7 +152,7 @@ class GuardHttpServer:
 		sock.settimeout(0.5)
 		try:
 			result = sock.recv(MAX_PACKET_SIZE)
-			log.info("sock:" + str(sock.fileno()) + " clearbuf:" + str(result))
+			# log.info("sock:" + str(sock.fileno()) + " clearbuf:" + str(result))
 		except:
 			#log.info("sock:" + str(sock.fileno()) + " clear sock error!!!")
 			pass
@@ -163,6 +183,17 @@ class GuardHttpServer:
 		respStr += "Access-Control-Allow-Origin: *\r\n"
 		respStr += "\r\n"
 		sock.send(respStr.encode('utf-8'))
+
+	def genSimpleRtnMsg(self, path, state, msg, data=""):
+		result =  "{"
+		result += ("\"" + SER_RTN_PATH  + "\":\"" + str(path) + "\",")
+		result += ("\"" + SER_RTN_STATE + "\":\"" + str(state) + "\",")
+		result += ("\"" + SER_RTN_MSG   + "\":\"" + str(msg) + "\"")
+		if data != "":
+			result += ","
+			result += ("\"" + SER_RTN_DATA   + "\":" + str(data))
+		result += "}"
+		return result
 
 	def echo_msg(self, sock, msg):
 		self.clear_sock(sock)
@@ -227,28 +258,9 @@ class GuardHttpServer:
 			contentType = SER_CONTYPE_HTML
 		elif SER_TYPE_ICO in name:
 			contentType = SER_CONTYPE_ICO
+		elif SER_TYPE_LOG in name:
+			contentType = SER_CONTYPE_LOG
 		return contentType 
-
-	def echo_err(self, sock, status, code, msg):
-		self.clear_sock(sock)
-		respErrStr = "HTTP/1.1 " + str(status) + " " + str(code) + "\r\n"
-		respErrStr += "Content-Type: text/html\r\n"
-		respErrStr += "Access-Control-Allow-Origin: *\r\n"
-		respErrStr += "\r\n"
-		respErrStr += str(msg) + "\r\n"
-		sock.send(respErrStr.encode('utf-8'))
-
-	def echo_err_jsonmsg(self, sock, code, jsonMsg):
-		self.clear_sock(sock)
-		respErrStr = "HTTP/1.1 " + str(self.getHttpRtnStatusCode(code)) + " " + str(code) + "\r\n"
-		respErrStr += "Content-Type: text/html\r\n"
-		respErrStr += "Access-Control-Allow-Origin: *\r\n"
-		respErrStr += "\r\n"
-		respErrStr += str(jsonMsg) + "\r\n"
-		sock.send(respErrStr.encode('utf-8'))
-
-	def echo_err_code(self, sock, code):
-		self.echo_err(sock, self.getHttpRtnStatusCode(code), code, code)
 
 	def echo_htmlfile(self, filepath, sock):
 		self.clear_sock(sock)
@@ -302,17 +314,17 @@ class GuardHttpServer:
 					fileSize = int(tmpAry[1])
 		log.info("sock:" + str(sock.fileno()) + " path:" + str(path) + " name:" + str(name) + " fileSize:" + str(fileSize))
 		if path == "" or name == "" or fileSize < -1:
-			self.echo_err_code(sock, "params error!")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_PARAMSERR))
 			return
 		if not self.isSerPermitPath(path[1:]):
-			self.echo_err_code(sock, "not permit path")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_NOTPERMIT))
 			return
 		dirPath = self.gRootPath + path
 		if os.path.isdir(dirPath):
 			log.info("sock:" + str(sock.fileno()) + " uploadOpt() isDir")
 		else:
 			log.info("sock:" + str(sock.fileno()) + " uploadOpt() is not Dir!!!!")
-			self.echo_err_code(sock, "path not found")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_PATHNOTFOUND))
 			return
 		
 		retGetLine = 0
@@ -340,7 +352,7 @@ class GuardHttpServer:
 					log.info("sock:" + str(sock.fileno()) + " find boundary :" + " \n" + boundary)
 					break
 		if len(boundary) <= 0:
-			self.echo_err_code(sock, "error request")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_REQUESTERR))
 			return
 		
 		boundaryMid = "--" + boundary + "\n"
@@ -393,7 +405,7 @@ class GuardHttpServer:
 			file = open(filePath, "wb")
 		except:
 			log.info("sock:" + str(sock.fileno()) + " open file error!!!")
-			self.echo_err_code(sock, "request not permit")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_NOTPERMIT))
 			return
 
 		writeRetTotal = 0
@@ -442,7 +454,7 @@ class GuardHttpServer:
 			uploadSucc = 1
 		self.clear_sock(sock)
 		if uploadSucc == 0:
-			self.echo_err_code(sock, "request time out")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_TIMEOUT))
 		else:
 			#upload success
 			if isMozilla == 1:
@@ -564,11 +576,18 @@ class GuardHttpServer:
 		self.clear_sock(sock)
 		log.info("sock:" + str(sock.fileno()) + " echo_showfile() path:" + path)
 		try:
-			path = self.gRootPath + path
-			file = open(path, "rb")
-			name = os.path.basename(path)
+			#去掉参数
+			if "?" in path:
+				aryPath = path.split("?")
+				path = aryPath[0]
+				tail = aryPath[1]
+				if tail == "download":
+					return self.downloadOpt(sock, path)
+			filePath = self.gRootPath + path
+			file = open(filePath, "rb")
+			name = os.path.basename(filePath)
 			contentType = self.getContentType(name)
-			log.info("path:" + path + " name:" + name + " contentType:" + contentType)
+			log.info("path:" + filePath + " name:" + name + " contentType:" + contentType)
 			self.echo_200(sock, contentType)
 			cntLen = 0
 			while True:
@@ -581,9 +600,10 @@ class GuardHttpServer:
 					sock.send(ret)
 					cntLen += len(ret)
 					time.sleep(0.01)
-					log.info("sock:" + str(sock.fileno()) + " echo_htmlfile() - write len:" + str(len(ret)) + " cntLen:" + str(cntLen))
+					#log.info("sock:" + str(sock.fileno()) + " echo_htmlfile() - write len:" + str(len(ret)) + " cntLen:" + str(cntLen))
 		except FileNotFoundError:
 			log.info("sock:" + str(sock.fileno()) + " file not found!!!")
+			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_FILENOTFOUND))
 			return -1
 		except IsADirectoryError:
 			log.info("sock:" + str(sock.fileno()) + " is dir error!!!")
@@ -603,7 +623,7 @@ class GuardHttpServer:
 		isFoundContentLen = 0
 		while True:
 			ret, rtnStr = self.getline(sock)
-			log.info("sock:" + str(sock.fileno()) + " test get line:" + str(rtnStr) + " and len:" + str(len(rtnStr)) + " ret:" + str(ret))
+			#log.info("sock:" + str(sock.fileno()) + " test get line:" + str(rtnStr) + " and len:" + str(len(rtnStr)) + " ret:" + str(ret))
 			if ret < 0:
 				#滚到最后
 				break
@@ -631,10 +651,38 @@ class GuardHttpServer:
 	
 	def isSerPermitPath(self, path):
 		ret = 0
-		log.info("test ---- " + path[0:len(SER_DIR_DATA)] + " ---- " + path[0:len(SER_DIR_WEB)])
-		if path[0:len(SER_DIR_DATA)] == SER_DIR_DATA or path[0:len(SER_DIR_WEB)] == SER_DIR_WEB:
+		#log.info("test ---- " + path[0:len(SER_DIR_DATA)] + " ---- " + path[0:len(SER_DIR_WEB)])
+		if path[0:len(SER_DIR_DATA)] == SER_DIR_DATA or path[0:len(SER_DIR_WEB)] == SER_DIR_WEB or path[0:len(SER_DIR_CMD)] == SER_DIR_CMD:
 			ret = 1
 		return ret
+	
+	def listDir(self, path):
+		aryFiles = []
+		try:
+			fullPath = self.gRootPath + path
+			fileList = os.listdir(fullPath)
+			fileList.sort()
+			for i in fileList:
+				tmpObj = {}
+				tmpSize = -1
+				tFileFullPath = os.path.join(fullPath, i)
+				if not (os.path.isdir(tFileFullPath)):
+					tmpSize = os.path.getsize(tFileFullPath)
+				tmpObj[SER_FILE_NAME] = i
+				tmpObj[SER_FILE_SIZE] = tmpSize
+				aryFiles.append(tmpObj)
+		except:
+			log.info("listDir() path:" + str(path) + " error!!!")
+			log.info(traceback.format_exc())
+			aryFiles = []
+		
+		rtnObj = {}
+		rtnObj[SER_FILE_PATH] = path
+		rtnObj[SER_FILE_FILES] = aryFiles
+		strRtn = str(rtnObj)
+		strRtn = strRtn.replace("\'", "\"")
+		return strRtn
+		
 
 	def handle_client(self, sock, server_socket):
 		log.info("handleclient() enter sock:" + str(sock.fileno()))
@@ -652,7 +700,6 @@ class GuardHttpServer:
 			path = pathAry[1]
 			path = self.decodepath(path)
 			log.info("sock:" + str(sock.fileno()) + " method:" + method + " path:" + path)
-			# echo_err(sock, 404, "badbad", "errmessage")
 			if rtnStr.find(SER_TAG_HTTP) >= 0:
 				#HTTP 协议
 				if method == SER_TAG_POST and len(path) > len(SER_TAG_UPLOAD) and (path[0:len(SER_TAG_UPLOAD)] == SER_TAG_UPLOAD):
@@ -660,14 +707,18 @@ class GuardHttpServer:
 				else:
 					if self.isSerPermitPath(path[1:]):
 						contentType = self.getContentType(path)
-						if contentType == SER_CONTYPE_MP4:
-							self.downloadOpt(sock, path)
+						testPath = self.gRootPath + path
+						if os.path.isdir(testPath):
+							self.echo_msg(sock, self.listDir(path))
 						else:
-							#echo对应类型和网页
-							self.echo_showfile(path, sock)
+							if contentType == SER_CONTYPE_MP4:
+								self.downloadOpt(sock, path)
+							else:
+								#echo对应类型和网页
+								self.echo_showfile(path, sock)
 					else:
 						contentData = self.getContentData(sock)
-						rtnStr = self.ue4Ctrl.handleCtrl(path, contentData)
+						rtnStr = self.ctrl.handleRecv(path, contentData)
 						self.echo_msg(sock, rtnStr)
 				sock.close()
 			else:
@@ -696,13 +747,19 @@ class GuardHttpServer:
 		return
 
 	def __init__(self, name=__name__):
-		log.info('startServer()')
-
+		log.info('init()')
 		webDir = self.gRootPath + getPathSeperater() + SER_DIR_WEB
 		checkAndCreateDir(webDir)
 		dataDir = self.gRootPath + getPathSeperater() + SER_DIR_DATA
 		checkAndCreateDir(dataDir)
-
+		cmdDir = self.gRootPath + getPathSeperater() + SER_DIR_CMD
+		checkAndCreateDir(cmdDir)
+		params = []
+		if len(sys.argv) > 1:
+			params = list(sys.argv[1:])
+			log.info("init() params ---> " + str(params))
+		self.ctrl = GuardCtrl(params)
+		self.ctrl.setPathCmdDir(cmdDir)
 		#server
 		server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

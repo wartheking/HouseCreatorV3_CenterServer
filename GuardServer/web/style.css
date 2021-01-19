@@ -1,0 +1,110 @@
+@charset "utf-8";
+
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei UI", "Microsoft YaHei", SimHei, "\5B8B\4F53", simsun, sans-serif;
+	color: #666;
+}
+
+.logo {
+	padding : 0px;
+}
+
+/*导航栏 logo*/
+#navbar-collapse ul {
+	margin-top: 0px;
+}
+
+.navbar_path{
+	margin-top: 50px;
+	background-color: #fff;
+	border: 0px;
+	padding-top: 8px;
+}
+
+
+/*
+
+
+
+
+首页界面
+
+
+
+
+*/
+.nav_index{
+	margin-top: 50px;
+}
+
+#footer_index {
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
+#indexlist_bg{
+	margin-top: 100px;
+}
+
+
+/*
+
+
+
+
+log界面
+
+
+
+
+*/
+#logContainer{
+	margin-top: 60px;
+	padding: 0px;
+}
+
+#logDiv{
+	height: 500px;
+}
+
+#logbg{
+  resize: none;
+  outline: none;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  height: 100%;
+  /*margin: -10px;*/
+  font-size: 10px;
+  color: #000000;
+}
+
+textarea:disabled{
+  opacity: 1;
+  -webkit-text-fill-color: #000000;
+}
+
+/*没有小于768px， 是因为Bootstrap以移动端优先设计*/
+
+/*小屏幕（平板，大于等于768px）*/
+@media (min-width: 768px) {
+	#logbg{
+		font-size: 10px;
+	}
+}
+
+/*中屏幕（桌面显示器， 大于等于992px）*/
+@media (min-width: 992px) {
+	#logbg{
+		font-size: 12px;
+	}
+}
+
+@media (min-width: 1200px) {
+	#logbg{
+		font-size: 14px;
+	}
+}

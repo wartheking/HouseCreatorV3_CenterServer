@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<title>LOG</title>
+</head>
+<body>
+
+	<!-- 标题 开始-->
+	<nav class="navbar navbar-default navbar-fixed-top" style="z-index: 99; background: #fff; ">
+		<div class="container">
+			<div class="row" style="text-align: center;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 15px;">
+					<span id="logName" class="label label-success" style="font-size: 15px;">Loading...</span>	
+				</div>
+			</div>
+			<div id="alertTips" class="alert alert-warning fade in hidden" style="margin-top: 10px;"></div>
+		</div>
+	</nav>
+	<!-- 标题 结束 -->
+	
+		<!-- 程序列表列表 开始 -->
+	<div id="logContainer" class="container">
+		<div class="row" style="text-align: center;">
+			<div id="logDiv" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+				<textarea id="logbg" disabled="true">
+					loading...
+				</textarea>
+			</div>
+		</div>
+	</div>
+	<!-- 文件列表 结束 -->
+
+	<!-- 底部 开始 -->
+	<footer id="footer_index" class="navbar-fixed-bottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: left;">
+					<div id="btnsBg">
+						<button id="btnAuto" class="btn btn-danger" type="button" onclick="setAuto()"><span id="btnAutoIcon" class="glyphicon glyphicon-play"></span></button>
+						<button id="btnRefresh" class="btn btn-primary" type="button" onclick="refreshOnce()"><span class="glyphicon glyphicon-refresh"></span></button>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right;">
+					<div id="streamRateBg">
+						<button id="btnDownload" class="btn btn-success" type="button" onclick="onClickDownload()"><span id="download">0.00K</span> <span class="glyphicon glyphicon-arrow-down"></span></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- 底部 结束 -->
+
+	<!-- 先让网页显示出来，再加载js -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="IP.js"></script>
+	<script type="text/javascript">
+
+		var isAuto = 0;
+		var name = "";
+		var cmd = -1;
+		var logName = "";
+
+		$(window).load(function() {
+
+			updateUIWhenResize();
+
+			name = getQueryString("name");
+			cmd  = getQueryString("cmd");
+			console.log("name:" + name + " cmd:" + cmd);
+			var tmpName = name + "_" + cmd;
+			$(document).attr("title", tmpName);
+			$('#logName').html(tmpName);
+			findLogFile(name, cmd);
+
+		});
+
+		$(window).resize(function() {
+			updateUIWhenResize();
+		});
+
+		function updateUIWhenResize(){
+			$('#btnsBg').css('margin-top', (($('#footer_index').height() - $('#btnsBg').height()) * 0.5) + 'px');
+			$('#streamRateBg').css('margin-top', (($('#footer_index').height() - $('#streamRateBg').height()) * 0.5) + 'px');
+			//log长度更新
+			var footer_height = $('#footer_index').height();
+			var bodyHeight = $(window).height() - 30;
+			var marginTop = parseInt($("#logContainer").css('margin-top').replace('px', ''));
+
+			console.log("footer height:" + footer_height);
+			console.log("height:" +  bodyHeight);
+			console.log("margin-top:" + marginTop);
+
+			$("#logDiv").css('height', (bodyHeight - footer_height - marginTop) + 'px');
+		}
+
+		function getQueryString(name){
+		    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		    var r = window.location.search.substr(1).match(reg);
+		    if (r!=null) return r[2]; return '';
+		}
+
+
+		function findLogFile(name, cmd){
+			console.log("findLogFile() --- name:" + name + " cmd:" + cmd);
+			// var url = DEV_IP + "/getHistoryTasks"
+			var url = DEV_IP + "/cmd/logs"
+			console.log("findLogFile() -- url:" + url)
+
+			$.get(url, "", function(result){
+				console.log("result:" + JSON.stringify(result));
+				var aryFiles = result.files;
+				var tail = "_" + cmd + "_" + name + ".log";
+				console.log("tail:" + tail);
+				var isHas = 0;
+				var tmpObj;
+				for(var i = aryFiles.length-1; i >= 0; i--){
+					tmpObj = aryFiles[i];
+					console.log("[" + i + "]" + tmpObj.name)
+					if(tmpObj.name.lastIndexOf(tail) > 0){
+						isHas = 1;
+						logName = tmpObj.name;
+						$(document).attr("title", logName);
+						$('#logName').html(logName);
+						updateLog(logName);
+						break;
+					}
+				}
+				if(isHas == 0){
+					$('#logbg').html("no log files!!!");
+				}
+  			});
+		}
+
+		function setAuto(){
+			isAuto = isAuto == 1 ? 0 : 1;
+			console.log("setAuto() isAuto = " + isAuto);
+			if (isAuto == 1){
+				$("#btnAutoIcon").attr("class", "glyphicon glyphicon-pause");
+			}else{
+				$("#btnAutoIcon").attr("class", "glyphicon glyphicon-play");
+			}
+		}
+
+		function refreshOnce(){
+			var url = DEV_IP + "/cmd/logs/" + logName;
+			console.log("updating once!!! url:" + url);
+			var len = 0;
+			$.get(url, "", function(result){
+				updateLogUI(result);
+			});
+		}
+
+		function updateLog(name){
+			var url = DEV_IP + "/cmd/logs/" + name;
+			console.log("update first time~~~");
+			$.get(url, "", function(result){
+				updateLogUI(result);
+			});	
+			intervalRrefreshTime1 = setInterval(function() {
+				if(isAuto == 1){
+					console.log("updating ???");
+					$.get(url, "", function(result){
+						updateLogUI(result);
+					});
+				}
+			},1000);
+		}
+
+		function updateLogUI(result){
+			len = result.length;
+			$('#download').html(getFileSize(len));
+			$('#logbg').html(result);
+			$('#logbg').scrollTop($('#logbg')[0].scrollHeight);
+		}
+
+		function getFileSize(fileByte) {
+		    var fileSizeByte = fileByte;
+		    var fileSizeMsg = "";
+		    if (fileSizeByte < 1048576) fileSizeMsg = (fileSizeByte / 1024).toFixed(2) + "KB";
+		    else if (fileSizeByte == 1048576) fileSizeMsg = "1MB";
+		    else if (fileSizeByte > 1048576 && fileSizeByte < 1073741824) fileSizeMsg = (fileSizeByte / (1024 * 1024)).toFixed(2) + "MB";
+		    else if (fileSizeByte > 1048576 && fileSizeByte == 1073741824) fileSizeMsg = "1GB";
+		    else if (fileSizeByte > 1073741824 && fileSizeByte < 1099511627776) fileSizeMsg = (fileSizeByte / (1024 * 1024 * 1024)).toFixed(2) + "GB";
+		    else fileSizeMsg = "文件超过1TB";
+		    return fileSizeMsg;
+		}
+
+		function isPC() {
+		    var userAgentInfo = navigator.userAgent;
+		    //alert(userAgentInfo);
+		    var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+		    var flag = true;
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = false;
+		            break;
+		        }
+		    }
+		    return flag;
+		}
+
+		function onClickDownload(){
+			if(isPC()){
+				var url = DEV_IP + "/cmd/logs/" + logName + "?download";
+				window.open(url); 
+			}else{
+				showTips("only PC can download!!!", "danger", 3000);
+			}
+		}
+
+		var showTipsTimer;
+		function showTips(msg, level="warning", timeout=3000)
+		{
+			console.log("showTips:" + msg);
+
+			//clear timer
+			clearTimeout(showTipsTimer);
+			var btnHtml = "<button type=\"button\" class=\"close\" onclick=\"closeTips('" + level + "')\"><span aria-hidden=\"true\">&times;</span></button>";
+			$("#alertTips").html(btnHtml + msg);
+			var classAttr = "alert alert-" + level + " fade in";
+			$("#alertTips").attr("class", classAttr);
+
+			showTipsTimer = setTimeout(function(){
+				console.log("showTips timeout ----");
+				var classAttr = "alert alert-" + level + " fade out hidden";
+				$("#alertTips").attr("class", classAttr);
+				clearTimeout(showTipsTimer);
+			}, timeout);
+
+		}
+
+		function closeTips(level)
+		{
+			console.log("closeTips ----");
+			var classAttr = "alert alert-" + level + " fade out hidden";
+			$("#alertTips").attr("class", classAttr);
+			clearTimeout(showTipsTimer);
+		}
+
+
+	</script>
+</body>
+</html>

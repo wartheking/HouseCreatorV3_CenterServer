@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<title>Setting</title>
+</head>
+<body id="setting_body">
+	<!-- 导航栏 开始 -->
+	<nav class="navbar navbar-default navbar-fixed-top" style="z-index: 100;">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="#" class="navbar-brand logo"><img src="img/logo.jpg" width="162px" height="50px" alt="altalt"></a>
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+					<!-- 三根线 -->
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar-collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="index.html"><span class="glyphicon glyphicon-home"></span> Index</a>
+					</li>
+					<li>
+						<a href="capture.html"><span class="glyphicon glyphicon-camera"></span> Capture</a>
+					</li>
+					<li>
+						<a href="file.html"><span class="glyphicon glyphicon-file"></span> File</a>
+					</li>
+					<li class="active">
+						<a href="setting.html"><span class="glyphicon glyphicon-cog"></span> Setting</a>
+					</li>
+					<li>
+						<a href="debug.html"><span class="glyphicon glyphicon glyphicon-list-alt"></span> Debug</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- 导航栏 结束 -->
+
+	<!-- 弹出框 -->
+	<div class="modal" id="modalConfirm" tabindex="-1" role="dialog" aria-labelledby="confirmLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" aria-hidden="true" id="confirmClose">&times;</button>
+					<h4 class="modal-title">Tips</h4>
+				</div>
+				<div class="modal-body" id="modalConfirmBody">
+					<span> Are you sure to <span id="confirmValue" style="color: #f00;">Format</span>?</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" id="confirmYES">Yes</button>
+					<button type="button" class="btn btn-primary" id="confirmNo">No</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<!-- 弹出框 结束-->
+
+	<div id="setting_bg"  class="container">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3 hidden-sm hidden-xs">
+					<div class="list-group">
+						<a href="#1" class="list-group-item">1.Storage & Format</a>
+						<a href="#2" class="list-group-item">2.Date & Time</a>
+						<a href="#3" class="list-group-item">3.Timezone</a>
+						<a href="#4" class="list-group-item">4.Auto-PowerOff</a>
+						<a href="#5" class="list-group-item">5.Wi-Fi Band</a>
+						<a href="#6" class="list-group-item">6.AE Settings</a>
+					</div>
+				</div>
+				<div class="col-md-9 bgSettingsItem">
+					<!-- 1. Date & Time start -->
+					<a name="1"></a>
+					<h3>1.Storage & Format</h3>
+					<div class="container">
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickRefreshStorage()"><span class="glyphicon glyphicon-refresh"></span></button>
+								  </span>
+								  <input id="storageValue" type="text" class="form-control" disabled="disabled" value="">
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-warning" type="button" onclick="onClickFormat()">FORMAT</button>
+								  </span>
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<span id="tipsFormat" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span>
+
+						<br>
+
+					</div>
+					<!-- 2. Date & Time end -->
+
+					<!-- 2. Date & Time start -->
+					<a name="2"></a>
+					<h3>2. Date & Time</h3>
+					<div class="container">
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickRefreshDevTime()"><span class="glyphicon glyphicon-refresh"></span></button>
+								  </span>
+								  <input id="timeDev" type="text" class="form-control" disabled="disabled" value="2020-09-21 15:58:08">
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickCopyTime()"><span class="glyphicon glyphicon-duplicate"></span></button>
+								  </span>
+								  <input id="timeNow" type="text" class="form-control" disabled="disabled" value="2020-09-21 15:58:08">
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <input id="timeSet" type="text" class="form-control" placeholder="e.g 1600670790" title="">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-warning" type="button" onclick="onClickSyncTime()">SYNC</button>
+								  </span>
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<span id="tipsDateTime" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span>
+
+						<br>
+
+					</div>
+					<!-- 2. Date & Time end -->
+
+					<!-- 3. Timezone start -->
+					<a name="3"></a>
+					<h3>3. Timezone</h3>
+					<div class="container">
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickRefreshDevTimezone()"><span class="glyphicon glyphicon-refresh"></span></button>
+								  </span>
+								  <input id="timezoneDev" type="text" class="form-control" disabled="disabled" value="GMT-08:00">
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+									<div class="input-group-btn">
+										<button id="timeZoneSelect" type="button" class="btn btn-warning" onclick="" title="">GMT-08:00</button>
+										<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+											<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu" style="height:200px;overflow:scroll">
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(0, this)">GMT-12:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(1, this)">GMT-11:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(2, this)">GMT-10:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(3, this)">GMT-09:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(4, this)">GMT-08:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(5, this)">GMT-07:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(6, this)">GMT-06:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(7, this)">GMT-05:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(8, this)">GMT-04:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(9, this)">GMT-04:00</a></li>
+
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(10, this)">GMT-03:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(11, this)">GMT-03:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(12, this)">GMT-02:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(13, this)">GMT-01:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(14, this)">GMT+00:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(15, this)">GMT+01:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(16, this)">GMT+02:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(17, this)">GMT+03:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(18, this)">GMT+03:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(19, this)">GMT+04:00</a></li>
+
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(20, this)">GMT+04:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(21, this)">GMT+05:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(22, this)">GMT+05:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(23, this)">GMT+05:45</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(24, this)">GMT+06:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(25, this)">GMT+06:30</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(26, this)">GMT+07:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(27, this)">GMT+08:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(28, this)">GMT+09:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(29, this)">GMT+09:30</a></li>
+
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(30, this)">GMT+10:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(31, this)">GMT+11:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(32, this)">GMT+12:00</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickTimeZone(33, this)">GMT+13:00</a></li> 
+										</ul>
+							 		</div>
+								</div>
+							</div>
+						</div>
+						<br>
+
+						<span id="tipsTimeZone" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span>
+
+						<br>
+					</div>
+					<!-- 3. Timezone end -->
+
+					<!-- 4. Auto-PowerOff start -->
+					<a name="4"></a>
+					<h3>4. Auto-PowerOff</h3>
+					<div class="container">
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickRefreshAutoOff()"><span class="glyphicon glyphicon-refresh"></span></button>
+								  </span>
+								  <input id="autoOffDev" type="text" class="form-control" disabled="disabled" value="0">
+								  <span class="input-group-addon">min</span>
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+									<div class="input-group-btn">
+										<button id="autoOffSelect" type="button" class="btn btn-warning" onclick="" title="">0</button>
+										<button type="button" class="btn btn-warning" onclick="" title="">min</button>
+										<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+											<span class="caret"></span>
+										</button>
+
+										<ul class="dropdown-menu">
+											<li><a href="javascript:void(0)" onclick="onClickAutoOff(0)">0</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickAutoOff(5)">5</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickAutoOff(10)">10</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickAutoOff(30)">30</a></li> 
+										</ul>
+
+							 		</div>
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<span id="tipsAutoOff" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span>
+
+						<br>
+
+					</div>
+					<!-- 4. Auto-PowerOff end -->
+
+					<!-- 5. Wi-Fi Band start -->
+					<a name="5"></a>
+					<h3>5. Wi-Fi Band</h3>
+					<div class="container">
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+								  <span class="input-group-btn">
+								  	<button class="btn btn-primary" type="button" onclick="onClickRefreshDevWifiBand()"><span class="glyphicon glyphicon-refresh"></span></button>
+								  </span>
+								  <input id="wifiBandDev" type="text" class="form-control" disabled="disabled" value="2.4G">
+								</div>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="row">
+							<div class="col-lg-7 col-md-8 col-sm-11 col-xs-12">
+								<div class="input-group">
+									<div class="input-group-btn">
+										<button id="wifiBandSelect" type="button" class="btn btn-warning" onclick="" title="">2.4G</button>
+										<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+											<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu">
+											<li><a href="javascript:void(0)" onclick="onClickWifiBand('2.4G')">2.4G</a></li> 
+											<li><a href="javascript:void(0)" onclick="onClickWifiBand('5G')">5G</a></li> 
+										</ul>
+							 		</div>
+								</div>
+							</div>
+						</div>
+						<br>
+
+						<span id="tipsWifiBand" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span>
+
+						<br>
+					</div>
+					<!-- 5. Wi-Fi Band end -->
+
+					<!-- 6. AE Settings start-->
+					<a name="6"></a>
+					<h3>6. AE Settings</h3>
+					<table class="table">
+					  <thead>
+					    <tr>
+					      <th>Item</th>
+					      <th>Options</th>
+					    </tr>
+					  </thead>
+					  <tbody>
+					  	<tr>
+					  		<td><span>ManualMode:</span></td>
+					  		<td>
+					  			<div class="input-group">
+									<div class="input-group-btn">
+										<button id="manualModeOff" type="button" class="btn btn-default" onclick="onClickManualModeOnOff(0)" title="">OFF</button>
+										<button id="manualModeOn" type="button" class="btn btn-primary" onclick="onClickManualModeOnOff(1)" title="">ON</button>
+							 		</div>
+								</div>
+							</td>
+						</tr>
+						<tr id="itemExpMode">
+					  		<td><span>expMode:</span></td>
+					  		<td>
+					  			<div class="input-group">
+									<div class="input-group-btn">
+										<button id="expModeOff" type="button" class="btn btn-default" onclick="onClickExpModeOnOff(0)" title="">OFF</button>
+										<button id="expModeOn" type="button" class="btn btn-primary" onclick="onClickExpModeOnOff(1)" title="">ON</button>
+							 		</div>
+								</div>
+							</td>
+						</tr>
+						<tr id="itemISO">
+					  		<td><span>ISO:</span><br><span id="valueISO">200</span></td>
+					  		<td>
+					  			<input id="_aeParams_isoSlider" type="range" min="100" max="800" value="200" step="100" oninput="isoSliderChange(this.value)" οnchange="isoSliderChange(this.value)" />
+							</td>
+						</tr>
+						<tr id="itemCompensation">
+					  		<td><span>Compensation:</span><br><span id="valueCompensation">0</span></td>
+					  		<td>
+					  			<input id="_aeParams_compensationSlider" type="range" min="-1.0" max="1.0" value="0" step="0.1" oninput="compensationSliderChange(this.value)" οnchange="compensationSliderChange(this.value)" />
+							</td>
+						</tr>
+						<tr id="itemExpTime">
+							<td><span>expTime:</span><br><span id="valueExpTime" title="330">1/3000S</span></td>
+							<td>
+								<div class="input-group-btn dropup">
+									<button id="expTimeSelect" type="button" class="btn btn-primary" onclick="" title="">1/3000S</button>
+									<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" style="height:200px;overflow:scroll">
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(0, this)" title="330">1/3000S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(1, this)" title="500">1/2000S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(2, this)" title="1000">1/1000S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(3, this)" title="2000">1/500S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(4, this)" title="4000">1/250S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(5, this)" title="8000">1/125S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(6, this)" title="16700">1/60S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(7, this)" title="33000">1/30S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(8, this)" title="66000">1/15S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(9, this)" title="125000">1/8S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(10, this)" title="500000">1/2S</a></li> 
+										<li><a href="javascript:void(0)" name="itemExpTime" onclick="onClickExpTime(11, this)" title="1000000">1S</a></li> 
+									</ul>
+						 		</div>
+							</td>
+						</tr>
+						<tr id="itemColorTmpOnOff">
+							<td><span>colorTmpON/OFF:</span></td>
+							<td>
+								<div class="input-group">
+									<div class="input-group-btn">
+										<button id="colorTmpOff" type="button" class="btn btn-default" onclick="onClickColorTmpOnOff(0)" title="">OFF</button>
+										<button id="colorTmpOn" type="button" class="btn btn-primary" onclick="onClickColorTmpOnOff(1)" title="">ON</button>
+							 		</div>
+								</div>
+							</td>
+						</tr>
+						<tr id="itemColorTmp">
+							<td><span>colorTmp:</span><br><span id="valueColorTmp">3000</span></td>
+							<td>
+								<input id="_aeParams_colorTempratureSlider" type="range" min="2000" max="10000" value="3000" step="1" oninput="colorTempratureSliderChange(this.value)" οnchange="colorTempratureSliderChange(this.value)" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<div class="btn-group" role="group" aria-label="...">
+								  <button type="button" class="btn btn-warning" onclick="onClickSetAEParams()">SET</button>
+								  <button type="button" class="btn btn-primary" onclick="onClickRefreshAEParams()" ><span class="glyphicon glyphicon-refresh"></span></button>
+								</div>
+							</td>
+							<td>
+							</td>
+						</tr>
+						<tr>
+							<td style="border:0px;"><span id="tipsAEParams" name="tipsSpan" class="label label-warning" style="font-size: 15px;"></span></td>
+							<td style="border:0px;"></td>
+						</tr>
+					  </tbody>
+					</table>
+					<!-- 6. AE Settings end-->
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 底部 开始 -->
+	<footer id="footer_setting" class="navbar-fixed-bottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div id="bgScrollTop">
+						<button class="btn btn-warning" style="font-size: 16px;" onclick="onClickScrollToTop()">scroll to top <span class="glyphicon glyphicon-circle-arrow-up"></span></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- 底部 结束 -->
+
+	
+	<!-- 先让网页显示出来，再加载js -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="Protocol.js" charset="utf-8"></script>
+	<script type="text/javascript">
+		 
+		$(window).load(function() {
+			$('#bgScrollTop').css('margin-top', (($('#footer_setting').height() - $('#bgScrollTop').height()) * 0.5) + 'px');
+
+			//setting_bg
+			$('#setting_bg').css('margin-bottom', $('#footer_setting').height() + 20 + 'px');
+
+			updateTimeNow();
+
+			onClickRefreshStorage();
+			onClickRefreshDevTime();
+			onClickRefreshDevTimezone();
+			onClickRefreshAutoOff();
+			onClickRefreshDevWifiBand();
+			onClickRefreshAEParams();
+
+		});
+
+		$(window).resize(function() {
+			console.log("---------resize()------");
+
+			$('#bgScrollTop').css('margin-top', (($('#footer_setting').height() - $('#bgScrollTop').height()) * 0.5) + 'px');
+
+			//setting_bg
+			$('#setting_bg').css('margin-bottom', $('#footer_setting').height() + 20 + 'px')
+
+		});
+
+		var showTipsTimer;
+
+		function showTips(item, msg, level="warning", timeout=3000)
+		{
+			console.log("showTips:" + msg);
+
+			closeAllTips();
+
+			clearTimeout(showTipsTimer);
+
+			var classAttr = "label label-" + level;
+			$(item).attr("class", classAttr);
+			$(item).html(msg);
+
+			showTipsTimer = setTimeout(function(){
+				console.log("showTips timeout ----");
+				$(item).html("");
+				clearTimeout(showTipsTimer);
+			}, timeout);
+		}
+
+		function closeAllTips()
+		{
+			console.log("closeAllTips ----");
+			var aryTipsSpan = $("span[name='tipsSpan']");
+			console.log("aryTipsSpan len:" + aryTipsSpan.length);
+			for(var i = 0; i < aryTipsSpan.length; i++)
+			{
+				obj = aryTipsSpan[i];
+				$(obj).html("");
+			}
+		}
+
+		function onClickRefreshStorage()
+		{
+			console.log("onClickRefreshStorage()");
+			reqGetStorage(function(result){
+				var totalStorage  = result[OSC_JTAG_RESULTS][OSC_JTAG_OPTIONS][OSC_OPT_TOTALSPACE];
+				var remainStorage = result[OSC_JTAG_RESULTS][OSC_JTAG_OPTIONS][OSC_OPT_REMAININGSPACE];
+				console.log("totalStorage:" + totalStorage + " remainStorage:" + remainStorage);
+				var storageStr = "r:" + transSize(remainStorage) + "/" + transSize(totalStorage);
+				$("#storageValue").val(storageStr);
+			});
+		}
+
+		function transSize(fileByte) {
+		    var fileSizeByte = fileByte;
+		    var fileSizeMsg = "";
+		    if (fileSizeByte < 1024) fileSizeMsg = (fileSizeByte).toFixed(2) + "MB";
+		    else if (fileSizeByte == 1024) fileSizeMsg = "1GB";
+		    else if (fileSizeByte > 1024 && fileSizeByte < 1048576) fileSizeMsg = (fileSizeByte / 1024).toFixed(2) + "GB";
+		    else fileSizeMsg = "文件超过1TB";
+		    return fileSizeMsg;
+		}
+
+		function onClickFormat()
+		{
+			console.log("onClickFormat()");
+			showConfirmDialog();
+		}
+
+		function handleFormat()
+		{
+			showTips("#tipsFormat", "Formating ...", "warning", 10000);
+			devFormat(function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsFormat", "Format end !", "success");
+					onClickRefreshStorage();
+				}else{
+					showTips("#tipsFormat", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function showConfirmDialog()
+		{
+			console.log("showConfirmDialog()");
+
+			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
+			$('#confirmClose').click(function(){
+				dismissConfirmDialog();
+			});
+
+			$('#confirmNo').click(function(){
+				dismissConfirmDialog();
+			});
+
+			$('#confirmYES').click(function(){
+				dismissConfirmDialog();
+				handleFormat();
+			});
+
+			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
+			$('#modalConfirm').modal({backdrop: 'static', keyboard: false});
+			//代码调用 显示模态框的方法
+			$('#modalConfirm').modal("show");
+		}
+
+		function dismissConfirmDialog()
+		{
+			console.log("dismissConfirmDialog");
+			$('#confirmClose').off();
+			$('#confirmNo').off();
+			$('#confirmYES').off();
+			$('#modalConfirm').modal("hide");
+		}
+
+		function onClickRefreshDevTime()
+		{
+			console.log("onClickRefreshDevTime()");
+			//showTips("Refreshing ...");
+			reqGetDevTime(function(result){
+				jsonObj = result.results.options[OSC_OPT_DATETIME];
+				var year = jsonObj[OSC_JTAG_TM_YEAR];
+				var month = jsonObj[OSC_JTAG_TM_MONTH];
+				if (month < 10) {
+					month = "0" + month;
+				}
+				var day   = jsonObj[OSC_JTAG_TM_DAY];
+				if (day < 10) {
+					day = "0" + day;
+				}
+				var hour  = jsonObj[OSC_JTAG_TM_HOUR];
+				if (hour < 10) {
+					hour = "0" + hour;
+				}
+				var minute = jsonObj[OSC_JTAG_TM_MINUTE];
+				if (minute < 10) {
+					minute = "0" + minute;
+				}
+				var second = jsonObj[OSC_JTAG_TM_SECOND];
+				if (second < 10) {
+					second = "0" + second;
+				}
+				var txt = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+				console.log("txt:" + txt);
+				$("#timeDev").val(txt);
+			});
+		}
+
+		var intervalRrefreshTime;
+
+		function updateTimeNow(){
+			intervalRrefreshTime = setInterval(function() {
+				updateCurTime();
+			},1000);
+		}
+
+		function updateCurTime()
+		{ 
+			//创建对象  
+			var date = new Date();  
+			//获取年份  
+			var y = date.getFullYear(); 
+			//获取月份  返回0-11     
+			var m =date.getMonth()+1; 
+			// 获取日   
+			var d = date.getDate();
+			//获取星期几  返回0-6   (0=星期天)   
+			var w = date.getDay();    
+			//星期几
+			var ww = ' 星期'+'日一二三四五六'.charAt(date.getDay()) ;
+			//时
+			var h = date.getHours();
+			//分  
+			var minute = date.getMinutes() 
+			//秒 
+			var s = date.getSeconds(); 
+			//毫秒
+			var sss = date.getMilliseconds() ;
+			
+			if(m<10){
+			m = "0"+m;
+			}
+			if(d<10){
+			d = "0"+d;
+			}
+			if(h<10){
+			h = "0"+h;
+			}
+			if(minute<10){
+			minute = "0"+minute;
+			} 
+			if(s<10){
+			s = "0"+s;
+			}
+			
+			if(sss<10){
+			sss = "00"+sss;
+			}else if(sss<100){
+			sss = "0"+sss;
+			}
+
+			var strFormatDate = y+"-"+m+"-"+d+" "+h+":"+minute+":"+s;
+
+			$("#timeNow").val(strFormatDate);
+			$("#timeNow").attr("title", Number(Math.round(new Date() / 1000)));
+		}
+
+		function onClickCopyTime()
+		{
+			console.log("onClickCopyTime()");
+			$("#timeSet").val($("#timeNow").attr("title"));
+		}
+
+		function onClickSyncTime()
+		{
+			console.log("onClickSyncTime()");
+			var time = $("#timeSet").val();
+			if (time == null || time == "" || time.length <= 0) 
+			{
+				showTips("#tipsDateTime", "params error !!!", "danger");
+				return;
+			}
+			reqSetTimeToDev(Number(time), function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsDateTime", "sync success !", "success");
+					onClickRefreshDevTime();
+				}else{
+					showTips("#tipsDateTime", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function onClickRefreshDevTimezone()
+		{
+			console.log("onClickRefreshDevTimezone()");
+			reqGetDevTimezone(function(result){
+				var timeZoneValue = result.results.options._timeZoneValue._timeZone;
+				$("#timezoneDev").val(timeZoneValue);
+				$("#timeZoneSelect").html(timeZoneValue);
+			});
+		}
+
+		function onClickTimeZone(index, item)
+		{
+			console.log("onClickTimeZone() index:" + index);
+			$("#timeZoneSelect").html(item.innerHTML);
+			reqSetDevTimezone(index, function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsTimeZone", "set success !", "success");
+					onClickRefreshDevTime();
+					onClickRefreshDevTimezone();
+				}else{
+					showTips("#tipsTimeZone", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function onClickRefreshAutoOff()
+		{
+			console.log("onClickRefreshAutoOff()");
+			reqGetDevAutoOff(function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					$("#autoOffDev").val(result.results.options[OSC_OPT_OFFDELAY]);
+					$("#autoOffSelect").html(result.results.options[OSC_OPT_OFFDELAY]);
+				}
+			});
+		}
+
+		function onClickAutoOff(value)
+		{
+			console.log("onClickAutoOff() value:" + value);
+			$("#autoOffSelect").html(value);
+			reqSetDevAutoOff(value, function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsAutoOff", "set success !", "success");
+					onClickRefreshAutoOff();
+				}
+			});
+		}
+
+		function onClickRefreshDevWifiBand()
+		{
+			console.log("onClickRefreshDevWifiBand()");
+			reqGetDevWiFiBand(function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					$("#wifiBandDev").val(result.results.wifiBand);
+					$("#wifiBandSelect").html(result.results.wifiBand);
+				}
+			});
+		}
+
+		function onClickWifiBand(value)
+		{
+			console.log("onClickWifiBand() value:" + value);
+
+			reqSetDevWiFiBand(value, function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsWifiBand", "set success plz <a href=\"javascript:void(0)\" onclick=\"onClickReboot()\">REBOOT</a> !", "success", 5000);
+					onClickRefreshDevWifiBand();
+				}else{
+					showTips("#tipsWifiBand", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function onClickReboot(){
+			console.log("onClickReboot()");
+			reqDevReboot(function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsWifiBand", "rebooting ...", "success", 10000);
+				}else{
+					showTips("#tipsWifiBand", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function onClickManualModeOnOff(isOn)
+		{
+			console.log("onClickManualModeOnOff() isOn:" + isOn);
+			var classSelect = "btn btn-primary";
+			var classNotSelect = "btn btn-default";
+			$("#manualModeOn").attr("class", classNotSelect);
+			$("#manualModeOff").attr("class", classNotSelect);
+			if (isOn) 
+			{
+				$("#manualModeOn").attr("class", classSelect);
+			}
+			else
+			{
+				$("#manualModeOff").attr("class", classSelect);	
+			}
+
+			if (isOn) 
+			{
+				$("#itemExpMode").show();
+				if (getExpModeOnOff()) 
+				{
+					$("#itemCompensation").hide();
+					$("#itemISO").show();
+					$("#itemExpTime").show();
+				}
+				else
+				{
+					$("#itemCompensation").show();
+					$("#itemISO").hide();
+					$("#itemExpTime").hide();
+				}
+
+				$("#itemColorTmpOnOff").show();
+				if (getColorTmpOnOff()) 
+				{
+					$("#itemColorTmp").show();	
+				}
+				else
+				{
+					$("#itemColorTmp").hide();		
+				}
+			}
+			else
+			{
+				$("#itemExpMode").hide();
+				$("#itemISO").hide();
+				$("#itemCompensation").hide();
+				$("#itemExpTime").hide();
+				$("#itemColorTmpOnOff").hide();
+				$("#itemColorTmp").hide();
+			}
+
+		}
+
+		function onClickExpModeOnOff(isOn)
+		{
+			console.log("onClickExpModeOnOff() isOn:" + isOn);
+			var classSelect = "btn btn-primary";
+			var classNotSelect = "btn btn-default";
+			$("#expModeOn").attr("class", classNotSelect);
+			$("#expModeOff").attr("class", classNotSelect);
+			if (isOn) 
+			{
+				$("#expModeOn").attr("class", classSelect);
+			}
+			else
+			{
+				$("#expModeOff").attr("class", classSelect);	
+			}
+			if (isOn) 
+			{
+				$("#itemCompensation").hide();
+				$("#itemISO").show();
+				$("#itemExpTime").show();
+			}
+			else
+			{
+				$("#itemCompensation").show();
+				$("#itemISO").hide();
+				$("#itemExpTime").hide();
+			}
+		}
+
+		function getManualModeOnOff(){
+			console.log("getManualModeOnOff()");
+			if($("#manualModeOn").attr("class").lastIndexOf("primary") >= 0)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		function onClickColorTmpOnOff(isOn)
+		{
+			console.log("onClickColorTmpOnOff() isOn:" + isOn);
+			var classSelect = "btn btn-primary";
+			var classNotSelect = "btn btn-default";
+			$("#colorTmpOn").attr("class", classNotSelect);
+			$("#colorTmpOff").attr("class", classNotSelect);
+			if (isOn) 
+			{
+				$("#colorTmpOn").attr("class", classSelect);
+			}
+			else
+			{
+				$("#colorTmpOff").attr("class", classSelect);	
+			}
+
+			if (isOn) 
+			{
+				$("#itemColorTmp").show();
+			}
+			else
+			{
+				$("#itemColorTmp").hide();
+			}
+		}
+
+		function getColorTmpOnOff(){
+			console.log("colorTmpOnOff()");
+			if($("#colorTmpOn").attr("class").lastIndexOf("primary") >= 0)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		function isoSliderChange(value)
+		{
+			console.log("isoSliderChange() value:" + value);
+			$("#valueISO").html(value);
+		}
+
+		function compensationSliderChange(value)
+		{
+			console.log("compensationSliderChange() value:" + value);
+			$("#valueCompensation").html(value);
+		}
+
+		function colorTempratureSliderChange(value)
+		{
+			console.log("colorTempratureSliderChange() value:" + value);
+			$("#valueColorTmp").html(value);
+		}
+
+		function onClickExpTime(value, item)
+		{
+			console.log("onClickExpTime() value:" + value + " title:" + item.title);
+			var value = item.innerHTML;
+			$("#valueExpTime").html(value);	
+			$("#expTimeSelect").html(value);
+			$("#valueExpTime").attr("title", item.title);
+		}
+
+		function onClickRefreshAEParams()
+		{
+			console.log("onClickRefreshAEParams()");
+			reqGetDevAEParams(function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) 
+				{
+					jsonObj = result.results.options[OSC_OPT_AEPARAMS];
+					var manualMode = jsonObj[OSC_JTAG_AE_MANUALMODE];
+					var expMode = jsonObj[OSC_JTAG_AE_EXPMODE];
+					var iso = jsonObj[OSC_JTAG_AE_ISO];
+					var compensation = jsonObj[OSC_JTAG_AE_COMPENSATION];
+					var expTimeValue = jsonObj[OSC_JTAG_AE_EXPTIMEVALUE];
+					var expTime      = jsonObj[OSC_JTAG_AE_EXPTIME];
+					
+					var colorTempratureManualMode = jsonObj[OSC_JTAG_AE_COLORTEMPMANUALMODE];
+					var colorTemprature = jsonObj[OSC_JTAG_AE_COLORTEMPRATURE];
+
+					console.log(
+						"[manualMode:" + manualMode + "]" +
+						"[expMode:" + expMode + "]" +
+						"[iso:" + iso + "]" +
+						"[compensation:" + compensation + "]" +
+						"[expTimeValue:" + expTimeValue + "]" +
+						"[expTime:" + expTime + "]" +
+						"[colorTempratureManualMode:" + colorTempratureManualMode + "]" +
+						"[colorTemprature:" + colorTemprature + "]"
+					);
+
+					isoSliderChange(iso);
+					$("#_aeParams_isoSlider").val(iso);
+
+					compensationSliderChange(compensation);
+					$("#_aeParams_compensationSlider").val(compensation);
+
+					$("#valueExpTime").html(expTime);
+					$("#expTimeSelect").html(expTime);
+					$("valueExpTime").attr("title", expTimeValue);
+
+					onClickColorTmpOnOff(colorTempratureManualMode);
+					colorTempratureSliderChange(colorTemprature);
+					$("#_aeParams_colorTempratureSlider").val(colorTemprature);
+
+					onClickManualModeOnOff(manualMode);
+
+				}
+				else
+				{
+					console.log("reqGetDevAEParams() error!!!!");
+				}
+			});
+		}
+
+		function onClickSetAEParams()
+		{
+			console.log("onClickSetAEParams()");
+			var manualMode = getManualModeOnOff();
+			var expMode    = getExpModeOnOff();
+			var compensation = $("#_aeParams_compensationSlider").val();
+			var expTimeValue = Number($("#valueExpTime").attr("title"));
+			console.log("expTimeValue:" + expTimeValue);
+			var iso = $("#_aeParams_isoSlider").val();
+			var colorTempratureManualMode = getColorTmpOnOff();
+			var colorTemprature = $("#_aeParams_colorTempratureSlider").val();
+			console.log(
+				"[manualMode:" + manualMode + "]" +
+				"[expMode:" + expMode + "]" +
+				"[iso:" + iso + "]" +
+				"[compensation:" + compensation + "]" +
+				"[expTimeValue:" + expTimeValue + "]" +
+				"[colorTempratureManualMode:" + colorTempratureManualMode + "]" +
+				"[colorTemprature:" + colorTemprature + "]"
+			);
+			reqSetDevAEParams(manualMode, expMode, compensation, expTimeValue, iso, colorTempratureManualMode, colorTemprature, function(result){
+				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) {
+					showTips("#tipsAEParams", "set success !", "success");
+				}else{
+					showTips("#tipsAEParams", result[OSC_JTAG_ERR][OSC_JTAG_ERR_MESSAGE], "danger");
+				}
+			});
+		}
+
+		function getExpModeOnOff(){
+			console.log("getExpModeOnOff()");
+			if($("#expModeOn").attr("class").lastIndexOf("primary") >= 0)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		function onClickScrollToTop()
+		{
+			console.log("onClickScrollToTop()");
+			document.body.scrollTop = document.documentElement.scrollTop = 0;
+		}
+
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------
+		
+		function reqGetStorage(callback)
+		{
+			console.log("reqGetStorage()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GETOPTIONS;
+			paramObj.parameters = new Object();
+			var aray = [];
+			aray[0] = OSC_OPT_TOTALSPACE;
+			aray[1] = OSC_OPT_REMAININGSPACE;
+			paramObj.parameters[OSC_JTAG_OPTIONNAMES] = aray;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqGetStorage result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			});
+		}
+
+		function reqGetDevTime(callback)
+		{
+			console.log("reqGetDevTime()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GETOPTIONS;
+			paramObj.parameters = new Object();
+			var aray = [];
+			aray[0] = OSC_OPT_DATETIME;
+			paramObj.parameters[OSC_JTAG_OPTIONNAMES] = aray;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("req get dev time result:" + result[OSC_JTAG_STATE]);
+				callback(result);
+  			});
+		}
+
+		function reqSetTimeToDev(time, callback)
+		{
+			console.log("reqSetTimeToDev()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_SETOPTIONS;
+			paramObj.parameters = new Object();
+			paramObj.parameters.options = new Object();
+			paramObj.parameters.options[OSC_OPT_DATETIME] = time;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqSetTimeToDev result:" + result[OSC_JTAG_STATE]);
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqSetTimeToDev error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});
+		}
+
+		function reqGetDevTimezone(callback)
+		{
+			console.log("reqGetDevTimezone()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GETOPTIONS;
+			paramObj.parameters = new Object();
+			var aray = [];
+			aray[0] = OSC_OPT_TIMEZONE;
+			paramObj.parameters[OSC_JTAG_OPTIONNAMES] = aray;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqGetDevTimezone result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			});
+		}
+
+		function reqSetDevTimezone(index, callback)
+		{
+			console.log("reqSetDevTimezone() - index:" + index);
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_SETOPTIONS;
+			paramObj.parameters = new Object();
+			paramObj.parameters.options = new Object();
+			paramObj.parameters.options[OSC_OPT_TIMEZONE] = index;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqSetDevTimezone result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqSetDevTimezone error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});
+		}
+
+		function reqGetDevAutoOff(callback)
+		{
+			console.log("reqGetDevAutoOff()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GETOPTIONS;
+			paramObj.parameters = new Object();
+			var aray = [];
+			aray[0] = OSC_OPT_OFFDELAY;
+			paramObj.parameters[OSC_JTAG_OPTIONNAMES] = aray;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqGetDevAutoOff result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			});
+		}
+
+		function reqSetDevAutoOff(value, callback){
+			console.log("reqSetDevAutoOff() value:" + value);
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_SETOPTIONS;
+			paramObj.parameters = new Object();
+			paramObj.parameters.options = new Object();
+			paramObj.parameters.options[OSC_OPT_OFFDELAY] = value;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqSetDevAutoOff result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			});
+		}
+
+		function reqGetDevWiFiBand(callback)
+		{
+			console.log("reqGetDevWiFiBand()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GET_WIFIBAND;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqGetDevWiFiBand result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			});
+		}
+
+		function reqSetDevWiFiBand(value, callback)
+		{
+			console.log("reqSetDevWiFiBand() value:" + value);
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_SET_WIFIBAND;
+			paramObj.parameters = new Object();
+			paramObj.parameters[OSC_JTAG_WIFI_BAND] = value;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqSetDevWiFiBand result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqSetDevWiFiBand error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});;
+		}
+
+		function reqDevReboot(callback){
+			console.log("reqDevReboot()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_REBOOT;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqDevReboot result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqDevReboot error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});
+		}
+
+		function reqGetDevAEParams(callback)
+		{
+			console.log("reqGetDevAEParams()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_GETOPTIONS;
+			paramObj.parameters = new Object();
+			var aray = [];
+			aray[0] = OSC_OPT_AEPARAMS;
+			paramObj.parameters[OSC_JTAG_OPTIONNAMES] = aray;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqGetDevAEParams result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqGetDevAEParams error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});
+		}
+
+		function reqSetDevAEParams(manualMode, expMode, compensation, expTimeValue, iso, colorTempratureManualMode, colorTemprature, callback)
+		{
+			console.log("reqSetDevAEParams()");
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_SETOPTIONS;
+			paramObj.parameters = new Object();
+			paramObj.parameters.options = new Object();
+			paramObj.parameters.options[OSC_OPT_AEPARAMS] = new Object();
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_MANUALMODE] = Number(manualMode);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_EXPMODE] = Number(expMode);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_COMPENSATION] = Number(compensation);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_EXPTIMEVALUE] =  Number(expTimeValue);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_ISO] =  Number(iso);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_COLORTEMPMANUALMODE] =  Number(colorTempratureManualMode);
+			paramObj.parameters.options[OSC_OPT_AEPARAMS][OSC_JTAG_AE_COLORTEMPRATURE] =  Number(colorTemprature);
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+				console.log("reqSetDevAEParams result:" + result[OSC_JTAG_STATE]);
+				console.log("---- " + JSON.stringify(result));
+				callback(result);
+  			}).error(function(resultErr){
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("reqSetDevAEParams error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				callback(resultObj);
+  			});
+		}
+
+		function devFormat(callback)
+		{
+			var paramObj = new Object();
+			paramObj.name = OSC_CMD_FORMAT;
+			var jsonStr = JSON.stringify(paramObj);
+			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
+
+				callback(result);
+
+  			}).error(function(resultErr){
+
+  				resultObj = JSON.parse(resultErr.responseText);
+  				console.log("error result:" + resultObj[OSC_JTAG_STATE]);
+  				//showTips(JSON.stringify(resultObj), "danger");
+  				//showTips(resultObj.error.message, "danger");
+  				callback(resultObj);
+  			});
+		}
+
+	</script>
+
+</body>
+</html>

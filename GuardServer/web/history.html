@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<title>History</title>
+</head>
+<body>
+	<!-- 导航栏 开始 -->
+	<nav class="navbar navbar-default navbar-fixed-top" style="z-index: 100;">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="#" class="navbar-brand logo"><img src="img/logo.jpg" width="162px" height="50px" alt="altalt"></a>
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+					<!-- 三根线 -->
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar-collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="index.html"><span class="glyphicon glyphicon-home"></span> Index</a>
+					</li>
+					<li class="active">
+						<a href="history.html"><span class="glyphicon glyphicon-time"></span> History</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- 导航栏 结束 -->
+
+	<!-- 标题 开始-->
+	<nav class="navbar navbar-default navbar-fixed-top navbar_path nav_index" style="z-index: 99; background: #fff; padding-top: 20px;">
+		<div class="container">
+			<div class="row" style="text-align: left;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<span id="ipValue" class="label label-success" style="font-size: 15px;">Loading...</span>	
+				</div>
+			</div>
+			<div id="alertTips" class="alert alert-warning fade in hidden" style="margin-top: 10px;"></div>
+		</div>
+	</nav>
+	<!-- 标题 结束 -->
+
+	<!-- Run 弹出框 -->
+	<div class="modal" id="modalRun" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" id="runClose" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title" id="runTitle">Run</h4>
+				</div>
+				<div class="modal-body" id="modalRunBody">
+					<div class="input-group">
+						<!-- 路径长度 代码去处理吧 小于 768px的都 只保留10个字符， 大于等于768px的保留 26个字符 -->
+				  		<span  id="runParamsTips" class="input-group-addon">parms:</span>
+				  		<input id="runParams" type="text" class="form-control" placeholder="e.g. c:\awsomepro,nobugfile.xxx,6666">
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" id="runYES" data-dismiss="modal">Run</button>
+					<button type="button" class="btn btn-primary" id="runNo" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<!-- Run 弹出框 结束-->
+
+	<!-- 程序列表列表 开始 -->
+	<div id="indexlist_bg" class="container">
+
+	</div>
+	<!-- 文件列表 结束 -->
+
+	<!-- 底部 开始 -->
+	<footer id="footer_index" class="navbar-fixed-bottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: left;">
+					<div class="dropup" id="btnsBg">
+						<button id="btnRefresh" class="btn btn-primary" type="button" onclick="updateTaskList()"><span class="glyphicon glyphicon-refresh"></span></button>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right;">
+					<div id="streamRateBg">
+						<span class="label label-danger"><span id="taskErrorTips">Error:0</span></span>
+						<span class="label label-warning"><span id="taskAbortTips">Abort:0</span></span>
+						<span class="label label-success"><span id="taskFinishedTips">Finished:0</span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- 底部 结束 -->
+
+	<!-- 先让网页显示出来，再加载js -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="IP.js"></script>
+	<script type="text/javascript">
+
+		$(window).load(function() {
+		 	//footer_index 居中
+			$('#btnsBg').css('margin-top', (($('#footer_index').height() - $('#btnsBg').height()) * 0.5) + 'px');
+			$('#streamRateBg').css('margin-top', (($('#footer_index').height() - $('#streamRateBg').height()) * 0.5) + 'px');
+			//5px 适配，button自带margin
+
+			//album_bg
+			$('#indexlist_bg').css('margin-bottom', $('#footer_index').height() + 'px')
+
+			$('#ipValue').html(DEV_IP)
+
+			updateTaskList();
+
+		});
+
+		$(window).resize(function() {
+			console.log("---------resize()------");
+			//footer_capture 居中
+			$('#btnsBg').css('margin-top', (($('#footer_index').height() - $('#btnsBg').height()) * 0.5) + 'px');
+			$('#streamRateBg').css('margin-top', (($('#footer_index').height() - $('#streamRateBg').height()) * 0.5) + 'px');
+
+			//album_bg
+			$('#indexlist_bg').css('margin-bottom', $('#footer_index').height() + 'px')
+
+		});
+		
+		function clearTaskList()
+		{
+			console.log("clearTaskList()");
+			$("#indexlist_bg").html("");
+		}
+
+		function transTime(timesince1970)
+		{ 
+			//创建对象  
+			var date = new Date(timesince1970*1000);  
+			//获取年份  
+			var y = date.getFullYear(); 
+			//获取月份  返回0-11     
+			var m =date.getMonth()+1; 
+			// 获取日   
+			var d = date.getDate();
+			//获取星期几  返回0-6   (0=星期天)   
+			var w = date.getDay();    
+			//星期几
+			var ww = ' 星期'+'日一二三四五六'.charAt(date.getDay()) ;
+			//时
+			var h = date.getHours();
+			//分  
+			var minute = date.getMinutes() 
+			//秒 
+			var s = date.getSeconds(); 
+			//毫秒
+			var sss = date.getMilliseconds() ;
+			
+			if(m<10){
+			m = "0"+m;
+			}
+			if(d<10){
+			d = "0"+d;
+			}
+			if(h<10){
+			h = "0"+h;
+			}
+			if(minute<10){
+			minute = "0"+minute;
+			} 
+			if(s<10){
+			s = "0"+s;
+			}
+			
+			if(sss<10){
+			sss = "00"+sss;
+			}else if(sss<100){
+			sss = "0"+sss;
+			}
+			return y+"-"+m+"-"+d+" "+h+":"+minute+":"+s;
+		}  
+
+		function formatSeconds(value) {
+			var day  = 0;
+			var hour = 0; //小时
+            var sec  = parseInt(value);// 秒
+            var min  = 0;// 分
+
+            //大于一天
+            if (value >= 86400){
+            	day = parseInt(value/86400);
+            	value -= (day * 86400);
+            }
+
+            //大于一小时
+            if (value >= 3600){
+            	hour = parseInt(value/3600);
+            	value -= (hour * 3600);
+            }
+
+            //大于一分钟
+            if (value >= 60){
+            	min = parseInt(value/60);
+            	value -= (min * 60);
+            }
+
+            //剩下的就是秒了
+            sec = value
+
+            var result = "";
+            result += (day + " day ")
+            result += hour > 9 ? hour : "0" + hour; 
+            result += ":"
+            result += min > 9 ? min : "0" + min; 
+            result += ":"
+            result += sec > 9 ? sec : "0" + sec; 
+            return result;
+        }
+
+		function updateTaskList()
+		{
+			showTips("refreshing...");
+			console.log("updateTaskList()");
+			var url = DEV_IP + "/getHistoryTasks"
+			// var url = DEV_IP + "/getAllTasks"
+			console.log("updateTaskList() -- url:" + url)
+			$.get(url, "", function(result){
+				//callback(result);
+				console.log("result:" + JSON.stringify(result))
+				clearTaskList();
+				var newHtml = "";
+				aryData = result["data"];
+				var index = aryData.length;
+				var newHtml = ""
+				var tmpObj;
+				var tmpHtml;
+				var cntError = 0;
+				var cntAbort = 0;
+				var cntFinished = 0;
+				var cntRunning = 0;
+				for(var i = aryData.length-1; i >= 0; i--)
+				{
+					tmpObj = aryData[i];
+					console.log("---> " + JSON.stringify(tmpObj));
+					tName = tmpObj.name;
+					tStatus = tmpObj.status;
+					if(tStatus == "error"){
+						cntError++;
+					}
+					if(tStatus == "abort"){
+						cntAbort++;
+					}
+					if(tStatus == "finished"){
+						cntFinished++;
+					}
+					tParams = tmpObj.params;
+					tStart = tmpObj.tm_start;
+					tStrStart = transTime(tStart);
+					tEnd = tmpObj.tm_end;
+					tStrEnd = tEnd == -1 ? "" : transTime(tEnd)
+					tTime = 0
+					if(tEnd == -1)
+					{
+						tTime = Math.round(new Date() / 1000) - tStart
+					}
+					else
+					{
+						tTime = tEnd - tStart
+					}
+					tStrTime = formatSeconds(tTime)
+					tmpHtml = generateListItem(index, tName, tStatus, tParams, tStrStart, tStrEnd, tStrTime, tmpObj.cmd);
+					newHtml += tmpHtml
+					index -= 1;
+				}
+				$("#taskErrorTips").html("Error:" + cntError);
+				$("#taskAbortTips").html("Abort:" + cntAbort);
+				$("#taskFinishedTips").html("Finished:" + cntFinished);
+				$("#indexlist_bg").html(newHtml);
+				showTips("refresh end~~", "success", 3000);
+  			});
+		}
+
+		function clickLog(name, cmd){
+			console.log("clickLog() --- cmd:" + cmd);
+			window.open(DEV_IP + "/web/log.html?name=" + name + "&cmd=" + cmd); 
+		}
+
+		function generateListItem(index, name, status, params, start, end, time, cmd)
+		{
+
+			var result = "";
+			result += "<div class=\"panel panel-default\">";
+			result += 	"<div class=\"panel-heading\">";
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: left;\">";
+			result +=   			"<h5>" + index + "." + name + "_" + cmd + " </h5>";
+			result += 			"</div>";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: right;\">";
+			result +=   			"<div style=\"margin-top: 3px;\">";
+			result +=   				"<button class=\"btn btn-warning\" type=\"button\" onclick=\"clickLog('" + name + "', " + cmd + ")\" title='查看LOG'><span class=\"glyphicon glyphicon-file\"></span></button>&nbsp;";
+			result +=   				"<button class=\"btn btn-primary\" type=\"button\" onclick=\"showRunDialog('" + name  + "','" + params + "')\" title='重启程序'><span class=\"glyphicon glyphicon-refresh\"></span></button>&nbsp;";
+			//result +=   				"<button class=\"btn btn-default\" type=\"button\" onclick=\"\"><span class=\"glyphicon glyphicon-chevron-down\"></span></button>";
+			result +=   			"</div>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 	"</div>";
+
+			result += 	"<div class=\"panel-body\">";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-default\" >状态:</span>&nbsp;";
+			if(status == "finished"){
+			result +=   				"<span class=\"label label-success\" >" + status + "</span>";
+			}else if (status == "error"){
+			result +=   				"<span class=\"label label-danger\" >" + status + "</span>";
+			}else{
+			result +=   				"<span class=\"label label-warning\" >" + status + "</span>";	
+			}
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-default\" >参数:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + params + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-default\" >开始:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + start + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			if(end != -1 && end != ""){
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-default\" >结束:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + end + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+			}
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-default\" >运行:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + time + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 	"</div>";
+			result += "</div>";
+			return result;
+		}
+
+		function showRunDialog(name, params)
+		{
+			console.log("showRunDialog()");
+			
+			$("#runTitle").html("Run - " + name);
+       		$("#runParams").val(params);
+
+       		$('#modalRun').on('hidden.bs.modal', function (e) {
+				console.log("hide modalRun----------");
+				$('#runClose').off();
+				$('#runNo').off();
+				$('#runYES').off();
+				$('#modalRun').off('hidden.bs.modal');//去除绑定
+				//console.log($(document.activeElement).attr("id"));
+				if(isAndroid()){
+					if($(document.activeElement).attr("id") == "runYES"){
+						var params = $("#runParams").val();
+						handleClickRunYes(name, params);
+					}
+				}
+			});
+
+			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
+			if(!isAndroid())
+			{
+				$('#runYES').click(function(){
+					var params = $("#runParams").val();
+					handleClickRunYes(name, params);
+				});
+			}
+
+			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
+			$('#modalRun').modal({backdrop: 'static', keyboard: false});
+			//代码调用 显示模态框的方法
+			$('#modalRun').modal("show");
+
+			$('#runParams').focus();
+		}
+
+		function handleClickRunYes(name, params){
+			console.log("handleClickRunYes() name:" + name + " params:" + params);
+			var obj = new Object();
+			obj.name = name;
+			var aryParams = params.split(",");
+			obj.params = aryParams;
+			var jsonStr = JSON.stringify(obj);
+			console.log("handleClickRunYes() jsStr:" + jsonStr);
+			var url = DEV_IP + "/execute";
+			showTips("running " + name + "...", "warning", 10000);
+			$.post(url, jsonStr, function(result){
+				console.log("result:" + JSON.stringify(result));
+				if(result.state == "error"){
+					showTips(result.msg, "danger", 3000);
+				}else if(result.state == "done"){
+					showTips("run " + name +" end~~~", "success");
+					setTimeout(function(){
+						updateTaskList();
+						window.open(DEV_IP + "/web/index.html"); 
+					}, 1000);
+				}
+  			});
+		}
+
+		function dismissRunDialog()
+		{
+			console.log("dismissRunDialog");
+			if(isPC())
+			{
+				$('#modalRun').modal("hide");
+			}
+		}
+
+		function isAndroid() {
+		    var userAgentInfo = navigator.userAgent;
+		    //alert(userAgentInfo);
+		    var Agents = ["Android"];
+		    var flag = false;
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = true;
+		            break;
+		        }
+		    }
+		    return flag;
+		}
+
+		var showTipsTimer;
+		function showTips(msg, level="warning", timeout=3000)
+		{
+			console.log("showTips:" + msg);
+
+			//clear timer
+			clearTimeout(showTipsTimer);
+			var btnHtml = "<button type=\"button\" class=\"close\" onclick=\"closeTips('" + level + "')\"><span aria-hidden=\"true\">&times;</span></button>";
+			$("#alertTips").html(btnHtml + msg);
+			var classAttr = "alert alert-" + level + " fade in";
+			$("#alertTips").attr("class", classAttr);
+
+			showTipsTimer = setTimeout(function(){
+				console.log("showTips timeout ----");
+				var classAttr = "alert alert-" + level + " fade out hidden";
+				$("#alertTips").attr("class", classAttr);
+				clearTimeout(showTipsTimer);
+			}, timeout);
+
+		}
+
+		function closeTips(level)
+		{
+			console.log("closeTips ----");
+			var classAttr = "alert alert-" + level + " fade out hidden";
+			$("#alertTips").attr("class", classAttr);
+			clearTimeout(showTipsTimer);
+		}
+
+	</script>
+</body>
+</html>

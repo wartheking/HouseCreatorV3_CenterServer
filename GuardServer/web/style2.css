@@ -1,0 +1,338 @@
+@charset "utf-8";
+
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei UI", "Microsoft YaHei", SimHei, "\5B8B\4F53", simsun, sans-serif;
+	color: #666;
+}
+
+.logo {
+	padding : 0px;
+}
+
+/*
+
+
+
+
+拍照界面列表
+
+
+
+
+*/
+
+/*导航栏 logo*/
+#navbar-collapse ul {
+	margin-top: 0px;
+}
+
+.navbar_path{
+	margin-top: 50px;
+	background-color: #fff;
+	border: 0px;
+	padding-top: 8px;
+}
+
+/*capture footer*/
+#footer_capture {
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
+#footer_status {
+	height: 25px;
+	background-color: #666;
+	margin-bottom: 80px;
+	text-align: center;
+}
+
+/*capture bottom start btn*/
+.btn-circle {
+  width: 55px;
+  height: 55px;
+  line-height: 45px;
+  border-radius: 27.5px;
+  font-size: 20px;
+}
+
+#path_bg{
+	margin-top: 65px;
+}
+
+#path_bg .input-group{
+	box-shadow: 3px 3px 3px #ccc;
+}
+
+#album_bg{
+	margin-top: 100px;
+}
+
+.album_item {
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+#album_bg p{
+	color: #666;
+	margin-top: 10px;
+	font-size: 12px;
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+#album_bg .caption button{
+	font-size: 14px;
+}
+
+
+/*
+
+
+
+
+文件列表
+
+
+
+
+*/
+#filelist_bg{
+	margin-top: 100px;
+}
+
+#filelist_bg td{
+	vertical-align: middle;
+}
+
+#filelist_bg .item_name{
+	font-size: 13px;
+	color: #000;
+}
+
+#filelist_bg .item_size{
+	font-size: 12px;
+	font-style: italic;
+	color: #999;
+}
+
+#filelist_bg td button span{
+	font-size: 11px;
+}
+
+#footer_files {
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
+#spanCount{
+	font-size: 13px;
+}
+
+/*
+
+
+
+
+设置界面
+
+
+
+
+*/
+#setting_body{
+	background-color: #eee;
+}
+
+#setting_bg{
+	margin-top: 70px;
+}
+
+#footer_setting{
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
+.bgSettingsItem {
+	background-color: #fff;
+	box-shadow: 2px 2px 3px #ccc;
+}
+
+#setting_bg h3{
+	color: #333;
+	font-size: 18px;
+	border-bottom: 1px solid #eee;
+	padding: 20px 0;
+	margin: 0 0 10px 0;
+}
+
+#setting_bg p{
+	line-height: 2;
+	font-size: 13px;
+	padding-bottom: 10px;
+}
+
+#setting_bg td{
+	vertical-align: middle;
+}
+
+/*
+
+
+
+
+首页界面
+
+
+
+
+*/
+
+#footer_index {
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
+#ssidValue{
+	font-size: 11px;
+}
+
+#batteryBg{
+	font-size: 9px;
+}
+
+#versionBg{
+	font-size: 9px;
+}
+
+.nav_index{
+	margin-top: 50px;
+}
+
+#indexlist_bg{
+	margin-top: 100px;
+}
+
+/*没有小于768px， 是因为Bootstrap以移动端优先设计*/
+
+/*小屏幕（平板，大于等于768px）*/
+@media (min-width: 768px) {
+	#album_bg .caption button{
+		font-size: 14px;
+	}
+
+	#filelist_bg td button span{
+		font-size: 16px;
+	}
+
+	#filelist_bg .item_name{
+		font-size: 18px;
+	}
+
+	#filelist_bg .item_size{
+		font-size: 16px;
+		font-style: italic;
+	}
+
+	#spanCount{
+		font-size: 15px;
+	}
+
+	#setting_bg h3{
+		font-size: 19px;
+	}
+
+	#setting_bg p{
+		font-size: 14px;
+	}
+
+	#ssidValue{
+		font-size: 15px;
+	}
+
+	#batteryBg{
+		font-size: 13px;
+	}
+
+	#versionBg{
+		font-size: 13px;
+	}
+
+}
+
+/*中屏幕（桌面显示器， 大于等于992px）*/
+@media (min-width: 992px) {
+	#album_bg p{
+		font-size: 15px;
+	}
+	#album_bg .caption button{
+		font-size: 16px;
+	}
+	.btn-circle {
+	  width: 80px;
+	  height: 80px;
+	  line-height: 75px;
+	  border-radius: 40px;
+	  font-size: 35px;
+	}
+	#footer_capture {
+		height: 120px;
+		padding-bottom: 30px;
+	}
+	#footer_status {
+		margin-bottom: 120px;
+	}
+
+	#setting_bg h3{
+		font-size: 20px;
+	}
+
+	#setting_bg p{
+		font-size: 15px;
+	}
+}
+
+@media (min-width: 1200px) {
+	#album_bg p{
+		font-size: 15px;
+	}
+	#album_bg .caption button{
+		font-size: 16px;
+	}
+	.btn-circle {
+	  width: 80px;
+	  height: 80px;
+	  line-height: 75px;
+	  border-radius: 40px;
+	  font-size: 35px;
+	}
+	#footer_capture {
+		height: 120px;
+		padding-bottom: 30px;
+	}
+	#footer_status {
+		margin-bottom: 120px;
+	}
+
+	#setting_bg h3{
+		font-size: 22px;
+	}
+
+	#setting_bg p{
+		font-size: 16px;
+	}
+}
+
+
