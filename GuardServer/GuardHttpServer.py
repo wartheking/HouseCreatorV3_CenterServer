@@ -20,6 +20,7 @@ SER_TAG_UPLOAD  = "/upload"
 SER_DIR_DATA    = "data"
 SER_DIR_WEB     = "web"
 SER_DIR_CMD     = "cmd"
+SER_DIR_ACCESS  = "access"
 
 SER_RTN_PATH = "path"
 SER_RTN_STATE = "state"
@@ -33,6 +34,7 @@ SER_RTN_MSG_PATHNOTFOUND = "path not found"
 SER_RTN_MSG_FILENOTFOUND = "file not found"
 SER_RTN_MSG_REQUESTERR = "request error"
 SER_RTN_MSG_TIMEOUT = "time out"
+SER_RTN_MSG_DELETEERR = "delete err"
 SER_RTN_DATA = "data"
 
 SER_FILE_PATH  = "path"
@@ -67,7 +69,7 @@ SER_CONTYPE_PPT  = "application/vnd.ms-powerpoint"
 SER_CONTYPE_XLS  = "application/x-xls"
 SER_CONTYPE_APK  = "application/vnd.android.package-archive"
 SER_CONTYPE_IPA  = "application/vnd.iphone"
-SER_CONTYPE_DEFAULT = "application/octet-stream"
+SER_CONTYPE_DEFAULT = "text/plain"
 
 SER_TYPE_CSS  = ".css"
 SER_TYPE_GIF  = ".gif"
@@ -160,7 +162,7 @@ class GuardHttpServer:
 
 	def echo_200(self, sock, contentType):
 		respStr  = "HTTP/1.1 200 OK\r\n"
-		respStr += "Content-Type: " + str(contentType) + "\r\n"
+		respStr += "Content-Type: " + str(contentType) + ";charset=UTF-8\r\n"
 		respStr += "Access-Control-Allow-Origin: *\r\n"
 		respStr += "\r\n"
 		sock.send(respStr.encode('utf-8'))
@@ -320,6 +322,8 @@ class GuardHttpServer:
 			self.echo_msg(sock, self.genSimpleRtnMsg(path, SER_RTN_STATE_ERROR, SER_RTN_MSG_NOTPERMIT))
 			return
 		dirPath = self.gRootPath + path
+		if self.isAccessPath(path):
+			dirPath = self.pathRemoveAccess(path)
 		if os.path.isdir(dirPath):
 			log.info("sock:" + str(sock.fileno()) + " uploadOpt() isDir")
 		else:
@@ -474,6 +478,8 @@ class GuardHttpServer:
 		log.info("downloadOpt sock:" + str(sock.fileno()) + " path:" + path)
 		try:
 			filePath = self.gRootPath + path
+			if self.isAccessPath(path):
+				filePath = self.pathRemoveAccess(path)
 			file = open(filePath, "rb")
 			fileSize = self.http_get_file_size(filePath)
 			isGetRange = 0
@@ -572,18 +578,42 @@ class GuardHttpServer:
 				log.info("sock:" + str(sock.fileno()) + " finally close file error!!!")
 			return 0
 
+	def deleteFile(self, sock, urlpath, path):
+		log.info("sock:" + str(sock.fileno()) + " deleteFile() path:" + path)
+		ret = 0
+		try:
+			filePath = self.gRootPath + path
+			if self.isAccessPath(path):
+				filePath = self.pathRemoveAccess(path)
+			os.remove(filePath)
+			ret = 1
+		except:
+			log.info("deleteFile path:" + filePath + " error!!!")
+			log.info(traceback.format_exc())
+			ret = 0
+		time.sleep(0.2)
+		if ret == 0:
+			self.echo_msg(sock, self.genSimpleRtnMsg(urlpath, SER_RTN_STATE_ERROR, SER_RTN_MSG_DELETEERR))
+		else:
+			self.echo_msg(sock, self.genSimpleRtnMsg(urlpath, SER_RTN_STATE_DONE, ""))
+
 	def echo_showfile(self, path, sock):
 		self.clear_sock(sock)
 		log.info("sock:" + str(sock.fileno()) + " echo_showfile() path:" + path)
 		try:
 			#去掉参数
 			if "?" in path:
+				urlpath = path
 				aryPath = path.split("?")
 				path = aryPath[0]
 				tail = aryPath[1]
 				if tail == "download":
 					return self.downloadOpt(sock, path)
+				elif tail == "delete":
+					return self.deleteFile(sock, urlpath, path)
 			filePath = self.gRootPath + path
+			if self.isAccessPath(path):
+				filePath = self.pathRemoveAccess(path)
 			file = open(filePath, "rb")
 			name = os.path.basename(filePath)
 			contentType = self.getContentType(name)
@@ -609,6 +639,7 @@ class GuardHttpServer:
 			log.info("sock:" + str(sock.fileno()) + " is dir error!!!")
 		except:
 			log.info("sock:" + str(sock.fileno()) + " other exception!!!")
+			log.info(traceback.format_exc())
 		finally:
 			try:
 				log.info("sock:" + str(sock.fileno()) + " echo_showfile() finally close file~~~~")
@@ -653,7 +684,7 @@ class GuardHttpServer:
 	def isSerPermitPath(self, path):
 		ret = 0
 		#log.info("test ---- " + path[0:len(SER_DIR_DATA)] + " ---- " + path[0:len(SER_DIR_WEB)])
-		if path[0:len(SER_DIR_DATA)] == SER_DIR_DATA or path[0:len(SER_DIR_WEB)] == SER_DIR_WEB or path[0:len(SER_DIR_CMD)] == SER_DIR_CMD:
+		if path[0:len(SER_DIR_DATA)] == SER_DIR_DATA or path[0:len(SER_DIR_WEB)] == SER_DIR_WEB or path[0:len(SER_DIR_CMD)] == SER_DIR_CMD or path[0:len(SER_DIR_ACCESS)] == SER_DIR_ACCESS:
 			ret = 1
 		return ret
 	
@@ -661,6 +692,8 @@ class GuardHttpServer:
 		aryFiles = []
 		try:
 			fullPath = self.gRootPath + path
+			if self.isAccessPath(path):
+				fullPath = self.pathRemoveAccess(path)
 			fileList = os.listdir(fullPath)
 			fileList.sort()
 			for i in fileList:
@@ -684,6 +717,27 @@ class GuardHttpServer:
 		strRtn = strRtn.replace("\'", "\"")
 		return strRtn
 		
+	def isAccessPath(self, path):
+		ret = 0
+		tmp = path[1:]
+		tmp = tmp[:len(SER_DIR_ACCESS)]
+		log.info("isAccessPath() -- " + str(tmp))
+		if tmp == SER_DIR_ACCESS:
+			ret = 1
+		return ret
+	
+	def pathRemoveAccess(self, path):
+		tmp = path[(1+len(SER_DIR_ACCESS)+1): ]
+		if len(tmp) == 1:
+			#只有盘符的情况
+			tmp += ":/"
+		else:
+			#这里要在盘符后面加上:
+			disk = tmp[0:1]
+			last = tmp[1:]
+			tmp = disk + ":" + last
+		log.info("pathRemoveAccess() ---> " + str(tmp))
+		return tmp
 
 	def handle_client(self, sock, server_socket):
 		log.info("handleclient() enter sock:" + str(sock.fileno()))
@@ -699,16 +753,24 @@ class GuardHttpServer:
 			pathAry = rtnStr.split(" ")
 			method = pathAry[0]
 			path = pathAry[1]
-			path = self.decodepath(path)
+			# path = self.decodepath(path)
+			path = urllib.parse.unquote(path)
 			log.info("sock:" + str(sock.fileno()) + " method:" + method + " path:" + path)
 			if rtnStr.find(SER_TAG_HTTP) >= 0:
 				#HTTP 协议
 				if method == SER_TAG_POST and len(path) > len(SER_TAG_UPLOAD) and (path[0:len(SER_TAG_UPLOAD)] == SER_TAG_UPLOAD):
 					self.uploadOpt(sock, path)
 				else:
+					if path == "/favicon.ico":
+						path = "/web/favicon.ico"
+					if path == "/":
+						path = "/web/jump2index.html"
 					if self.isSerPermitPath(path[1:]):
 						contentType = self.getContentType(path)
 						testPath = self.gRootPath + path
+						if self.isAccessPath(path):
+							testPath = self.pathRemoveAccess(path)
+						log.info("testPath ---> " + str(testPath))
 						if os.path.isdir(testPath):
 							self.echo_msg(sock, self.listDir(path))
 						else:

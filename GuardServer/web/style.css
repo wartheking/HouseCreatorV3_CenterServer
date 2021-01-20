@@ -87,12 +87,67 @@ textarea:disabled{
   -webkit-text-fill-color: #000000;
 }
 
+/*
+
+
+
+
+文件界面
+
+
+
+
+*/
+#filelist_bg{
+	margin-top: 100px;
+}
+
+#filelist_bg td{
+	vertical-align: middle;
+}
+
+#filelist_bg .item_name{
+	font-size: 13px;
+	color: #000;
+}
+
+#filelist_bg .item_size{
+	font-size: 12px;
+	font-style: italic;
+	color: #999;
+}
+
+#filelist_bg td button span{
+	font-size: 11px;
+}
+
+#footer_files {
+	height: 80px;
+	background-color: #666;
+	text-align: center;
+	color: #eee;
+	padding-bottom: 10px;
+}
+
 /*没有小于768px， 是因为Bootstrap以移动端优先设计*/
 
 /*小屏幕（平板，大于等于768px）*/
 @media (min-width: 768px) {
 	#logbg{
 		font-size: 10px;
+	}
+
+	#filelist_bg td button span{
+		font-size: 16px;
+	}
+
+	#filelist_bg .item_name{
+		font-size: 18px;
+	}
+
+	#filelist_bg .item_size{
+		font-size: 16px;
+		font-style: italic;
 	}
 }
 

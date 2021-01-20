@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Index</title>
+</head>
+<body>
+	<script type="text/javascript">
+		var url = window.location.href;
+		if(url.lastIndexOf("http://") >= 0){
+			 url = url + "web/index.html";
+		}
+		console.log("url:" + url)
+		window.location.href = url;
+	</script>
+</body>
+</html>

@@ -26,16 +26,10 @@
 						<a href="index.html"><span class="glyphicon glyphicon-home"></span> Index</a>
 					</li>
 					<li>
-						<a href="capture.html"><span class="glyphicon glyphicon-camera"></span> Capture</a>
+						<a href="history.html"><span class="glyphicon glyphicon-time"></span> History</a>
 					</li>
 					<li class="active">
 						<a href="file.html"><span class="glyphicon glyphicon-file"></span> File</a>
-					</li>
-					<li>
-						<a href="setting.html"><span class="glyphicon glyphicon-cog"></span> Setting</a>
-					</li>
-					<li>
-						<a href="debug.html"><span class="glyphicon glyphicon glyphicon-list-alt"></span> Debug</a>
 					</li>
 				</ul>
 			</div>
@@ -51,11 +45,13 @@
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 					<div class="input-group">
 						<div class="input-group-btn">
-					  		<button type="button" id="proRoot" class="btn btn-default" onclick="goBack()" title="/mnt/DCIM/">/mnt/DCIM/</button>
+					  		<button type="button" id="proRoot" class="btn btn-default" onclick="goBack()" title="/cmd">/cmd</button>
 							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
 							<ul class="dropdown-menu">
-							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/mnt/DCIM/</a></li> 
-							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/opt/</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/cmd</a></li> 
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/web</a></li> 
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/data</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/access</a></li>
 							</ul>
 				         </div><!-- /btn-group -->
 					  <input id="proName" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="" title="">
@@ -81,10 +77,10 @@
 					<h4 class="modal-title">Tips</h4>
 				</div>
 				<div class="modal-body" id="modalDeleteBody">
-					<span> Are you sure to <span style="color: #f00;">DELETE</span>?</span>
+					<span> 确定要 <span style="color: #f00;">删除</span> 这些文件吗?</span>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="deleteYES">Yes</button>
+					<button type="button" class="btn btn-default" id="deleteYES">YES</button>
 					<button type="button" class="btn btn-primary" id="deleteNo">No</button>
 				</div>
 			</div>
@@ -93,105 +89,6 @@
 		<!-- /.modal -->
 	</div>
 	<!-- Delete 弹出框 结束-->
-
-	<!-- New Folder 弹出框 -->
-	<div class="modal" id="modalNewFolder" tabindex="-1" role="dialog">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" id="newFolderClose" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">New Folder</h4>
-				</div>
-				<div class="modal-body" id="modalNewFolderBody">
-					<div class="input-group">
-						<!-- 路径长度 代码去处理吧 小于 768px的都 只保留10个字符， 大于等于768px的保留 26个字符 -->
-				  		<span  id="newFolderProRoot" class="input-group-addon">/mnt/DCIM/</span>
-				  		<input id="newFolderProName" type="text" class="form-control" placeholder="a-z, A-Z, 0-9, '_'">
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="newFolderYES" data-dismiss="modal">Create</button>
-					<button type="button" class="btn btn-primary" id="newFolderNo" data-dismiss="modal">Cancel</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
-	<!-- New Folder 弹出框 结束-->
-
-	<!-- Compress 弹出框 -->
-	<div class="modal" id="modalCompress" tabindex="-1" role="dialog" aria-labelledby="compressLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" aria-hidden="true" id="compressClose">&times;</button>
-					<h4 class="modal-title">Tips</h4>
-				</div>
-				<div class="modal-body" id="modalCompressBody">
-					<span> Ready to <span style="color: #f00;">COMPRESS</span>?</span>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="compressYES">Yes</button>
-					<button type="button" class="btn btn-primary" id="compressNo">No</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
-	<!-- Compress 弹出框 结束-->
-
-	<!-- Rename 弹出框 -->
-	<div class="modal" id="modalRename" tabindex="-1" role="dialog" aria-labelledby="renameLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" aria-hidden="true" id="renameClose" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Rename</h4>
-				</div>
-				<div class="modal-body" id="modalRenameBody">
-					<span id="renameDialogName">20200914_122417_0_STITCH.jpg</span>
-					<br/><br/>
-					<div class="input-group">
-						<!-- 路径长度 代码去处理吧 小于 768px的都 只保留10个字符， 大于等于768px的保留 26个字符 -->
-				  		<input id="renameNewName" type="text" class="form-control" placeholder="a-z, A-Z, 0-9, '_', '.'">
-				  		<span class="input-group-addon" style="color: #f00; font-weight: 800;">*</span>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="renameYES" data-dismiss="modal">Yes</button>
-					<button type="button" class="btn btn-primary" id="renameNo" data-dismiss="modal">No</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
-	<!-- Rename 弹出框 结束-->
-
-	<!-- Move 弹出框 -->
-	<div class="modal" id="modalMove" tabindex="-1" role="dialog" aria-labelledby="moveLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" aria-hidden="true" id="moveClose" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title" id="modalMoveTitle">Move To</h4>
-				</div>
-				<div class="modal-body" id="modalMoveBody">
-					
-				</div>
-				<div class="modal-footer">
-					<span id="moveTips" class="label label-danger"></span>
-					<button type="button" class="btn btn-default" id="moveYES" data-dismiss="modal">Yes</button>
-					<button type="button" class="btn btn-primary" id="moveNo" data-dismiss="modal">No</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
-	<!-- Move 弹出框 结束-->
 
 	<!-- Upload 弹出框 -->
 	<div class="modal" id="modalUpload" tabindex="-1" role="dialog">
@@ -257,12 +154,8 @@
 						<button class="btn btn-info dropdown-toggle" type="button" id="dropdownOption" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="spanOption">Delete</span>&nbsp;&nbsp;<span class="caret"></span></button>
 						<ul id="bgListOptions" class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownOption">
 							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Delete</a></li>
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Move</a></li>
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Compress</a></li>
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Copy</a></li>
 							<li role="separator" class="divider"></li>
 							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Upload</a></li>
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">New Folder</a></li>
 						</ul>
 					</div>
 				</div>
@@ -274,20 +167,19 @@
 	<!-- 先让网页显示出来，再加载js -->
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="Protocol.js" charset="utf-8"></script>
+	<script type="text/javascript" src="IP.js" charset="utf-8"></script>
 	<script type="text/javascript">
 		 
-		//GLOBAL PARAMS
 		var gJObjFileList;
 		var gIsDeleting = false;
 		var gIsUploading = false;
+
 		var gIsCompressing = false;
 		var gIsMoveCpying  = false;
-		var gIsUploading   = false;
 
 		function isBusy()
 		{
-			var result = gIsDeleting || gIsUploading || gIsCompressing || gIsMoveCpying || gIsUploading;
+			var result = gIsDeleting || gIsUploading || gIsCompressing || gIsMoveCpying;
 			console.log("isBusy() - " + result);
 			return result;
 		}
@@ -311,8 +203,8 @@
    //     		});
 
 			//更新 按钮的大小
-       		updateItemBtnsSize();
-       		initDev();
+       		// updateItemBtnsSize();
+       		// initDev();
        		refreshFileList();
 
 		});
@@ -325,331 +217,11 @@
 			$('#bgSpanCount').css('margin-top', (($('#footer_files').height() - $('#bgSpanCount').height()) * 0.5) + 'px');
 
 			//album_bg
-			$('#filelist_bg').css('margin-bottom', $('#footer_files').height() + 'px')
+			$('#filelist_bg').css('margin-bottom', $('#footer_files').height() + 'px');
 
-			//弹出框显示在中间
-			// $('#myModal').on('shown.bs.modal', function (e) {
-	  //           // 关键代码，如没将modal设置为 block，则$modala_dialog.height() 为零
-	  //           $(this).css('display', 'block');
-	  //           var modalHeight = $(window).height() / 2 - $('#myModal .modal-dialog').height() / 2;
-	  //           $(this).find('.modal-dialog').css({'margin-top': modalHeight});
-   //     		});
+			updateItemBtnsSize();
 
-			//更新 按钮的大小
-       		updateItemBtnsSize();
-       		dismissDeleteDialog();
-       		dismissCompressDialog();
-       		dismissRenameDialog();
-       		dismissMoveDialog();
-       		dismissUploadDialog();
-       		dismissNewFolderDialog();
 		});
-
-		$(document).keydown(function(event){
-// 　　　　		console.log("keyboard enter:" + event.keyCode);
-			if (isPC() && event.keyCode == 13) 
-			{
-				if (isBusy()) {return;}
-				console.log("keyboard click enter!");
-				$("#proName").blur();
-				onClickRefresh();
-			}
-			if (isPC() && event.keyCode == 27) 
-			{
-				console.log("keyboard click esc!");
-	       		dismissDeleteDialog();
-	       		dismissCompressDialog();
-	       		dismissRenameDialog();
-	       		dismissMoveDialog();
-	       		dismissUploadDialog();
-	       		dismissNewFolderDialog();
-			}
-　　　　  });
-
-
-		function updateItemBtnsSize()
-		{
-			console.log("updateItemBtnsSize()");
-			//更新 按钮的大小
-       		var classAttr1 = "btn btn-warning btn-xs item_btn item_btn1";
-       		var classAttr2 = "btn btn-info btn-xs item_btn item_btn2";
-       		if($(window).width() >= 768)
-       		{
-       			classAttr1 = "btn btn-warning item_btn item_btn1";
-       			classAttr2 = "btn btn-info item_btn item_btn2"
-       		}
-       		$(".item_btn1").attr("class", classAttr1);
-       		$(".item_btn2").attr("class", classAttr2);
-		}
-
-		function initDev()
-		{
-			console.log("initDev()");
-
-			//sync time
-			sycTimeToDev();
-		}
-
-		function getCurrentTimeProName()
-		{ 
-			//创建对象  
-			var date = new Date();  
-			//获取年份  
-			var y = date.getFullYear(); 
-			//获取月份  返回0-11     
-			var m =date.getMonth()+1; 
-			// 获取日   
-			var d = date.getDate();
-			//获取星期几  返回0-6   (0=星期天)   
-			var w = date.getDay();    
-			//星期几
-			var ww = ' 星期'+'日一二三四五六'.charAt(date.getDay()) ;
-			//时
-			var h = date.getHours();
-			//分  
-			var minute = date.getMinutes() 
-			//秒 
-			var s = date.getSeconds(); 
-			//毫秒
-			var sss = date.getMilliseconds() ;
-			
-			if(m<10){
-			m = "0"+m;
-			}
-			if(d<10){
-			d = "0"+d;
-			}
-			if(h<10){
-			h = "0"+h;
-			}
-			if(minute<10){
-			minute = "0"+minute;
-			} 
-			if(s<10){
-			s = "0"+s;
-			}
-			
-			if(sss<10){
-			sss = "00"+sss;
-			}else if(sss<100){
-			sss = "0"+sss;
-			}
-			return y+""+m+""+d+"_"+h+""+minute+""+s;  
-		}
-
-
-		function checkIsBusy(resultCallback)
-		{
-			console.log("checkIsBusy");
-			getDevStatus(function(result){
-				ret = 0;
-				isRecording = 0;
-				for (tmp in result)
-				{
-					tmpRet = result[tmp];
-					if (typeof(tmpRet) == 'number' && tmp !== "recTime") 
-					{
-						console.log("state:" + tmp + " tmpRet:" + tmpRet);
-						if (tmpRet > 0) 
-						{
-							ret = 1;
-						}
-						if (tmp == "isRecording" && tmpRet > 0) 
-						{
-							isRecording = 1;
-						}
-					}
-				}
-				resultCallback(ret, isRecording);
-			});
-		}
-
-		var showTipsTimer;
-		function showTips(msg, level="warning", timeout=3000)
-		{
-			console.log("showTips:" + msg);
-
-			//clear timer
-			clearTimeout(showTipsTimer);
-			var btnHtml = "<button type=\"button\" class=\"close\" onclick=\"closeTips('" + level + "')\"><span aria-hidden=\"true\">&times;</span></button>";
-			$("#alertTips").html(btnHtml + msg);
-			var classAttr = "alert alert-" + level + " fade in"
-			$("#alertTips").attr("class", classAttr);
-
-			showTipsTimer = setTimeout(function(){
-				console.log("showTips timeout ----");
-				var classAttr = "alert alert-" + level + " fade out hidden";
-				$("#alertTips").attr("class", classAttr);
-				clearTimeout(showTipsTimer);
-			}, timeout);
-
-		}
-
-		function closeTips(level)
-		{
-			console.log("closeTips ----");
-			var classAttr = "alert alert-" + level + " fade out hidden";
-			$("#alertTips").attr("class", classAttr);
-			clearTimeout(showTipsTimer);
-		}
-
-		function getFileNameFromPath(path)
-		{
-			var pos = path.lastIndexOf("\/");
-			strFileName = path.substring(pos + 1);//文件名带后缀
-			return strFileName;
-		}
-
-		function isPC() {
-		    var userAgentInfo = navigator.userAgent;
-		    //alert(userAgentInfo);
-		    var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
-		    var flag = true;
-		    for (var v = 0; v < Agents.length; v++) {
-		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
-		            flag = false;
-		            break;
-		        }
-		    }
-		    return flag;
-		}
-
-		function isAndroid() {
-		    var userAgentInfo = navigator.userAgent;
-		    //alert(userAgentInfo);
-		    var Agents = ["Android"];
-		    var flag = false;
-		    for (var v = 0; v < Agents.length; v++) {
-		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
-		            flag = true;
-		            break;
-		        }
-		    }
-		    return flag;
-		}
-
-		function isiPhoneOriPad() {
-		    var userAgentInfo = navigator.userAgent;
-		    //alert(userAgentInfo);
-		    var Agents = ["iPhone", "iPad", "iPod"];
-		    var flag = false;
-		    for (var v = 0; v < Agents.length; v++) {
-		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
-		            flag = true;
-		            break;
-		        }
-		    }
-		    return flag;
-		}
-
-		function isPhoto(name){
-			if(name.indexOf(".jpg") > 0 || name.indexOf(".JPG") > 0 || name.indexOf(".jpeg") > 0 || name.indexOf(".JPEG") > 0 || name.indexOf(".png") > 0 || name.indexOf(".PNG") > 0)
-			{
-				return 1;
-			}
-			return 0;
-		}
-
-		function isVideo(name){
-			if(name.indexOf(".mp4") > 0 || name.indexOf(".MP4") > 0){
-				return 1;
-			}
-			return 0;
-		}
-
-		function onClickRootPath(item)
-		{
-			if (isBusy()) {return;}
-			var oldPath = $("#proRoot").attr("title");
-			var path    = item.innerHTML;
-			console.log("onClickRootPath() oldPath:" + oldPath + " path:" + path);
-			if(oldPath == path)
-			{
-				//一样的就不管了
-				console.log("select the same path!");
-				return;
-			}
-			else
-			{
-				//不一样的
-				updateProRoot(path);
-				updateProName("");
-				updateOptions(path);
-				updateBtnConfirm(path);
-				if (path == "/mnt/DCIM/") 
-				{
-					// $("#proRoot").removeAttr("disabled");
-					// $("#proName").removeAttr("disabled");
-					$("#proRoot").attr("class","btn btn-default");
-				}
-				else
-				{
-					// $("#proRoot").attr("disabled","disabled");
-					// $("#proName").attr("disabled","disabled");
-					$("#proRoot").attr("class","btn btn-default");
-
-				}
-				refreshFileList();
-			}
-		}
-
-		function updateOptions(path)
-		{
-			console.log("updateOptions() path:" + path);
-
-			// if (path == "/opt/")
-			// {
-			// 	$("#bgOption").hide();
-			// }
-			// else if(path == "/opt/web/")
-			// {
-			// 	$("#bgOption").hide();
-			// }
-			// else if(path == "/opt/log/")
-			// {
-			// 	$("#bgOption").hide();
-			// }
-			// else
-			// {
-			// 	//带/mnt/DCIM的了
-			// 	$("#bgOption").show();
-			// }
-		}
-
-		function updateBtnConfirm(path)
-		{
-			// console.log("updateBtnConfirm()");
-			// if (path == "/opt/") 
-			// {
-			// 	$("#btnConfirm").html("Upload");
-			// 	$("#btnConfirm").show();
-			// }
-			// else if(path == "/opt/web/")
-			// {
-			// 	$("#btnConfirm").html("Upload");
-			// 	$("#btnConfirm").show();
-			// }
-			// else if(path == "/opt/log/")
-			// {
-			// 	$("#btnConfirm").hide();
-			// }
-			// else
-			// {
-			// 	//带/mnt/DCIM的了
-			// 	$("#btnConfirm").html("Confirm");
-			// 	$("#btnConfirm").show();
-			// }
-		}
-
-		function onClickRefresh()
-		{
-			if (isBusy()) {return;}
-			console.log("onClickRefresh()");
-			pathRoot = $("#proRoot").attr("title");
-			pathProName = $("#proName").val();
-			handleUpdateProRootAndName(pathRoot + pathProName);
-			refreshFileList();
-		}
 
 		function refreshFileList()
 		{
@@ -664,11 +236,25 @@
 
 			showTips("Refreshing ....");
 
-			listFiles(path, function(result){
-				if(result.state == OSC_JTAG_STATE_DONE)
+			var url = DEV_IP + path;
+			$.get(url, "", function(result){
+				console.log("result:" + JSON.stringify(result));
+
+				if(result.state && result.state == "error")
+				{
+					showTips("path error or not exists !!!");
+					$("#spanCount").html("0");
+					clearFileList();
+					setTimeout(function(){
+						handleUpdateProRootAndName("/cmd");
+						refreshFileList();
+					}, 1000);
+					
+				}
+				else
 				{
 					gJObjFileList = result;
-					if (result.results.count <= 0) 
+					if (result.files.length <= 0) 
 					{
 						showTips("no files !!!");
 						$("#spanCount").html("0");
@@ -680,18 +266,8 @@
 						updateFileList(result);
 					}
 				}
-				else
-				{
-					showTips("path error or not exists !!!");
-					$("#spanCount").html("0");
-					clearFileList();
-					setTimeout(function(){
-						handleUpdateProRootAndName("/mnt/DCIM/");
-						refreshFileList();
-					}, 1000);
-				}
+  			});
 
-			});
 		}
 
 		function clearFileList()
@@ -700,277 +276,66 @@
 			$("#filelistBody").html("");
 		}
 
-		function updateFileList(jsonObj)
+		function fixSlash(src)
 		{
-			console.log("updateFileList()");
-			var path = jsonObj.results.path;
-			var count = jsonObj.results.count;
-			var aryFiles = jsonObj.results.files;
-			var mIndex = 0;
-
-			var outName = "";
-			var outUrl  = "";
-			var outUrlShow = "";
-			var outPathDev = "";
-			var newHtml = "";
-			var outSize = 0;
-			var isSubDir = 0;
-			var isOpt = 0;
-			if($("#proRoot").attr("title").lastIndexOf("/opt") >= 0)
+			var len = src.length;
+			var i = 0;
+			var dst = "";
+			var dstLen = dst.length;
+			while(i < len)
 			{
-				isOpt = 1;
-			}
-			for(mIndex = 0; mIndex < count; mIndex++)
-			{
-				tmpItem = aryFiles[mIndex];
-				outName = tmpItem.name;
-				outPathDev = path + "/" + outName;
-				outUrl  = OSC_DEV_IP + outPathDev;
-				outUrlShow = OSC_DEV_IP + "/show" + outPathDev;
-				isSubDir = 0;
-				if (tmpItem.size == -1) 
+				dstLen = dst.length;
+				if (i != 0 && dst[dstLen-1] == '/' && src[i] == '/') 
 				{
-					outSize = "Document";
-					isSubDir = 1;
+					i++;
+					continue;
 				}
 				else
 				{
-					outSize = getFileSize(tmpItem.size);	
-				}
-				newHtml += generateFileItem(outName, outSize, isSubDir, isOpt, outUrl, outUrlShow);
-				//console.log("outName:" + outName + " outUrl:" + outUrl + " outUrlShow:" + outUrlShow + " outPathDev:" + outPathDev);
-			}
-			$("#spanCount").html(count);
-			$("#filelistBody").html(newHtml);
-			updateItemBtnsSize();
-		}
-
-		function getFileSize(fileByte) {
-		    var fileSizeByte = fileByte;
-		    var fileSizeMsg = "";
-		    if (fileSizeByte < 1048576) fileSizeMsg = (fileSizeByte / 1024).toFixed(2) + "KB";
-		    else if (fileSizeByte == 1048576) fileSizeMsg = "1MB";
-		    else if (fileSizeByte > 1048576 && fileSizeByte < 1073741824) fileSizeMsg = (fileSizeByte / (1024 * 1024)).toFixed(2) + "MB";
-		    else if (fileSizeByte > 1048576 && fileSizeByte == 1073741824) fileSizeMsg = "1GB";
-		    else if (fileSizeByte > 1073741824 && fileSizeByte < 1099511627776) fileSizeMsg = (fileSizeByte / (1024 * 1024 * 1024)).toFixed(2) + "GB";
-		    else fileSizeMsg = "文件超过1TB";
-		    return fileSizeMsg;
-		}
-
-		function generateFileItem(name, size, isDir, isOpt, url, urlShow)
-		{
-			//console.log("updateFileList()");
-			var itemValue = "<tr>";
-		    itemValue += "<td><input name=\"item_check\" type=\"checkbox\" onclick=\"onClickItemCheck()\"></td>";
-		    imgTarget = "_blank";
-			if(name.indexOf(".mp4") > 0 || name.indexOf(".MP4") > 0)
-			{
-				imgTarget = "_self";
-			}
-			var isMedia = 0;
-			if( isVideo(name) || isPhoto(name))
-			{
-				isMedia = 1;
-			}
-
-		    // if(isDir == 1 && isOpt == 0)
-		    if(isDir == 1)
-		    {
-		    	itemValue += "<td><a href=\"javascript:void(0)\" onclick=\"onClickSubDir('" + name + "')\"><span class=\"item_name\" style=\"color:#3f77c4;\" title=\"" + name + "\">" + handleItemName(name) + "</span></a><br/><span class=\"item_size\">" + size + "</span></td>";
-		    }
-		    // else if(isDir == 0 && isOpt == 0 && isMedia == 1)
-		    else if(isDir == 0 && isMedia == 1)
-		    {
-		    	itemValue += "<td><a href=\"" + urlShow + "\" target=\"" + imgTarget + "\"><span class=\"item_name\" style=\"color:#3f77c4;\" title=\"" + name + "\">" + handleItemName(name) + "</span></a><br/><span class=\"item_size\">" + size + "</span></td>";
-		    }
-		    else
-		    {
-		    	itemValue += "<td><span class=\"item_name\" title=\"" + name + "\">" + handleItemName(name) + "</span><br/><span class=\"item_size\">" + size + "</span></td>";
-			}
-		    itemValue += "<td>";
-		    if(!isDir)
-		    {
-	    		itemValue += "<button class=\"btn btn-warning item_btn item_btn1\" title=\"Download\" onclick=\"onClickDownload(" + isOpt + ", '" + url + "', '" + urlShow + "')\"><span class=\"glyphicon glyphicon-download-alt\"></span></button>&nbsp;";
-			}
-			// if(!isOpt)
-			// {
-		    	itemValue += "<button class=\"btn btn-info item_btn item_btn2\" title=\"Rename\" onclick=\"onClickRename('" + name + "')\"><span class=\"glyphicon glyphicon-edit\"></span></button>";
-		    // }
-		    itemValue += "</td>";
-		    itemValue += "</tr>";
-
-		    return itemValue;
-		}
-
-		function handleItemName(name)
-		{
-			var maxLen = 31;
-			var nameLen = name.length;
-			var showName = name;
-   			//取前12个，后12个，中间3个点
-   			if (nameLen >= maxLen) 
-   			{
-   				showName = "";
-   				showName += name.substring(0, ((maxLen-3)/2));
-   				showName += "..."
-   				showName += name.substring(nameLen - ((maxLen-3)/2));
-   			}
-
-			return showName;
-		}
-
-		function getSelectedFiles()
-		{
-			console.log("getSelectedFiles()");
-			var nowPath = fixSlash($("#proRoot").attr("title") + "/" + $("#proName").attr("title"));
-			console.log("getSelectedFiles() nowPath:" + nowPath);
-			var arySelectedFiles = [];
-			var aryItemNames = $(".item_name");
-			console.log("aryItemNames len:" + aryItemNames.length);
-			// for debug
-			// for(var i = 0; i < aryItemNames.length; i++)
-			// {
-			// 	obj = aryItemNames[i];
-			// 	console.log("aryItemNames[" + i + "]:" + $(obj).html());
-			// }
-			var aryItemChecks = $("input[name='item_check']");
-			console.log("aryItemChecks len:" + aryItemChecks.length);
-			for(var i = 0; i < aryItemChecks.length; i++)
-			{
-				obj = aryItemChecks[i];
-				//for debug
-				//console.log("aryItemChecks[" + i + "]:" + obj.checked);
-				if (obj.checked) 
-				{
-					filePath = nowPath + "/" + $(aryItemNames[i]).attr("title");
-					arySelectedFiles.push(filePath);
+					dst += src[i];
+					i++;
 				}
 			}
-
-			console.log("getSelectedFiles() arySelectedFiles:" + arySelectedFiles);
-			return arySelectedFiles;
+			lenDst = dst.length;
+			if (lenDst != 1 && dst[lenDst-1] == '/') 
+			{
+				dst = dst.substring(0, lenDst-1);
+			}
+			return dst;
 		}
 
-		function onClickListOption(item)
+		function handleUpdateProRootAndName(path)
 		{
-			if (isBusy()) {return;}
-			var option = item.innerHTML;
-			console.log("onClickListOption -- " + option);
-			if (option == "New Folder") 
+			console.log("handleUpdateProRootAndName()");
+			var fixPath = fixSlash(path);
+			var newProName = "";
+			var newProRoot = fixPath;
+			if (fixPath != "/cmd" && fixPath != "/data" && fixPath != "/web" && fixPath != "/access") 
 			{
-				showNewFolderDialog();
+				console.log("handleUpdateProRootAndName() path:" + path + " fixPath:" + fixPath);
+				//将一个完整的路径path 转换并更新当前 proRoot 和 proName, 包括title
+				var pos = fixPath.lastIndexOf("\/") + 1 ;
+				var len = fixPath.length;
+				newProName = fixPath.substring(pos, len);
+				newProRoot = fixPath.substring(0, pos);
+				console.log("handleUpdateProRootAndName() newProName:" + newProName + " newProRoot:" + newProRoot);
 			}
-			else if(option == "Upload")
-			{
-				showUploadDialog();
-			}
-			else
-			{
-				$("#spanOption").html(item.innerHTML);
-			}
+			updateProName(newProName);
+			updateProRoot(newProRoot);
 		}
 
-		function onClickDownload(isOpt, url, urlShow)
+		function updateProName(path)
 		{
-			if (isBusy()) {return;}
-			console.log("onClickDownload:" + url);
-			//alert("isPC:" + isPC());
-			if (isPC()){
-				//电脑端直接弹出下载
-				window.open(url);
-			}else{
-
-				if (isAndroid()) 
-				{
-					window.open(url);
-				}
-				else
-				{
-					//苹果手机或者平板
-					if(isVideo(url))
-					{
-						window.location.href=urlShow;
-					}
-					// else if(isPhoto(url) && isOpt == 0)
-					else if(isPhoto(url))
-					{
-						//手机端，弹出提示，让他们点击图片，长按保存, 而且不是opt目录下面的
-						showTips("Tap the file，then long press to「Save to album」！！！");
-					}
-					else
-					{
-						showTips("Sorry, Plz download via PC browser ！！！");
-					}
-					
-				}
-			}
+			console.log("updateProName() " + path);
+			$("#proName").attr("title", path);
+			$("#proName").val(path);
 		}
 
-		function goBack()
+		function updateProRoot(path)
 		{
-			if (isBusy()) {return;}
-
-			pathRoot = $("#proRoot").attr("title");
-			proName  = $("#proName").attr("title");
-			// if (pathRoot == "/mnt/DCIM/" && proName == "") 
-			if ((pathRoot == "/mnt/DCIM/" && proName == "") || (pathRoot == "/opt/" && proName == ""))
-			{
-				//本来就是根目录
-				console.log("is already /mnt/DCIM/ or /opt/");
-			}
-			else
-			{
-				nowPath = pathRoot + proName
-				//最后一个路径的名字
-				handleUpdateProRootAndName(pathRoot);
-				refreshFileList();
-			}
-
-		}
-
-		function onClickConfirm(btn)
-		{
-			if (isBusy()) {return;}
-			console.log("onClickConfirm() " + $(btn).html());
-			if ($(btn).html() == "Upload") 
-			{
-				showUploadDialog();
-				return;
-			}
-			var aryFiles = getSelectedFiles();
-			var selectedLen = aryFiles.length
-			if(selectedLen <= 0)
-			{
-				console.log("onClickConfirm() select none!!!");
-				showTips("no file selected !!!", "danger");
-				return;
-			}
-			var option = $("#spanOption").html();
-			console.log("onClickConfirm() - option:" + option);
-			if (option == "Delete") 
-			{
-				showDeleteDialog(aryFiles);
-			}
-			else if(option == "Move")
-			{
-				showMoveDialog(aryFiles, 0);
-			}
-			else if(option == "Compress")
-			{
-				showCompressDialog(aryFiles);
-			}
-			else if(option == "Copy")
-			{
-				showMoveDialog(aryFiles, 1);
-			}
-		}
-
-		function showNewFolderDialog()
-		{
-			console.log("showNewFolderDialog()");
-			var rootPath = fixSlash($("#proRoot").attr("title") + $("#proName").attr("title")) + "/";
-			var pathLen = rootPath.length;
-			var showPath = rootPath;
+			console.log("uploadProRoot() " + path);
+			pathLen = path.length;
+			showPath = path;
 			if($(window).width() >= 768)
        		{
        			//保留26个字符
@@ -978,9 +343,9 @@
        			if (pathLen > 26) 
        			{
        				showPath = "";
-       				showPath += rootPath.substring(0, 12);
+       				showPath += path.substring(0, 12);
        				showPath += "..."
-       				showPath += rootPath.substring(pathLen - 12);
+       				showPath += path.substring(pathLen - 12);
        			}
 
        		}
@@ -991,802 +356,32 @@
        			if (pathLen > 10) 
        			{
        				showPath = "";
-       				showPath += rootPath.substring(0, 4);
+       				showPath += path.substring(0, 4);
        				showPath += "..."
-       				showPath += rootPath.substring(pathLen - 4);
+       				showPath += path.substring(pathLen - 4);
        			}
        		}
-
-       		console.log("showNewFolderDialog() - rootPath:" + rootPath + " showPath:" + showPath);
-       		$("#newFolderProRoot").html(showPath);
-       		$("#newFolderProRoot").attr("title", rootPath);
-       		$("#newFolderProName").val("");
-
-       		$('#modalNewFolder').on('hidden.bs.modal', function (e) {
-				console.log("hide modalNewFolder----------");
-				$('#newFolderClose').off();
-				$('#newFolderNo').off();
-				$('#newFolderYES').off();
-				$('#modalNewFolder').off('hidden.bs.modal');//去除绑定
-				//console.log($(document.activeElement).attr("id"));
-				if(isAndroid()){
-					if($(document.activeElement).attr("id") == "newFolderYES")
-					{
-						var dirName = $("#newFolderProName").val();
-						var rootPath = $("#newFolderProRoot").attr("title");
-						handleNewFolder(rootPath, dirName);
-					}
-				}
-
-			});
-
-			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
-			if(!isAndroid())
-			{
-				
-				$('#newFolderYES').click(function(){
-					var dirName = $("#newFolderProName").val();
-					var rootPath = $("#newFolderProRoot").attr("title");
-					handleNewFolder(rootPath, dirName);
-					
-				});
-			}
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalNewFolder').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalNewFolder').modal("show");
-
-			$('#newFolderProName').focus();
+       		$("#proRoot").attr("title", path);
+       		$("#proRoot").html(showPath);
 		}
 
-		function handleNewFolder(rootPath, dirName)
+		function onClickListOption(item)
 		{
-			var pattern = /^[a-zA-Z0-9_]{1,}$/;
-			
-			if(!dirName.match(pattern))
-			{
-				showTips("folder name not permit !!!", "danger");
-				return;
-			}
-
-			var dirPath = fixSlash(rootPath + "/" + dirName);
-			
-			
-			createDir(dirPath, function(result){
-				if (result[OSC_JTAG_STATE] == OSC_JTAG_STATE_DONE) 
-				{
-					console.log("create dir success ~!");
-					handleUpdateProRootAndName(dirPath);
-					refreshFileList();
-				}
-			})
-		}
-
-		function dismissNewFolderDialog()
-		{
-			console.log("dismissNewFolderDialog");
-			if(isPC())
-			{
-				$('#modalNewFolder').modal("hide");
-			}
-		}
-
-		function showDeleteDialog(selectedFiles)
-		{
-			console.log("showDeleteDialog() - " + selectedFiles);
-
-			//修改模态框的内容以及点击操作
-			// var bodyHtml = "<span><span style=\"color: #f00;\">DELETE</span>&nbsp; " + name + "&nbsp;?</span>";
-			// $('#modalDeleteBody').html(bodyHtml);
-
-			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
-			$('#deleteClose').click(function(){
-				dismissDeleteDialog();
-			});
-
-			$('#deleteNo').click(function(){
-				dismissDeleteDialog();
-			});
-
-			$('#deleteYES').click(function(){
-				dismissDeleteDialog();
-				gIsDeleting = true;
-				var selectedLen = selectedFiles.length;
-				showTips("Deleting ...", "warning", (selectedLen  * 1000));
-				var countDelEnd = 0;
-				for(var i = 0; i < selectedLen; i++)
-				{
-					tmpPath = selectedFiles[i];
-					deleteFile(tmpPath, function(result){
-						countDelEnd++;
-						console.log("delete end [" + countDelEnd + "]- " + tmpPath);
-						if(countDelEnd >= selectedLen)
-						{
-							showTips("Deleting End !", "success");
-							refreshFileList();
-							gIsDeleting = false;
-						}
-					});
-				}
-			});
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalDelete').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalDelete').modal("show");
-		}
-
-		function dismissDeleteDialog()
-		{
-			console.log("dismissDeleteDialog");
-			$('#deleteClose').off();
-			$('#deleteNo').off();
-			$('#deleteYES').off();
-			$('#modalDelete').modal("hide");
-		}
-
-		var compressInterval;
-
-		function showCompressDialog(selectedFiles)
-		{
-			console.log("showCompressDialog");
-
-			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
-			$('#compressClose').click(function(){
-				dismissCompressDialog();
-			});
-
-			$('#compressNo').click(function(){
-				dismissCompressDialog();
-			});
-
-			$('#compressYES').click(function(){
-				dismissCompressDialog();
-				showTips("Compressing ...", "warning", 60000);
-				gIsCompressing = true;
-				compressFile(selectedFiles, function(result){
-					if(result[OSC_JTAG_STATE] == OSC_JTAG_STATE_INPROGRESS)
-					{
-						//每秒更新压缩状态
-						compressInterval = setInterval(function() {
-							getDevStatus(function(result){
-								if(result[OSC_JTAG_STATUS_ISPACKETINGFILES] == 0)
-								{
-									clearInterval(compressInterval);
-									console.log("compress file end ~~~~ path:" + result[OSC_JTAG_STATUS_PACKETINGFILESPATH]);
-									var link = "<a class=\"alert-link\" href=\"javascript:void(0)\" onclick=\"onClickCompressLink('" + result[OSC_JTAG_STATUS_PACKETINGFILESPATH] + "')\">" + result[OSC_JTAG_STATUS_PACKETINGFILESPATH] + "</a>"
-									showTips("Compress End ! " + link, "success", 20000);
-									gIsCompressing = false;
-								}
-							});
-						},1000);
-					}
-					else 
-					{
-						gIsCompressing = false;
-					}
-				});
-			});
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalCompress').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalCompress').modal("show");
-		}
-
-		function onClickCompressLink(path)
-		{
-			console.log("onClickCompressLink() - " + path);
-			if(isiPhoneOriPad()){
-				handleUpdateProRootAndName("/mnt/DCIM/tmp");
-				refreshFileList();
-			}else{
-				var url = OSC_DEV_IP + path;
-				window.open(url);
-			}
-		}
-
-		function dismissCompressDialog()
-		{
-			console.log("dismissCompressDialog");
-			$('#compressClose').off();
-			$('#compressNo').off();
-			$('#compressYES').off();
-			$('#modalCompress').modal("hide");
-		}
-
-		function showRenameDialog(name)
-		{
-			console.log("showRenameDialog() " + name);
-			//@MARK 
-			//1, 如果modal里面带input组件，按钮用监听onclick方法去 hide modal，手机端会出现modal显示就闪退的问题。
-			//2, 将所有带隐藏功能的按钮都用 参数来加这部分，data-dismiss="modal", 就不用onclick来处理了。
-			//3, 但是 modal.('show')的方法 还是可以用onclick方法来实现。
-			//4, 接着，show之前，监听好 'hidden.bs.modal'， 在监听里面处理是哪个按键点击来dismiss modal的，看它的id，来处理yes的逻辑。
-			//5, ps  ios 的不行, 只能还是用 onclick来监听，nnd
-			$('#modalRename').on('hidden.bs.modal', function (e) {
-				console.log("hide----------");
-				$('#renameClose').off();
-				$('#renameNo').off();
-				$('#renameYES').off();
-				$('#modalRename').off('hidden.bs.modal');//去除绑定
-				//console.log($(document.activeElement).attr("id"));
-				if(isAndroid()){
-					if($(document.activeElement).attr("id") == "renameYES")
-					{
-						var newName = $("#renameNewName").val();
-						handleRename(newName, name);
-					}
-				}
-
-			});
-
-			if(!isAndroid()){
-				$("#renameYES").click(function(){
-					var newName = $("#renameNewName").val();
-					handleRename(newName, name);
-				});
-			}
-
-			$("#renameDialogName").html(name);
-			$("#renameNewName").val("");
-			
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalRename').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalRename').modal("show");
-
-			$('#renameNewName').focus();
-		}
-
-		function handleRename(newName, name)
-		{
-
-			if (newName == null || newName.length <= 0 || newName == name) 
-			{
-				//新名字是空的
-				showTips("new name empty or exists !!!", "danger");
-			}
-			else
-			{
-
-				//判断正则表达式
-				//只允许 a-z A-Z 0-9 _ .   点必须夹在中间
-				var pattern = /^\w{1,}[a-zA-Z0-9_\.]{1,}$/;
-				if(!newName.match(pattern))
-				{
-					console.log("folder not match!!!");
-					showTips("new name not permit !!!", "danger");
-					return;
-				}
-
-				//判断名字有没有跟其它人重复, 就是新的名字不能是当前目录下的子目录，不然movefile 会把它挪进去文件夹里面了而不是重命名
-				//简而言之，新名字，不能和列表里面的名字重名
-				var count = gJObjFileList.results.count;
-				var aryFiles = gJObjFileList.results.files;
-				var mIndex = 0;
-				for(mIndex = 0; mIndex < count; mIndex++)
-				{
-					tmpItem = aryFiles[mIndex];
-					if(tmpItem.name == newName)
-					{
-						console.log("find same name in folder!!!");
-						showTips("new name empty or exists !!!", "danger");
-						return;
-					}
-				}
-
-				var nowPath = $("#proRoot").attr("title") + $("#proName").attr("title");
-				var oldPath = fixSlash(nowPath + "/" + name);
-				var newPath = fixSlash(nowPath + "/" + newName);
-				renameFile(oldPath, newPath, function(result){
-					showTips("Rename success !", "success");
-					refreshFileList();
-				});
-			}
-		}
-
-		function dismissRenameDialog()
-		{
-			console.log("dismissRenameDialog");
-			//modal hide 这句话 安卓上面有毒，只要有，modal就闪退
-			if(isPC())
-			{
-				$("#modalRename").modal("hide");
-			}
-		}
-
-		function showMoveDialog(selectedFiles, isCpy)
-		{
-			console.log("showMoveDialog() - " + selectedFiles);
-
-			$("#modalMoveBody").html(genMoveDialogTips() + genMoveDialogRoot(1));
-			$("#modalMoveTitle").html($("#spanOption").html() + " To");
-
-			$('#modalMove').on('hidden.bs.modal', function (e) {
-				console.log("hide----------");
-				$('#moveClose').off();
-				$('#moveNo').off();
-				$('#moveYES').off();
-				$('#modalMove').off('hidden.bs.modal');//去除绑定
-				//console.log($(document.activeElement).attr("id"));
-				if(isAndroid()){
-					if($(document.activeElement).attr("id") == "moveYES")
-					{
-						var targetPath = getMoveRootPath();
-						if ($("#moveSubFolder").html() != undefined) 
-						{
-							targetPath += ($("#moveSubFolder").html() + "/");
-						}
-						handleMoveCpy(targetPath, isCpy);
-					}
-				}
-			});
-
-			if(!isAndroid())
-			{
-				$('#moveYES').click(function(){
-					var targetPath = getMoveRootPath();
-					if ($("#moveSubFolder").html() != undefined) 
-					{
-						targetPath += ($("#moveSubFolder").html() + "/");
-					}
-					handleMoveCpy(targetPath, isCpy);
-				});
-			}
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalMove').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalMove').modal("show");
-		}
-
-		function handleMoveCpy(targetPath, isCpy)
-		{
-			//当前没办法判断了, modal 闪退问题
-			// if($("#modalMoveBody").html().lastIndexOf("<br name=") > 0)
+			if (isBusy()) {return;}
+			var option = item.innerHTML;
+			console.log("onClickListOption -- " + option);
+			// if (option == "New Folder") 
 			// {
-			// 	//还在编辑创建文件夹
-			// 	showMoveDialogTips("you're creating folder !!!");
-			// 	return;
+			// 	showNewFolderDialog();
 			// }
-
-			gIsMoveCpying = true;
-
-			showTips("please wait ... ", "warning", 60000);
-
-			moveCpyFiles(getSelectedFiles(), targetPath, isCpy, function(result){
-				if(!isCpy){
-					if (result.state == OSC_JTAG_STATE_DONE) 
-					{
-						handleUpdateProRootAndName(targetPath);
-						refreshFileList();
-					}
-					gIsMoveCpying = false;
-				}else{
-					if (result.state == OSC_JTAG_STATE_INPROGRESS) 
-					{
-						copyInterval = setInterval(function() {
-							getDevStatus(function(result){
-								if(result[OSC_JTAG_STATUS_ISCOPYINGFILES] == 0)
-								{
-									clearInterval(copyInterval);
-									console.log("copy file end ~~~~ ");
-									showTips("Copy End ! ", "success");
-									handleUpdateProRootAndName(targetPath);
-									refreshFileList();
-									gIsMoveCpying = false;
-								}
-							});
-						},1000);
-					}
-					else
-					{
-						gIsMoveCpying = false;
-					}
-				}
-			});
-		}
-
-		function dismissMoveDialog()
-		{
-			console.log("dismissMoveDialog");
-			// $('#moveClose').off();
-			// $('#moveNo').off();
-			// $('#moveYES').off();
-			if(isPC())
+			if(option == "Upload")
 			{
-				$('#modalMove').modal("hide");
-			}
-		}
-
-		var showMoveDialogTipsTimer;
-		function showMoveDialogTips(msg, timeout=3000)
-		{
-			console.log("showMoveDialogTips() " + msg);
-			//clear timer
-			clearTimeout(showMoveDialogTipsTimer);
-			$("#moveTips").html(msg);
-
-			showMoveDialogTipsTimer = setTimeout(function(){
-				console.log("showMoveDialogTips timeout ----");
-				$("#moveTips").html("");
-				clearTimeout(showMoveDialogTipsTimer);
-			}, timeout);
-		}
-
-		/*
-			获取 MoveRootPath 里面 的值
-		*/
-		function getMoveRootPath()
-		{
-			console.log("getMoveRootPath()");
-			var fullPath = $("#moveRootPath").attr("title");
-			console.log("getMoveRootPath() :" + fullPath);
-			return fullPath;
-		}
-
-		function transMovePaths(path)
-		{
-			console.log("transMovePaths() path:" + path);
-			var showPath = path;
-			var pathLen = path.length;
-			var maxLen_pc = 73;
-			var maxLen_nonpc = 39;
-			if($(window).width() >= 768)
-       		{
-       			//保留75个字符
-       			//取前12个，后12个，中间3个点
-       			if (pathLen >= maxLen_pc) 
-       			{
-       				showPath = "";
-       				showPath += path.substring(0, ((maxLen_pc-3)/2));
-       				showPath += "..."
-       				showPath += path.substring(pathLen - ((maxLen_pc-3)/2));
-       			}
-
-       		}
-       		else
-       		{
-       			//保留10个字符
-       			//取前4个，后4个，中间3个点
-       			if (pathLen > maxLen_nonpc) 
-       			{
-       				showPath = "";
-       				showPath += path.substring(0, ((maxLen_nonpc-3)/2));
-       				showPath += "..."
-       				showPath += path.substring(pathLen - ((maxLen_nonpc-3)/2));
-       			}
-       		}
-			console.log("transMovePaths() end - " + showPath);
-			return showPath;
-		}
-
-		/*
-		 生成 move dialog 第一行的 choose folder
-		*/
-		function genMoveDialogTips()
-		{
-			console.log("genMoveDialogTips()");
-			var html = "<button class=\"btn btn-primary disabled\">choose folder :</button><br/>";
-			return html;
-		}
-
-		/*
-		  生成第二行 /mnt/DCIM/ 的路径
-		*/
-		function genMoveDialogRoot(isHasOption=0)
-		{
-			console.log("genMoveDialogRoot()");
-			var html =  "<br/>";
-				html += "<div class=\"btn-group\">";
-				html +=      "<button class=\"btn btn-default disabled\" type=\"button\" id=\"moveRootPath\" title=\"/mnt/DCIM/\">/mnt/DCIM/</button>";
-
-				if(isHasOption){
-					html +=      "<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\"><span class=\"caret\"></span></button>"
-					html +=      "<ul class=\"dropdown-menu\">"
-					html +=      "<li><a href=\"javascript:void(0)\" onclick=\"onClickMoveRootPath('" + "/mnt/DCIM/" + "')\">/mnt/DCIM/</a></li>" 
-					html +=      "<li><a href=\"javascript:void(0)\" onclick=\"onClickMoveRootPath('" + "/opt/" + "')\">/opt/</a></li>"
-					html +=      "</ul>"
-					html +=     "<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogFolder()\">"
-					html +=         "<span class=\"glyphicon glyphicon-folder-open\"></span>"
-					html +=     "</button>"
-					html +=     "<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogPlus()\">"
-					html += 	    "<span class=\"glyphicon glyphicon-plus\"></span>"
-					html +=     "</button>"
-				}
-				html += "</div>";
-				html += "<br/>";
-
-			return html;
-		}
-
-		/*
-			点击事件 - 点击了 可选择子目录部分 下拉列表的item
-			更新子目录
-		*/
-		function onClickMoveRootPath(name)
-		{
-			console.log("onClickMoveRootPath() - " + name);
-			$("#moveRootPath").html(name);
-			$("#moveRootPath").attr("title", (name));
-		}
-
-		/*
-		  生成 创建文件夹部分的 输入框 打勾 交叉
-		*/
-		function genMoveDialogAddFolder()
-		{
-			console.log("genMoveDialogAddFolder()");
-
-			var html =  "<br name=\"sep\"/>";
-				html += "<div class=\"input-group\">";
-				html +=   "<input id=\"moveAddFolderName\" type=\"text\" class=\"form-control\" placeholder=\"a-z, A-Z, 0-9, '_'\">";
-				html +=   "<span class=\"input-group-btn\">";
-				html +=   	"<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogNewFolderYes()\">";
-				html +=   		"<span class=\"glyphicon glyphicon-ok\"></span>";
-				html +=   	"</button>";
-				html +=   "</span>";
-				html +=   "<span class=\"input-group-btn\">";
-				html +=   	"<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogNewFolderNo()\">";
-				html +=   		"<span class=\"glyphicon glyphicon-remove\"></span>";
-				html +=   	"</button>";
-				html +=   "</span>";
-				html += "</div>";
-
-			return html;
-		}
-
-		/*
-			生成 可以选择子目录的部分  文件夹按钮  加号 减号
-		*/
-		function genMoveDialogSubFolder(aryFolderNames, showDirName="")
-		{
-			console.log("genMoveDialogSubFolder()");
-			if (showDirName == "") 
-			{
-				showDirName = aryFolderNames[0];
-			}
-			var html = "<br/>";
-				html += "<div class=\"btn-group\">";
-				html +=     "<button class=\"btn btn-default disabled\" type=\"button\" id=\"moveSubFolder\">" + showDirName + "</button>";
-				html +=     "<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">";
-				html +=         "<span class=\"caret\"></span>";
-				html +=     "</button>";
-				html +=     "<ul class=\"dropdown-menu\">";
-				var len = aryFolderNames.length;
-				for(var i = 0; i < len; i++)
-				{
-					html += genMoveDialogSubFolderItems(aryFolderNames[i]);
-				}
-				html +=     "</ul>";
-				html +=	"</div>";
-				html +=	"<br/>";
-				html +=	"<br/>";
-				html += "<div class=\"btn-group\">";
-				html +=	  	"<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogFolder()\">";
-				html +=	  	    "<span class=\"glyphicon glyphicon-folder-open\"></span>";
-				html +=	  	"</button>";
-				html +=	  	"<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogPlus()\">";
-				html +=	  		"<span class=\"glyphicon glyphicon-plus\"></span>";
-				html +=	  	"</button>";
-				html +=	  	"<button class=\"btn btn-default\" type=\"button\" onclick=\"onClickMoveDialogMinus()\">";
-				html +=	  		"<span class=\"glyphicon glyphicon-minus\"></span>";
-				html +=	  	"</button>";
-				html +=	"</div>";
-				html +=	"<br/>";
-
-			return html;
-		}
-
-		/*
-			生成 可以选择子目录部分， 下拉列表的item
-		*/
-		function genMoveDialogSubFolderItems(name)
-		{
-			return ("<li><a href=\"javascript:void(0)\" onclick=\"onClickMoveSubFolderListItem('" + name + "')\">" + name +"</a></li>");
-		}
-
-		/*
-			点击事件 - 点击了 可选择子目录部分 下拉列表的item
-			更新子目录
-		*/
-		function onClickMoveSubFolderListItem(name)
-		{
-			console.log("onClickSubFolderListItem");
-			$("#moveSubFolder").html(name);
-		}
-
-		/*
-			点击事件 - 点击了 文件夹按钮， 列出下一级的子目录
-		*/
-		function onClickMoveDialogFolder()
-		{
-			console.log("onClickMoveDialogFolder()");
-			var nowPath = getMoveRootPath();
-			if ($("#moveSubFolder").html() != undefined) 
-			{
-				nowPath += ($("#moveSubFolder").html() + "/");
-			}
-			console.log("onClickMoveDialogFolder() nowPath:" + nowPath);
-			getMoveFoldersNames(nowPath, function(aryFolderNames){
-				console.log("sub folders - " + aryFolderNames);
-				if (aryFolderNames.length > 0)
-				{
-					var html = genMoveDialogTips();
-					html += genMoveDialogRoot(0);
-					html += genMoveDialogSubFolder(aryFolderNames);
-					$("#modalMoveBody").html(html);
-					$("#moveRootPath").attr("title", (nowPath));
-					$("#moveRootPath").html(transMovePaths(nowPath));
-				}
-				else
-				{
-					console.log("no more sub folders!!!");
-					showMoveDialogTips("no folders !!!");
-				}
-			});
-		}
-
-		/*
-			获取指定路径下的 所有文件夹的名字
-		*/
-		function getMoveFoldersNames(path, callback){
-			console.log("getMoveFoldersNames() - " + path);
-			listFiles(path, function(result){
-				var count    = result.results.count;
-				var aryFiles = result.results.files;
-				var aryFolderNames = [];
-				for(var i = 0; i < count; i++)
-				{
-					obj = aryFiles[i];
-					if (obj.type == 4) 
-					{
-						aryFolderNames.push(obj.name);
-					}
-				}
-				callback(aryFolderNames);
-			});
-		}
-
-		/*
-			点击事件 -  点了目录旁边的 +号，用来显示创建文件夹的输入框
-		*/
-		function onClickMoveDialogPlus()
-		{
-			console.log("onClickMoveDialogPlus");
-			var html = $("#modalMoveBody").html() + genMoveDialogAddFolder();
-			$("#modalMoveBody").html(html);
-			$("#moveAddFolderName").focus();
-		}
-
-		/*
-			点击事件 - 点了 - 号， 显示回上一层
-		*/
-		function onClickMoveDialogMinus()
-		{
-			console.log("onClickMoveDialogMinus()");
-			//因为有减号一定是有子目录的
-			var nowPath = getMoveRootPath();
-
-			var isRoot = 0;
-			//因为
-			if (nowPath == "/mnt/DCIM/" || nowPath == "/opt/") 
-			{
-				isRoot = 1;
+				showUploadDialog();
 			}
 			else
 			{
-				nowPath = fixSlash(nowPath);
-				var pos = nowPath.lastIndexOf("/");
-				nowPath = nowPath.substring(0, pos) + "/";
+				$("#spanOption").html(item.innerHTML);
 			}
-
-			console.log("onClickMoveDialogMinus() nowPath:" + nowPath);
-
-			if (isRoot) 
-			{
-				var html = genMoveDialogTips();
-				html    += genMoveDialogRoot(1);
-				$("#modalMoveBody").html(html);
-				$("#moveRootPath").attr("title", (nowPath));
-				$("#moveRootPath").html(transMovePaths(nowPath));
-			}
-			else
-			{
-				getMoveFoldersNames(nowPath, function(aryFolderNames){
-					console.log("sub folders - " + aryFolderNames);
-					if (aryFolderNames.length > 0)
-					{
-						var html = genMoveDialogTips();
-						html += genMoveDialogRoot(0);
-						html += genMoveDialogSubFolder(aryFolderNames);
-						$("#modalMoveBody").html(html);
-						$("#moveRootPath").attr("title", (nowPath));
-						$("#moveRootPath").html(transMovePaths(nowPath));
-					}
-					else
-					{
-						console.log("no more sub folders!!!");
-						showMoveDialogTips("no folders !!!");
-					}
-				});
-			}
-		}
-
-		/*
-			点击事件 - 点了 创建文件夹部分的 打勾
-		*/
-		function onClickMoveDialogNewFolderYes()
-		{
-			console.log("onClickMoveDialogNewFolderYes()");
-			var folderName = $("#moveAddFolderName").val();
-			console.log("onClickMoveDialogNewFolderYes() name:" + folderName);
-			if (folderName == undefined || folderName == "" || folderName.length <= 0) 
-			{
-				console.log("empty new folder name !!!");
-				return;
-			}
-			//只允许 a-z A-Z 0-9 _ 
-			var pattern = /^[a-zA-Z0-9_]{1,}$/;
-			if(!folderName.match(pattern))
-			{
-				console.log("folder not match!!!");
-				showMoveDialogTips("name not permit !!!");
-				return;
-			}
-
-			var newRootPath = getMoveRootPath();
-			if ($("#moveSubFolder").html() != undefined) 
-			{
-				newRootPath += ($("#moveSubFolder").html() + "/");
-			}
-
-			var folderPath = newRootPath + folderName;
-			console.log("onClickMoveDialogNewFolderYes() folderPath:" + folderPath);
-
-			createDir(folderPath, function(result){
-				if (result.state == OSC_JTAG_STATE_DONE) 
-				{
-					getMoveFoldersNames(newRootPath, function(aryFolderNames){
-						console.log("sub folders - " + aryFolderNames);
-						if (aryFolderNames.length > 0)
-						{
-							var html = genMoveDialogTips();
-							html += genMoveDialogRoot(0);
-							html += genMoveDialogSubFolder(aryFolderNames, folderName);
-							$("#modalMoveBody").html(html);
-							$("#moveRootPath").attr("title", (newRootPath));
-							$("#moveRootPath").html(transMovePaths(newRootPath));
-						}
-						else
-						{
-							console.log("no more sub folders!!!");
-							showMoveDialogTips("no folders !!!");
-						}
-					});
-				}
-				else
-				{
-					console.log("onClickMoveDialogNewFolderYes() create dir error !!!");
-					showMoveDialogTips("create error !!!");
-				}
-			});
-
-		}
-
-		/*
-			点击事件 - 点了 创建文件夹部分的  交叉 按钮
-		*/
-		function onClickMoveDialogNewFolderNo()
-		{
-			console.log("onClickMoveDialogNewFolderNo()");
-			var html = $("#modalMoveBody").html();
-			var pos = html.lastIndexOf("<br name=");
-			html = html.substring(0, pos);
-			$("#modalMoveBody").html(html);
 		}
 
 		function showUploadDialog()
@@ -1858,7 +453,7 @@
 		  }
 	    }
 
-	    function uploadMultiFile(callback) {
+		function uploadMultiFile(callback) {
 
 	    	console.log("uploadMultiFile()");
 
@@ -1881,13 +476,13 @@
 		    	fileSize = $('#uploadChoosefile')[0].files[i].size;
 		    	console.log( "[" + i + "]" + fileName + " size:" + fileSize);
 
-				if(!fileName.match(pattern))
-				{
-					console.log("file name:" + fileName + " not right!!!");
-					showUploadDialogTips("upload file name not permit !!!");
-					gIsUploading = false;
-					return;
-				}
+				// if(!fileName.match(pattern))
+				// {
+				// 	console.log("file name:" + fileName + " not right!!!");
+				// 	showUploadDialogTips("upload file name not permit !!!");
+				// 	gIsUploading = false;
+				// 	return;
+				// }
 		    }
 
 		    startUploadFile(0, callback);
@@ -1908,7 +503,7 @@
 		    	console.log("startUploadFile() index:" + index + " name:" + fileName + " size:" + fileSize);
 
 		    	var pathname = fixSlash($("#proRoot").attr("title") + $("#proName").val());
-			    var reqURL = OSC_DEV_IP + "/upload" + "?path=" + pathname + "&name=" + fileName + "&filesize=" + fileSize;
+			    var reqURL = DEV_IP + "/upload" + "?path=" + pathname + "&name=" + fileName + "&filesize=" + fileSize;
 			    console.log("uploadFile filename:" + fileName + " size:" + fileSize + " url:" + reqURL);
 			    var formdata = new FormData();
 			    formdata.append('file', $('#uploadChoosefile')[0].files[index]);
@@ -1943,76 +538,6 @@
 	    	}
 		}
 
-		function uploadFile(callback) {
-			//获取上传的文件
-		    var filepath = $('#uploadChoosefile').val();
-		    var pos = filepath.lastIndexOf("\\");
-		    var filename = filepath.substring(pos + 1);
-		    console.log("uploadFile - val:" + $('#uploadChoosefile').val());
-		    if($('#uploadChoosefile').val() == null || $('#uploadChoosefile').val().length <= 0)
-		    {
-		    	console.log("no file choosen !!!");
-		    	showUploadDialogTips("no upload file !!!");
-		    	return;
-		    }
-
-		    var pattern = /^\w{1,}[a-zA-Z0-9_\.]{1,}$/;
-			if(!filename.match(pattern))
-			{
-				console.log("file name:" + filename + " not right!!!");
-				showUploadDialogTips("upload file name not permit !!!");
-				return;
-			}
-
-		    var fileSize = $('#uploadChoosefile')[0].files[0].size;
-
-		    console.log("uploadChoosefile() --- size:" + $('#uploadChoosefile')[0].files.length);
-
-		    for(var i = 0; i < $('#uploadChoosefile')[0].files.length; i++)
-		    {
-		    	console.log( "[" + i + "]" + $('#uploadChoosefile')[0].files[i].name + " size:" + $('#uploadChoosefile')[0].files[i].size );
-		    	// for(tmpObj in $('#uploadChoosefile')[0].files[i])
-		    	// {
-		    	// 	console.log(tmpObj + " " + $('#uploadChoosefile')[0].files[i][tmpObj]);
-		    	// }
-		    }
-
-
-
-		    return;
-
-		    var pathname = fixSlash($("#proRoot").attr("title") + $("#proName").val());
-		    var reqURL = OSC_DEV_IP + "/upload" + "?path=" + pathname + "&name=" + filename + "&filesize=" + fileSize;
-		    console.log("uploadFile filename:" + filename + " size:" + fileSize + " url:" + reqURL);
-		    var formdata = new FormData();
-		    formdata.append('file', $('#uploadChoosefile')[0].files[0]);
-		    gIsUploading = true;
-		    $.ajax({
-	           url: reqURL,
-	           data: formdata,
-	           type: "Post",
-	           dataType: "json",
-	           cache: false,//上传文件无需缓存
-	           processData: false,//用于对data参数进行序列化处理 这里必须false
-	           contentType: false, //必须
-	           xhr:xhrOnProgress(function(e){
-	   			  var percent=e.loaded/e.total;
-	   			  percent = parseInt(percent * 100);
-	   			  percent = percent + "%";
-	   			  $("#uploadProgressbar").css("width", percent);
-	   			  $("#uploadProgressValue").html(percent);
-	   			  console.log(percent);
-	   		   }),
-	           success: function (result) {
-	               console.log(JSON.stringify(result));
-	               callback(1);
-	           },
-	           error: function(result){
-	           	   console.log("upload error rtn:" + JSON.stringify(result));
-	               callback(0);
-	           }
-        	});
-		}
 
 		var showUploadDialogTipsTimer;
 		function showUploadDialogTips(msg, timeout=3000)
@@ -2029,102 +554,151 @@
 			}, timeout);
 		}
 
-		function fixSlash(src)
+		function updateFileList(jsonObj)
 		{
-			var len = src.length;
-			var i = 0;
-			var dst = "";
-			var dstLen = dst.length;
-			while(i < len)
+			console.log("updateFileList()");
+			var path = jsonObj.path;
+			var aryFiles = jsonObj.files;
+			var count = jsonObj.files.length;
+			var mIndex = 0;
+
+			var outName = "";
+			var outUrlDownload  = "";
+			var outUrlShow = "";
+			var outPathDev = "";
+			var outSize = 0;
+			var isSubDir = 0;
+			var outLogUrl = "";
+			var newHtml = "";
+
+			for(mIndex = count - 1; mIndex >= 0; mIndex--)
 			{
-				dstLen = dst.length;
-				if (i != 0 && dst[dstLen-1] == '/' && src[i] == '/') 
+				tmpItem = aryFiles[mIndex];
+				outName = tmpItem.name;
+				outPathDev = path + "/" + outName;
+				outUrlShow  = DEV_IP + outPathDev;
+				outUrlDownload = outUrlShow + "?download";
+				isSubDir = 0;
+				if (tmpItem.size == -1) 
 				{
-					i++;
-					continue;
+					outSize = "Document";
+					isSubDir = 1;
 				}
 				else
 				{
-					dst += src[i];
-					i++;
+					outSize = getFileSize(tmpItem.size);	
 				}
+
+				if(outName.lastIndexOf(".log") >= 0){
+					outUrlShow = DEV_IP + "/web/log.html?path=" + outPathDev;
+				}
+				newHtml += generateFileItem(outName, outSize, isSubDir, outUrlDownload, outUrlShow);
+				//console.log("outName:" + outName + " outUrl:" + outUrl + " outUrlShow:" + outUrlShow + " outPathDev:" + outPathDev);
 			}
-			lenDst = dst.length;
-			if (lenDst != 1 && dst[lenDst-1] == '/') 
-			{
-				dst = dst.substring(0, lenDst-1);
-			}
-			return dst;
+			$("#spanCount").html(count);
+			$("#filelistBody").html(newHtml);
+			updateItemBtnsSize();
 		}
 
-		function handleUpdateProRootAndName(path)
+		function goBack()
 		{
-			console.log("handleUpdateProRootAndName()");
-			// if (path.lastIndexOf("/opt") >= 0) 
+			if (isBusy()) {return;}
+			console.log("goBack()");
+			pathRoot = $("#proRoot").attr("title");
+			proName  = $("#proName").attr("title");
+			// if (pathRoot == "/mnt/DCIM/" && proName == "") 
+			if ((pathRoot == "/cmd" && proName == "") || (pathRoot == "/web" && proName == "") || (pathRoot == "/data" && proName == ""))
+			{
+				//本来就是根目录
+				console.log("is already /web/ or /cmd/ or /data/");
+			}
+			else if(pathRoot == "/access/" && proName.length == 1)
+			{
+				console.log("is access root");
+			}
+			else
+			{
+				nowPath = pathRoot + proName
+				//最后一个路径的名字
+				handleUpdateProRootAndName(pathRoot);
+				refreshFileList();
+			}
+
+		}
+
+		function handleItemName(name)
+		{
+			var maxLen = 50;
+			var nameLen = name.length;
+			var showName = name;
+   			//取前12个，后12个，中间3个点
+   			if (nameLen >= maxLen) 
+   			{
+   				showName = "";
+   				showName += name.substring(0, ((maxLen-3)/2));
+   				showName += "..."
+   				showName += name.substring(nameLen - ((maxLen-3)/2));
+   			}
+
+			return showName;
+		}
+
+		function generateFileItem(name, size, isDir, urlDownload, urlShow)
+		{
+			//console.log("updateFileList()");
+			var itemValue = "<tr>";
+		    itemValue += "<td><input name=\"item_check\" type=\"checkbox\" onclick=\"onClickItemCheck()\"></td>";
+		    imgTarget = "_blank";
+			
+		    if(isDir == 1)
+		    {
+		    	itemValue += "<td><a href=\"javascript:void(0)\" onclick=\"onClickSubDir('" + name + "')\"><span class=\"item_name\" style=\"color:#3f77c4;\" title=\"" + name + "\">" + handleItemName(name) + "</span></a><br/><span class=\"item_size\">" + size + "</span></td>";
+		    }
+		    else
+		    {
+		    	itemValue += "<td><a href=\"" + urlShow + "\" target=\"" + imgTarget + "\"><span class=\"item_name\" style=\"color:#3f77c4;\" title=\"" + name + "\">" + handleItemName(name) + "</span></a><br/><span class=\"item_size\">" + size + "</span></td>";
+		    }
+		    itemValue += "<td>";
+
+		    if(!isDir)
+		    {
+	    		itemValue += "<button class=\"btn btn-warning item_btn item_btn1\" title=\"Download\" onclick=\"onClickDownload(" + "'" + urlDownload + "')\"><span class=\"glyphicon glyphicon-download-alt\"></span></button>&nbsp;";
+			}
+			// if(!isOpt)
 			// {
-			// 	console.log("handleUpdateProRootAndName() find opt path!");
-			// 	return;
-			// }
-			var fixPath = fixSlash(path);
-			var newProName = "";
-			var newProRoot = "/mnt/DCIM/"
-			if(fixPath.lastIndexOf("/opt") >= 0)
-			{
-				newProRoot = "/opt/"
-			}
-			if (fixPath != "/mnt/DCIM" && fixPath != "/opt") 
-			{
-				console.log("handleUpdateProRootAndName() path:" + path + " fixPath:" + fixPath);
-				//将一个完整的路径path 转换并更新当前 proRoot 和 proName, 包括title
-				var pos = fixPath.lastIndexOf("\/") + 1 ;
-				var len = fixPath.length;
-				newProName = fixPath.substring(pos, len);
-				newProRoot = fixPath.substring(0, pos);
-				console.log("handleUpdateProRootAndName() newProName:" + newProName + " newProRoot:" + newProRoot);
-			}
-			updateProName(newProName);
-			updateProRoot(newProRoot);
+		    	// itemValue += "<button class=\"btn btn-info item_btn item_btn2\" title=\"Rename\" onclick=\"onClickRename('" + name + "')\"><span class=\"glyphicon glyphicon-edit\"></span></button>";
+		    // }
+		    itemValue += "</td>";
+		    itemValue += "</tr>";
+
+		    return itemValue;
 		}
 
-		function updateProName(path)
-		{
-			console.log("updateProName() " + path);
-			$("#proName").attr("title", path);
-			$("#proName").val(path);
+		function getFileSize(fileByte) {
+		    var fileSizeByte = fileByte;
+		    var fileSizeMsg = "";
+		    if (fileSizeByte < 1048576) fileSizeMsg = (fileSizeByte / 1024).toFixed(2) + "KB";
+		    else if (fileSizeByte == 1048576) fileSizeMsg = "1MB";
+		    else if (fileSizeByte > 1048576 && fileSizeByte < 1073741824) fileSizeMsg = (fileSizeByte / (1024 * 1024)).toFixed(2) + "MB";
+		    else if (fileSizeByte > 1048576 && fileSizeByte == 1073741824) fileSizeMsg = "1GB";
+		    else if (fileSizeByte > 1073741824 && fileSizeByte < 1099511627776) fileSizeMsg = (fileSizeByte / (1024 * 1024 * 1024)).toFixed(2) + "GB";
+		    else fileSizeMsg = "文件超过1TB";
+		    return fileSizeMsg;
 		}
 
-		function updateProRoot(path)
+		function updateItemBtnsSize()
 		{
-			console.log("uploadProRoot() " + path);
-			pathLen = path.length;
-			showPath = path;
-			if($(window).width() >= 768)
+			console.log("updateItemBtnsSize()");
+			//更新 按钮的大小
+       		var classAttr1 = "btn btn-warning btn-xs item_btn item_btn1";
+       		var classAttr2 = "btn btn-info btn-xs item_btn item_btn2";
+       		if($(window).width() >= 768)
        		{
-       			//保留26个字符
-       			//取前12个，后12个，中间3个点
-       			if (pathLen > 26) 
-       			{
-       				showPath = "";
-       				showPath += path.substring(0, 12);
-       				showPath += "..."
-       				showPath += path.substring(pathLen - 12);
-       			}
-
+       			classAttr1 = "btn btn-warning item_btn item_btn1";
+       			classAttr2 = "btn btn-info item_btn item_btn2"
        		}
-       		else
-       		{
-       			//保留10个字符
-       			//取前4个，后4个，中间3个点
-       			if (pathLen > 10) 
-       			{
-       				showPath = "";
-       				showPath += path.substring(0, 4);
-       				showPath += "..."
-       				showPath += path.substring(pathLen - 4);
-       			}
-       		}
-       		$("#proRoot").attr("title", path);
-       		$("#proRoot").html(showPath);
+       		$(".item_btn1").attr("class", classAttr1);
+       		$(".item_btn2").attr("class", classAttr2);
 		}
 
 		function onClickSubDir(name)
@@ -2137,10 +711,32 @@
 			refreshFileList();
 		}
 
-		function onClickRename(name)
+		function isPC() {
+		    var userAgentInfo = navigator.userAgent;
+		    //alert(userAgentInfo);
+		    var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+		    var flag = true;
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = false;
+		            break;
+		        }
+		    }
+		    return flag;
+		}
+		  
+
+		function onClickDownload(url)
 		{
 			if (isBusy()) {return;}
-			showRenameDialog(name);
+			console.log("onClickDownload:" + url);
+			//alert("isPC:" + isPC());
+			if (isPC()){
+				//电脑端直接弹出下载
+				window.open(url);
+			}else{
+				showTips("Sorry, Plz download via PC browser ！！！");				
+			}
 		}
 
 		function onClickItemCheck()
@@ -2148,7 +744,7 @@
 			console.log("onClickItemCheck()");
 			var arySelectedFiles = getSelectedFiles();
 			var selectedLen = arySelectedFiles.length;
-			var fileCount   = gJObjFileList.results.count;
+			var fileCount   = gJObjFileList.files.length;
 			console.log("onClickItemCheck() selectedLen:" + selectedLen + " fileCount:" + fileCount); 
 			if (selectedLen == fileCount) 
 			{
@@ -2176,7 +772,7 @@
 			console.log("onClickSelectAll() checked:" + item.checked);
 			var arySelectedFiles = getSelectedFiles();
 			var selectedLen = arySelectedFiles.length;
-			var fileCount   = gJObjFileList.results.count;
+			var fileCount   = gJObjFileList.files.length;
 			console.log("onClickSelectAll() - selectedLen:" + selectedLen + " fileCount:" + fileCount);
 			var aryItemChecks = $("input[name='item_check']");
 			console.log("aryItemChecks len:" + aryItemChecks.length);
@@ -2194,189 +790,197 @@
 			}
 		}
 
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		function sycTimeToDev()
+		function getSelectedFiles()
 		{
-			console.log("sycTimeToDev()");
-			var paramObj = new Object();
-			paramObj.name = OSC_CMD_SETOPTIONS;
-			paramObj.parameters = new Object();
-			paramObj.parameters.options = new Object();
-			paramObj.parameters.options[OSC_OPT_DATETIME] = Number(Math.round(new Date() / 1000));
-			var jsonStr = JSON.stringify(paramObj);
-			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(result){
-				console.log("sync time result:" + result[OSC_JTAG_STATE]);
-  			});
+			console.log("getSelectedFiles()");
+			var nowPath = fixSlash($("#proRoot").attr("title") + "/" + $("#proName").attr("title"));
+			console.log("getSelectedFiles() nowPath:" + nowPath);
+			var arySelectedFiles = [];
+			var aryItemNames = $(".item_name");
+			console.log("aryItemNames len:" + aryItemNames.length);
+			// for debug
+			// for(var i = 0; i < aryItemNames.length; i++)
+			// {
+			// 	obj = aryItemNames[i];
+			// 	console.log("aryItemNames[" + i + "]:" + $(obj).html());
+			// }
+			var aryItemChecks = $("input[name='item_check']");
+			console.log("aryItemChecks len:" + aryItemChecks.length);
+			for(var i = 0; i < aryItemChecks.length; i++)
+			{
+				obj = aryItemChecks[i];
+				//for debug
+				//console.log("aryItemChecks[" + i + "]:" + obj.checked);
+				if (obj.checked) 
+				{
+					filePath = nowPath + "/" + $(aryItemNames[i]).attr("title");
+					arySelectedFiles.push(filePath);
+				}
+			}
+
+			console.log("getSelectedFiles() arySelectedFiles:" + arySelectedFiles);
+			return arySelectedFiles;
 		}
 
-		function getDevStatus(callback)
+		function onClickRootPath(item)
 		{
-			console.log("getDevStatus()");
-			$.post(OSC_DEV_IP + OSC_STATUS, function(result){
-				callback(result);
-  			});
+			if (isBusy()) {return;}
+			var oldPath = $("#proRoot").attr("title");
+			var path    = item.innerHTML;
+			console.log("onClickRootPath() oldPath:" + oldPath + " path:" + path);
+			if(oldPath == path)
+			{
+				//一样的就不管了
+				console.log("select the same path!");
+				return;
+			}
+			else
+			{
+				//不一样的
+				updateProRoot(path);
+				updateProName("");
+				if(path == "/access"){
+					updateProRoot("/access/");
+					updateProName("c")
+				}
+				refreshFileList();
+			}
 		}
 
-		function createDir(path, callback)
+		function onClickRefresh()
 		{
-			console.log("createDir() path:" + path);
-			var paramObj = new Object();
-			paramObj.name = OSC_CMD_CREATEDIR;
-			paramObj.parameters = new Object();
-			paramObj.parameters[OSC_JTAG_PATH] = path;
-			var jsonStr = JSON.stringify(paramObj);
-			$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(createDirResult){
-				console.log("createDir result:" + createDirResult[OSC_JTAG_STATE]);
-				callback(createDirResult);
-  			}).error(function(createDirResultErr){
-  				resultObj = JSON.parse(createDirResultErr.responseText);
-  				console.log("createDir error result:" + resultObj[OSC_JTAG_STATE]);
-  				//showTips(JSON.stringify(resultObj), "danger");
-  				showTips(resultObj.error.message, "danger");
-  				//callback(resultObj);
-  			});
+			if (isBusy()) {return;}
+			console.log("onClickRefresh()");
+			pathRoot = $("#proRoot").attr("title");
+			pathProName = $("#proName").val();
+			handleUpdateProRootAndName(pathRoot + "/" + pathProName);
+			refreshFileList();
 		}
 
-
-		function listFiles(path, callback, index=0, length=9999)
+		function onClickConfirm(btn)
 		{
-			console.log("listFiles:" + path + " index:" + index + " length:" + length);
-			var paramObj = new Object();
-		 	paramObj.name = OSC_CMD_LISTFILES;
-		 	paramObj.parameters = new Object();
-		 	paramObj.parameters[OSC_JTAG_FL_PATH]   = path;
-		 	paramObj.parameters[OSC_JTAG_FL_INDEX]  = index;
-		 	paramObj.parameters[OSC_JTAG_FL_LENGTH] = length;
-		 	var jsonStr = JSON.stringify(paramObj);
-		 	$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(resultListFiles){
-				console.log("listFiles result:" + resultListFiles[OSC_JTAG_STATE]);
-				console.log("listFiles return:" + JSON.stringify(resultListFiles));
-				callback(resultListFiles);
-			}).error(function(resultListFilesErr){
-  				resultObj = JSON.parse(resultListFilesErr.responseText);
-  				console.log("listFiles error result:" + resultObj.error.message);
-  				//showTips(JSON.stringify(resultObj), "danger");
-  				callback(resultObj);
-  			});
+			if (isBusy()) {return;}
+			console.log("onClickConfirm() " + $(btn).html());
+			if ($(btn).html() == "Upload") 
+			{
+				showUploadDialog();
+				return;
+			}
+			var aryFiles = getSelectedFiles();
+			var selectedLen = aryFiles.length
+			if(selectedLen <= 0)
+			{
+				console.log("onClickConfirm() select none!!!");
+				showTips("no file selected !!!", "danger");
+				return;
+			}
+			var option = $("#spanOption").html();
+			console.log("onClickConfirm() - option:" + option);
+			if (option == "Delete") 
+			{
+				showDeleteDialog(aryFiles);
+			}
+			// else if(option == "Move")
+			// {
+			// 	showMoveDialog(aryFiles, 0);
+			// }
+			// else if(option == "Compress")
+			// {
+			// 	showCompressDialog(aryFiles);
+			// }
+			// else if(option == "Copy")
+			// {
+			// 	showMoveDialog(aryFiles, 1);
+			// }
 		}
 
-		function deleteFile(path, callback)
+		function showDeleteDialog(selectedFiles)
 		{
-			console.log("deleteFile:" + path);
-			var paramObj = new Object();
-		 	paramObj.name = OSC_CMD_DELETE;
-		 	paramObj.parameters = new Object();
-		 	paramObj.parameters[OSC_JTAG_FL_PATH]   = path;
-		 	var jsonStr = JSON.stringify(paramObj);
-		 	$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(resultDel){
-				console.log("deleteFile result:" + resultDel[OSC_JTAG_STATE]);
-				console.log("deleteFile return:" + JSON.stringify(resultDel));
-				callback(resultDel);
-			}).error(function(resultDelErr){
-  				resultObj = JSON.parse(resultDelErr.responseText);
-  				console.log("deleteFile error result:" + resultDelErr[OSC_JTAG_STATE]);
-  				//showTips(JSON.stringify(resultObj), "danger");
-  				//callback(resultObj);
-  			});
+			console.log("showDeleteDialog() - " + selectedFiles);
+
+			//修改模态框的内容以及点击操作
+			// var bodyHtml = "<span><span style=\"color: #f00;\">DELETE</span>&nbsp; " + name + "&nbsp;?</span>";
+			// $('#modalDeleteBody').html(bodyHtml);
+
+			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
+			$('#deleteClose').click(function(){
+				dismissDeleteDialog();
+			});
+
+			$('#deleteNo').click(function(){
+				dismissDeleteDialog();
+			});
+
+			$('#deleteYES').click(function(){
+				dismissDeleteDialog();
+				gIsDeleting = true;
+				var selectedLen = selectedFiles.length;
+				showTips("Deleting ...", "warning", (selectedLen  * 1000));
+				var countDelEnd = 0;
+				var tmpUrl = "";
+				var tmpPath = "";
+				for(var i = 0; i < selectedLen; i++){
+					tmpPath = selectedFiles[i];
+					tmpUrl = DEV_IP + tmpPath + "?delete";
+					console.log(i + ",url:" + tmpUrl);
+					$.get(tmpUrl, "", function(result){
+
+						console.log(i + ",delete ret:" +  JSON.stringify(result))
+						countDelEnd++;
+						if(countDelEnd >= selectedLen)
+						{
+							showTips("Deleting End !", "success");
+							refreshFileList();
+							gIsDeleting = false;
+						}
+
+					});
+				}
+			});
+
+			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
+			$('#modalDelete').modal({backdrop: 'static', keyboard: false});
+			//代码调用 显示模态框的方法
+			$('#modalDelete').modal("show");
 		}
 
-		function renameFile(oldPath, newPath, callback)
+		function dismissDeleteDialog()
 		{
-			console.log("renameFile() oldPath:" + oldPath + " new:" + newPath);
-			var paramObj = new Object();
-		 	paramObj.name = OSC_CMD_MOVEFILES;
-		 	paramObj.parameters = new Object();
-		 	files = [];
-		 	files[0] = oldPath;
-		 	paramObj.parameters[OSC_JTAG_FL_FILES] = files;
-		 	paramObj.parameters[OSC_JTAG_PATH] = newPath;
-		 	var jsonStr = JSON.stringify(paramObj);
-		 	console.log("rename -- jsonstr:" + jsonStr);
-		 	$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(resultRename){
-				console.log("renameFile result:" + resultRename[OSC_JTAG_STATE]);
-				console.log("renameFile return:" + JSON.stringify(resultRename));
-				callback(resultRename);
-			}).error(function(resultRenameErr){
-  				resultObj = JSON.parse(resultRenameErr.responseText);
-  				console.log("renameFile error result:" + resultRenameErr[OSC_JTAG_STATE]);
-  				// showTips(JSON.stringify(resultObj), "danger");
-  				showTips(resultObj.error.message, "danger");
-  				//callback(resultObj);
-  			});
+			console.log("dismissDeleteDialog");
+			$('#deleteClose').off();
+			$('#deleteNo').off();
+			$('#deleteYES').off();
+			$('#modalDelete').modal("hide");
 		}
 
-		function compressFile(files, callback)
+		var showTipsTimer;
+		function showTips(msg, level="warning", timeout=3000)
 		{
-			console.log("compressFile() files:" + files);
-			var paramObj = new Object();
-		 	paramObj.name = OSC_CMD_PACKETFILES;
-		 	paramObj.parameters = new Object();
-		 	paramObj.parameters[OSC_JTAG_FL_FILES] = files;
-		 	var jsonStr = JSON.stringify(paramObj);
-		 	console.log("compressFile -- jsonstr:" + jsonStr);
-		 	$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(resultCompress){
-				console.log("resultCompress result:" + resultCompress[OSC_JTAG_STATE]);
-				console.log("resultCompress return:" + JSON.stringify(resultCompress));
-				callback(resultCompress);
-			}).error(function(resultCompressErr){
-  				resultObj = JSON.parse(resultCompressErr.responseText);
-  				console.log("compressFile error result:" + resultCompressErr[OSC_JTAG_STATE]);
-  				// showTips(JSON.stringify(resultObj), "danger");
-  				showTips(resultObj.error.message, "danger");
-  				//callback(resultObj);
-  			});
+			console.log("showTips:" + msg);
+
+			//clear timer
+			clearTimeout(showTipsTimer);
+			var btnHtml = "<button type=\"button\" class=\"close\" onclick=\"closeTips('" + level + "')\"><span aria-hidden=\"true\">&times;</span></button>";
+			$("#alertTips").html(btnHtml + msg);
+			var classAttr = "alert alert-" + level + " fade in"
+			$("#alertTips").attr("class", classAttr);
+
+			showTipsTimer = setTimeout(function(){
+				console.log("showTips timeout ----");
+				var classAttr = "alert alert-" + level + " fade out hidden";
+				$("#alertTips").attr("class", classAttr);
+				clearTimeout(showTipsTimer);
+			}, timeout);
+
 		}
 
-		function moveCpyFiles(files, targetPath, isCpy, callback)
+		function closeTips(level)
 		{
-			console.log("moveCpyFiles() targetPath:" + targetPath + " files:" + files);
-			var paramObj = new Object();
-		 	paramObj.name = OSC_CMD_MOVEFILES;
-		 	if(isCpy)
-		 	{
-		 		paramObj.name = OSC_CMD_COPYFILES;
-		 	}
-		 	paramObj.parameters = new Object();
-		 	paramObj.parameters[OSC_JTAG_FL_FILES] = files;
-		 	paramObj.parameters[OSC_JTAG_PATH] = targetPath;
-		 	var jsonStr = JSON.stringify(paramObj);
-		 	console.log("moveCpyFiles -- jsonstr:" + jsonStr);
-		 	$.post(OSC_DEV_IP + OSC_EXECUTE, jsonStr, function(resultMove){
-				console.log("moveCpyFiles result:" + resultMove[OSC_JTAG_STATE]);
-				console.log("moveCpyFiles return:" + JSON.stringify(resultMove));
-				callback(resultMove);
-			}).error(function(resultMoveErr){
-  				resultObj = JSON.parse(resultMoveErr.responseText);
-  				console.log("moveCpyFiles error result:" + resultMoveErr[OSC_JTAG_STATE]);
-  				// showTips(JSON.stringify(resultObj), "danger");
-  				showTips(resultObj.error.message, "danger");
-  				callback(resultObj);
-  			});
+			console.log("closeTips ----");
+			var classAttr = "alert alert-" + level + " fade out hidden";
+			$("#alertTips").attr("class", classAttr);
+			clearTimeout(showTipsTimer);
 		}
-
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------		
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
-		// --------------------------------------------------------------------------------------------------------
 
 	</script>
 </body>
