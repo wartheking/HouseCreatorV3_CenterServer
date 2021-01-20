@@ -12,7 +12,6 @@ from Logger import *
 gStartSer = 0
 #记录当前是否在处理pro请求，每次只能处理一次pro，类似加锁
 gIsHandlingPro = 0
-gIsHandlingSyncDownloadModel = 0
 log = getLogger()
 
 #find non-busy servers and send req
@@ -646,39 +645,33 @@ def handle_client(client_socket, server_socket):
 			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 		else:
 			response_body = handle_SendReqToServers_datafactory_fixmodel(mName, mTaskId, mContent)
-	elif mPath == URL_PATH_SYNCMODEL or mPath == URL_PATH_DOWNLOADMODEL:
-		global gIsHandlingSyncDownloadModel
-		if gIsHandlingSyncDownloadModel == 1:
-			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mPath) + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
+	elif mPath == URL_PATH_SYNCMODEL:
+		#get data from http req header content
+		mContent = ""
+		mIndex = -1
+		isFindCntData = 0
+		cntStrAry = len(strAry)
+		for tmp in strAry:
+			mIndex += 1
+			#print("rptest[" + str(mIndex) + "]" + tmp)
+			# find empty then next one is the last one , the next one is json data
+			if tmp == "":
+				if (mIndex + 1) < cntStrAry:
+					nxtStr = strAry[mIndex + 1]
+					nxtStrLen = len(nxtStr)
+					#print("rptest nxtStr:" + nxtStr + " len:" + str(nxtStrLen) + " [0]:" + nxtStr[0])
+					if nxtStrLen >= 1 and nxtStr[0] == "{":
+						isFindCntData = 1
+						#log.info("strary[" + str(mIndex) + "]" + tmp + " find contentdata")
+						continue
+			if isFindCntData == 1:
+				mContent += tmp
+		log.info("syncdownloadmodel contentdata:" + mContent)
+		mVersion, result = getSyncDownloadModelInfosFromJContent(mContent)
+		if result < 0:
+			response_body = "{\"" + JTAG_NAME + "\":\""+ str(mPath) + "\", \"" + JTAG_VERSION + "\":\"" + mVersion + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
 		else:
-			gIsHandlingSyncDownloadModel = 1
-			#get data from http req header content
-			mContent = ""
-			mIndex = -1
-			isFindCntData = 0
-			cntStrAry = len(strAry)
-			for tmp in strAry:
-				mIndex += 1
-				#print("rptest[" + str(mIndex) + "]" + tmp)
-				# find empty then next one is the last one , the next one is json data
-				if tmp == "":
-					if (mIndex + 1) < cntStrAry:
-						nxtStr = strAry[mIndex + 1]
-						nxtStrLen = len(nxtStr)
-						#print("rptest nxtStr:" + nxtStr + " len:" + str(nxtStrLen) + " [0]:" + nxtStr[0])
-						if nxtStrLen >= 1 and nxtStr[0] == "{":
-							isFindCntData = 1
-							#log.info("strary[" + str(mIndex) + "]" + tmp + " find contentdata")
-							continue
-				if isFindCntData == 1:
-					mContent += tmp
-			log.info("syncdownloadmodel contentdata:" + mContent)
-			mVersion, result = getSyncDownloadModelInfosFromJContent(mContent)
-			if result < 0:
-				response_body = "{\"" + JTAG_NAME + "\":\""+ str(mPath) + "\", \"" + JTAG_VERSION + "\":\"" + mVersion + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
-			else:
-				response_body = handle_SendReqToServers_SyncDownloadModel(mPath, mVersion, mContent)
-			gIsHandlingSyncDownloadModel = 0
+			response_body = handle_SendReqToServers_SyncDownloadModel(mPath, mVersion, mContent)
 	#unknow
 	else:
 		response_body = "{\"" + JTAG_NAME + "\":\""+ mPath + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_UNKNOWN + "\"}"
