@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # coding:utf-8
-import psutil
-import pyautogui
-import time, os, threading, platform, json, sys, traceback, logging
-import urllib.request
+import logging
+import os, time, sys, platform, traceback, threading, urllib.request
 
 ##############
 #Logger start
@@ -23,16 +21,17 @@ class Logger:
             return "/"
 
     def checkDirs(self):
-        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
-        pathLogDir = pathDirNow + self.getPathSeperater() + self.LOG_DIR_NAME
-        print("pathLogDir --- " + str(pathLogDir))
+        pathLogDir = self.getLogDirPath()
         isExists = os.path.exists(pathLogDir)
         if not isExists:
             os.makedirs(pathLogDir) 
             print(pathLogDir + ' 创建成功')
 
     def getLogDirPath(self):
-        return os.path.abspath(os.path.join(sys.argv[0], "..")) + self.getPathSeperater()  +  self.LOG_DIR_NAME
+        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
+        #同其它的一样吧，统一放在根目录，log放同一个地方 加上个 /../../来返回上一级
+        pathLogDir = pathDirNow + self.getPathSeperater() + ".." + self.getPathSeperater() + self.LOG_DIR_NAME
+        return pathLogDir
 
     def closeCheckLog(self):
         self.checkLog = 0
@@ -93,7 +92,6 @@ class Logger:
         # 创建一个loggger
         self.__name = name
         self.fileName = sys.argv[0]
-        print("fileName:" + str(self.fileName))
         self.pid = pid
         self.logger = logging.getLogger(self.__name)
         self.logger.setLevel(logging.DEBUG)
@@ -124,12 +122,6 @@ class Logger:
 ##############
 #默认方法 start
 ##############
-
-def getPathSeperater():
-        if platform.platform().find("Windows") >= 0:
-            return "\\"
-        else:
-            return "/"
 
 def GETMYPID():
     print("GETMYPID() - argv:" + str(sys.argv))
@@ -166,75 +158,33 @@ log = LOGGER.logger
 #默认方法 end
 ##############
 
-class UE4Ctrl:
+##############
+#实例测试 start
+##############
 
-    #查找并且关闭UE4
-    def findAndKillUE4(self):
-        log.info("findAndKillUE4()")
-        #获取当前所有的进程
-        aryProcess = list(psutil.process_iter())
-
-        #for test
-        # mIndex = 0
-        # for tmpPro in aryProcess:
-        #     log.info("index:" + str(mIndex) + "-" + str(tmpPro.name()) + " pid:" + str(tmpPro.pid))
-        #     mIndex += 1
-        # return
-
-        if platform.platform().find("Windows") >= 0:
-            isHas = False
-            find_kill = "taskkill"
-            #获取每个进程的名字 和 pid
-            for tmpPro in aryProcess:
-                # if "chrome" in tmpPro.name().lower():
-                #     log.info("find chrome")
-                #     isHas = True
-                #     find_kill += (" /PID " + str(tmpPro.pid))
-                if "UE4Editor" in tmpPro.name():
-                    log.info("find chrUE4Editor")
-                    isHas = True
-                    find_kill += (" /PID " + str(tmpPro.pid))
-                if "CrashReportClientEditor" in tmpPro.name():
-                    log.info("find CrashReportClientEditor")
-                    isHas = True
-                    find_kill += (" /PID " + str(tmpPro.pid))
-                if "EpicGamesLauncher" in tmpPro.name():
-                    log.info("find EpicGamesLauncher")
-                    isHas = True
-                    find_kill += (" /PID " + str(tmpPro.pid))
-                if "EpicWebHelper" in tmpPro.name():
-                    log.info("find EpicWebHelper")
-                    isHas = True
-                    find_kill += (" /PID " + str(tmpPro.pid))
-            if isHas:
-                find_kill += " -f"
-                log.info("win cmd:" + find_kill)
-                result = os.popen(find_kill)
-                log.info("win kill ret:" + str(result))
-        else:
-            isHas = False
-            find_kill = "kill -9"
-            #mac
-            for tmpPro in aryProcess:
-                if "chrome" in tmpPro.name().lower():
-                    isHas = True
-                    find_kill += (" " + str(tmpPro.pid))
-            if isHas:
-                log.info("mac cmd:" + find_kill)
-                result = os.popen(find_kill)
-                log.info("mac kill ret:" + str(result))
-    
+class Template:
+    def mainfunc(self):
+        try:
+            log.info("mainfunc ----> " + 123)
+        except:
+            log.info(traceback.format_exc())
 
     def __init__(self, name=__name__):
-        log.info('init UE4Ctrl()')
-        self.findAndKillUE4()
+        log.info("python start--->" + str(__file__) + " pid:" + str(PID))
+        self.mainfunc()
+        # RUNEND(JTAG_PID_STATUS_BACKGROUND)
+        # while True:
+        #     time.sleep(1)
+        #     log.info("--->")
+        time.sleep(1)
         RUNEND(JTAG_PID_STATUS_FINISHED)
-
+        log.info("python end--->" + str(__file__))
 try:
-    tmp = UE4Ctrl()
+    tmp = Template()
 except:
     log.info("contain exception")
     log.info(traceback.format_exc())
 finally:
     log.info("finally END!!!")
     LOGGER.closeCheckLog()
+    

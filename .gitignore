@@ -4,3 +4,7 @@ __pycache__/
 *.txt
 CenterStatus*
 CenterSerConfigs.txt
+data/
+logs/
+cmd/logs/
+web/IP.js

@@ -23,16 +23,17 @@ class Logger:
             return "/"
 
     def checkDirs(self):
-        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
-        pathLogDir = pathDirNow + self.getPathSeperater() + self.LOG_DIR_NAME
-        print("pathLogDir --- " + str(pathLogDir))
+        pathLogDir = self.getLogDirPath()
         isExists = os.path.exists(pathLogDir)
         if not isExists:
             os.makedirs(pathLogDir) 
             print(pathLogDir + ' 创建成功')
 
     def getLogDirPath(self):
-        return os.path.abspath(os.path.join(sys.argv[0], "..")) + self.getPathSeperater()  +  self.LOG_DIR_NAME
+        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
+        #同其它的一样吧，统一放在根目录，log放同一个地方 加上个 /../../来返回上一级
+        pathLogDir = pathDirNow + self.getPathSeperater() + ".." + self.getPathSeperater() + self.LOG_DIR_NAME
+        return pathLogDir
 
     def closeCheckLog(self):
         self.checkLog = 0
@@ -171,7 +172,10 @@ CFG_TAG_UE4EDITOR = "ue4editor"
 CFG_TAG_PROJECT = "project"
 CFG_TAG_MAPFILE = "mapfile"
 
-class UE4Ctrl:
+TM_WAIT_UE4 = 40
+TM_WAIT_PYTHONEIDTOR = 5
+
+class StartUE4:
 
     #查找并且关闭UE4
     def findAndKillUE4(self):
@@ -305,15 +309,63 @@ class UE4Ctrl:
         else:
             log.info("not windows platform open software error!!!")
     
+    #处理打开UE4
+    def openUE4Editor(self):
+        log.info("openUE4Editor()~~~")
+        try:
+            time.sleep(TM_WAIT_UE4)
+
+            #最大化浏览器
+            # 最大化窗口：ALT＋空格＋X
+            # 最小化窗口：ALT+空格＋N
+            log.info("最大化窗口-start!")
+            pyautogui.hotkey('altleft', 'space')
+            pyautogui.press('x')
+            log.info("最大化窗口-end!")
+            time.sleep(1)
+
+            log.info("点击一下菜单-start!")
+            pyautogui.click(x=113, y=37, clicks=1, interval=0.0, button='left', duration=0.0, tween=pyautogui.linear)
+            log.info("点击一下菜单-end!")
+            time.sleep(1)
+
+            #输入python
+            log.info("输入python-start!")
+            strEnter = "python"
+            tmInterval = 0.05
+            pyautogui.typewrite(message=strEnter,interval=tmInterval)
+            tmWait = tmInterval * len(strEnter) + 1
+            log.info("输入python-end!")
+            time.sleep(tmWait)
+
+            #按好几下键
+            mIndex = 0
+            timesDown = 30
+            log.info("下键-start!")
+            while mIndex < timesDown:
+                pyautogui.press('down')
+                time.sleep(0.05)
+                mIndex += 1
+            log.info("下键-end!")
+            time.sleep(1)
+
+            #回车,启动python editor
+            log.info("回车-start!")
+            pyautogui.press('enter')
+            log.info("回车-end!")
+            time.sleep(TM_WAIT_PYTHONEIDTOR)
+        except:
+            log.info("openUE4Editor find error!!!")
+    
     def __init__(self, name=__name__):
-        log.info('init UE4Ctrl()')
+        log.info('init startUE4()')
         self.findAndKillUE4()
-        t = threading.Thread(target=self.cmdOpenUE4Editor)
-        t.start()
-        log.info('init UE4Ctrl()----------- end!!!')
+        self.cmdOpenUE4Editor()
+        log.info('start startUE4()')
+        self.openUE4Editor()
         RUNEND(JTAG_PID_STATUS_FINISHED)
 try:
-    tmp = UE4Ctrl()
+    tmp = StartUE4()
 except:
     log.info("contain exception")
     log.info(traceback.format_exc())

@@ -23,13 +23,16 @@
 			<div class="collapse navbar-collapse" id="navbar-collapse">
 				<ul class="nav navbar-nav navbar-right">
 					<li>
-						<a href="index.html"><span class="glyphicon glyphicon-home"></span> Index</a>
+						<a href="index.html"><span class="glyphicon glyphicon-home"></span> 首页</a>
 					</li>
 					<li>
-						<a href="history.html"><span class="glyphicon glyphicon-time"></span> History</a>
+						<a href="history.html"><span class="glyphicon glyphicon-time"></span> 历史</a>
 					</li>
 					<li class="active">
-						<a href="file.html"><span class="glyphicon glyphicon-file"></span> File</a>
+						<a href="file.html"><span class="glyphicon glyphicon-file"></span> 文件</a>
+					</li>
+					<li>
+						<a href="center.html"><span class="glyphicon glyphicon-blackboard"></span> 中控</a>
 					</li>
 				</ul>
 			</div>
@@ -51,7 +54,10 @@
 							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/cmd</a></li> 
 							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/web</a></li> 
 							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/data</a></li>
-							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/access</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/logs</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/access/Users</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/access/home</a></li>
+							  <li><a href="javascript:void(0)" onclick="onClickRootPath(this)">/access/c</a></li>
 							</ul>
 				         </div><!-- /btn-group -->
 					  <input id="proName" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="" title="">
@@ -80,8 +86,8 @@
 					<span> 确定要 <span style="color: #f00;">删除</span> 这些文件吗?</span>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="deleteYES">YES</button>
-					<button type="button" class="btn btn-primary" id="deleteNo">No</button>
+					<button type="button" class="btn btn-default" id="deleteYES">是的</button>
+					<button type="button" class="btn btn-primary" id="deleteNo">取消</button>
 				</div>
 			</div>
 			<!-- /.modal-content -->
@@ -90,27 +96,49 @@
 	</div>
 	<!-- Delete 弹出框 结束-->
 
+	<!-- Compress 弹出框 -->
+	<div class="modal" id="modalCompress" tabindex="-1" role="dialog" aria-labelledby="compressLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" aria-hidden="true" id="compressClose">&times;</button>
+					<h4 class="modal-title">Tips</h4>
+				</div>
+				<div class="modal-body" id="modalCompressBody">
+					<span> 确定要 <span style="color: #f00;">压缩</span> 吗?</span>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" id="compressYES">是的</button>
+					<button type="button" class="btn btn-primary" id="compressNo">取消</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal -->
+	</div>
+	<!-- Compress 弹出框 结束-->
+
 	<!-- Upload 弹出框 -->
 	<div class="modal" id="modalUpload" tabindex="-1" role="dialog">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" aria-hidden="true" id="uploadClose">&times;</button>
-					<h4 class="modal-title" id="uploadTitle">Upload</h4>
+					<h4 class="modal-title" id="uploadTitle">上传文件</h4>
 				</div>
 				<div class="modal-body" id="modalUploadBody">
 					<form id="uploadFile_form" role="form" action="" method="POST" enctype="multipart/form-data">
 						<input  type="file" multiple="multiple" id="uploadChoosefile" name="file"/>
 						<br/>
 						<div class="progress">
-						  <div id="uploadProgressbar" class="progress-bar" role="progressbar" style="width: 60%;"><span id="uploadProgressValue">90%</span></div>
+						  <div id="uploadProgressbar" class="progress-bar" role="progressbar" style="width: 60%;"><span id="uploadProgressValue">0%</span></div>
 						</div>
 					</form>
 				</div>
 				<div class="modal-footer">
 					<span id="uploadTips" class="label label-danger"></span>
-					<button type="button" class="btn btn-default" id="uploadYES">Upload</button>
-					<button type="button" class="btn btn-primary" id="uploadNo">Cancel</button>
+					<button type="button" class="btn btn-default" id="uploadYES">上传</button>
+					<button type="button" class="btn btn-primary" id="uploadNo">取消</button>
 				</div>
 			</div>
 			<!-- /.modal-content -->
@@ -141,7 +169,7 @@
 			<div class="row">
 				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
 					<div id="bgBtnConfirm">
-						<button id="btnConfirm" class="btn btn-info" type="button" onclick="onClickConfirm(this)">Confirm</button>
+						<button id="btnConfirm" class="btn btn-info" type="button" onclick="onClickConfirm(this)">选好了</button>
 					</div>
 				</div>
 				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
@@ -151,11 +179,12 @@
 				</div>
 				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
 					<div class="dropup" id="bgOption">
-						<button class="btn btn-info dropdown-toggle" type="button" id="dropdownOption" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="spanOption">Delete</span>&nbsp;&nbsp;<span class="caret"></span></button>
+						<button class="btn btn-info dropdown-toggle" type="button" id="dropdownOption" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="spanOption">删除</span>&nbsp;&nbsp;<span class="caret"></span></button>
 						<ul id="bgListOptions" class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownOption">
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Delete</a></li>
+							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">删除</a></li>
+							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">压缩</a></li>
 							<li role="separator" class="divider"></li>
-							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">Upload</a></li>
+							<li><a href="javascript:void(0)" onclick="onClickListOption(this)">上传</a></li>
 						</ul>
 					</div>
 				</div>
@@ -223,6 +252,27 @@
 
 		});
 
+		$(document).keydown(function(event){
+// 　　　　		console.log("keyboard enter:" + event.keyCode);
+			if (isPC() && event.keyCode == 13) 
+			{
+				if (isBusy()) {return;}
+				console.log("keyboard click enter!");
+				$("#proName").blur();
+				onClickRefresh();
+			}
+			if (isPC() && event.keyCode == 27) 
+			{
+				console.log("keyboard click esc!");
+	       		dismissDeleteDialog();
+	       		dismissCompressDialog();
+	       		// dismissRenameDialog();
+	       		// dismissMoveDialog();
+	       		dismissUploadDialog();
+	       		// dismissNewFolderDialog();
+			}
+　　　　  });
+
 		function refreshFileList()
 		{
 			console.log("refreshFileList() ");
@@ -234,7 +284,7 @@
 			//每次刷新 checkbox都设置为false
 			$("#itemSelectedAll").prop("checked", false);
 
-			showTips("Refreshing ....");
+			// showTips("Refreshing ....");
 
 			var url = DEV_IP + path;
 			$.get(url, "", function(result){
@@ -262,7 +312,7 @@
 					}
 					else
 					{
-						showTips("Refresh end !", "success");
+						// showTips("Refresh end !", "success");
 						updateFileList(result);
 					}
 				}
@@ -310,7 +360,7 @@
 			var fixPath = fixSlash(path);
 			var newProName = "";
 			var newProRoot = fixPath;
-			if (fixPath != "/cmd" && fixPath != "/data" && fixPath != "/web" && fixPath != "/access") 
+			if (fixPath != "/cmd" && fixPath != "/data" && fixPath != "/web" && fixPath != "/access" && fixPath != "/logs") 
 			{
 				console.log("handleUpdateProRootAndName() path:" + path + " fixPath:" + fixPath);
 				//将一个完整的路径path 转换并更新当前 proRoot 和 proName, 包括title
@@ -374,7 +424,7 @@
 			// {
 			// 	showNewFolderDialog();
 			// }
-			if(option == "Upload")
+			if(option == "上传")
 			{
 				showUploadDialog();
 			}
@@ -607,14 +657,16 @@
 			pathRoot = $("#proRoot").attr("title");
 			proName  = $("#proName").attr("title");
 			// if (pathRoot == "/mnt/DCIM/" && proName == "") 
-			if ((pathRoot == "/cmd" && proName == "") || (pathRoot == "/web" && proName == "") || (pathRoot == "/data" && proName == ""))
+			if ((pathRoot == "/cmd" && proName == "") || (pathRoot == "/web" && proName == "") || (pathRoot == "/data" && proName == "") || (pathRoot == "/logs" && proName == ""))
 			{
 				//本来就是根目录
-				console.log("is already /web/ or /cmd/ or /data/");
+				console.log("is already /web/ or /cmd/ or /data/ or /logs");
+				showTips("can not goBack", "warning", 3000)
 			}
 			else if(pathRoot == "/access/" && proName.length == 1)
 			{
 				console.log("is access root");
+				showTips("can not goBack", "warning", 3000)
 			}
 			else
 			{
@@ -648,7 +700,10 @@
 			//console.log("updateFileList()");
 			var itemValue = "<tr>";
 		    itemValue += "<td><input name=\"item_check\" type=\"checkbox\" onclick=\"onClickItemCheck()\"></td>";
-		    imgTarget = "_blank";
+		    imgTarget = "_self";
+		    if(isPC()){
+		    	imgTarget = "_blank";
+		    }
 			
 		    if(isDir == 1)
 		    {
@@ -731,12 +786,12 @@
 			if (isBusy()) {return;}
 			console.log("onClickDownload:" + url);
 			//alert("isPC:" + isPC());
-			if (isPC()){
+			// if (isPC()){
 				//电脑端直接弹出下载
 				window.open(url);
-			}else{
-				showTips("Sorry, Plz download via PC browser ！！！");				
-			}
+			// }else{
+			// 	showTips("Sorry, Plz download via PC browser ！！！");				
+			// }
 		}
 
 		function onClickItemCheck()
@@ -832,6 +887,7 @@
 			{
 				//一样的就不管了
 				console.log("select the same path!");
+				showTips("you're in this path!!!", "warning", 3000);
 				return;
 			}
 			else
@@ -839,9 +895,17 @@
 				//不一样的
 				updateProRoot(path);
 				updateProName("");
-				if(path == "/access"){
+				if(path == "/access/c"){
 					updateProRoot("/access/");
 					updateProName("c")
+				}
+				if(path == "/access/Users"){
+					updateProRoot("/access/");
+					updateProName("Users")
+				}
+				if(path == "/access/home"){
+					updateProRoot("/access/");
+					updateProName("home")
 				}
 				refreshFileList();
 			}
@@ -861,7 +925,7 @@
 		{
 			if (isBusy()) {return;}
 			console.log("onClickConfirm() " + $(btn).html());
-			if ($(btn).html() == "Upload") 
+			if ($(btn).html() == "上传") 
 			{
 				showUploadDialog();
 				return;
@@ -876,7 +940,7 @@
 			}
 			var option = $("#spanOption").html();
 			console.log("onClickConfirm() - option:" + option);
-			if (option == "Delete") 
+			if (option == "删除") 
 			{
 				showDeleteDialog(aryFiles);
 			}
@@ -884,10 +948,10 @@
 			// {
 			// 	showMoveDialog(aryFiles, 0);
 			// }
-			// else if(option == "Compress")
-			// {
-			// 	showCompressDialog(aryFiles);
-			// }
+			else if(option == "压缩")
+			{
+				showCompressDialog(aryFiles);
+			}
 			// else if(option == "Copy")
 			// {
 			// 	showMoveDialog(aryFiles, 1);
@@ -951,6 +1015,64 @@
 			$('#deleteNo').off();
 			$('#deleteYES').off();
 			$('#modalDelete').modal("hide");
+		}
+
+		function showCompressDialog(selectedFiles)
+		{
+			console.log("showCompressDialog");
+
+			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
+			$('#compressClose').click(function(){
+				dismissCompressDialog();
+			});
+
+			$('#compressNo').click(function(){
+				dismissCompressDialog();
+			});
+
+			$('#compressYES').click(function(){
+				dismissCompressDialog();
+				showTips("Compressing ...", "warning", 120000);
+				gIsCompressing = true;
+				var paramObj = new Object();
+			 	paramObj.path = $("#proRoot").attr("title") + $("#proName").attr("title");
+			 	paramObj.files = selectedFiles
+			 	var jsonStr = JSON.stringify(paramObj);
+			 	console.log("compress params:" + jsonStr);
+			 	$.post(DEV_IP + "/zipfiles", jsonStr, function(result){
+			 		if(result.state == "done"){
+			 			//done
+			 			var link = "<a class=\"alert-link\" href=\"javascript:void(0)\" onclick=\"onClickCompressLink('" + result.msg + "')\">" + result.msg + "</a>"
+						showTips("Compress End ! " + link, "success", 20000);
+						refreshFileList()
+			 		}else{
+			 			//error
+			 			showTips(result.msg, "danger", 3000)
+			 		}
+			 		gIsCompressing = false;
+			 	});
+			});
+
+			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
+			$('#modalCompress').modal({backdrop: 'static', keyboard: false});
+			//代码调用 显示模态框的方法
+			$('#modalCompress').modal("show");
+		}
+
+		function onClickCompressLink(path)
+		{
+			console.log("onClickCompressLink() - " + path);
+			var url = DEV_IP + path;
+			window.open(url);
+		}
+
+		function dismissCompressDialog()
+		{
+			console.log("dismissCompressDialog");
+			$('#compressClose').off();
+			$('#compressNo').off();
+			$('#compressYES').off();
+			$('#modalCompress').modal("hide");
 		}
 
 		var showTipsTimer;

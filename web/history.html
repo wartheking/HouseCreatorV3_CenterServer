@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="style.css">
-	<title>Index</title>
+	<title>History</title>
 </head>
 <body>
 	<!-- 导航栏 开始 -->
@@ -22,14 +22,17 @@
 			</div>
 			<div class="collapse navbar-collapse" id="navbar-collapse">
 				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="index.html"><span class="glyphicon glyphicon-home"></span> 首页</a>
+					</li>
 					<li class="active">
-						<a href="index.html"><span class="glyphicon glyphicon-home"></span> Index</a>
+						<a href="history.html"><span class="glyphicon glyphicon-time"></span> 历史</a>
 					</li>
 					<li>
-						<a href="history.html"><span class="glyphicon glyphicon-time"></span> History</a>
+						<a href="file.html"><span class="glyphicon glyphicon-file"></span> 文件</a>
 					</li>
 					<li>
-						<a href="file.html"><span class="glyphicon glyphicon-file"></span> File</a>
+						<a href="center.html"><span class="glyphicon glyphicon-blackboard"></span> 中控</a>
 					</li>
 				</ul>
 			</div>
@@ -42,37 +45,13 @@
 		<div class="container">
 			<div class="row" style="text-align: left;">
 				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-					<span id="ipValue" class="label label-success" style="font-size: 15px;">Connecting...</span>	
+					<span id="ipValue" class="label label-success" style="font-size: 15px;">Loading...</span>	
 				</div>
 			</div>
 			<div id="alertTips" class="alert alert-warning fade in hidden" style="margin-top: 10px;"></div>
 		</div>
 	</nav>
 	<!-- 标题 结束 -->
-
-	<!-- Abort 弹出框 -->
-	<div class="modal" id="modalAbort" tabindex="-1" role="dialog" aria-labelledby="abortLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" aria-hidden="true" id="abortClose">&times;</button>
-					<h4 class="modal-title">Tips</h4>
-				</div>
-				<div class="modal-body" id="modalAbortBody">
-					<span> 确定要终止这个程序?</span>
-					</br>
-					<span style="color: #f00;" id="abortInfo"></span>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="abortYES">Yes</button>
-					<button type="button" class="btn btn-primary" id="abortNo">No</button>
-				</div>
-			</div>
-			<!-- /.modal-content -->
-		</div>
-		<!-- /.modal -->
-	</div>
-	<!-- Abort 弹出框 结束-->
 
 	<!-- Run 弹出框 -->
 	<div class="modal" id="modalRun" tabindex="-1" role="dialog">
@@ -113,15 +92,13 @@
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: left;">
 					<div class="dropup" id="btnsBg">
 						<button id="btnRefresh" class="btn btn-primary" type="button" onclick="updateTaskList()"><span class="glyphicon glyphicon-refresh"></span></button>
-						<button class="btn btn-info dropdown-toggle" type="button" id="dropdownOption" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="spanOption">Run</span>&nbsp;&nbsp;<span class="caret"></span></button>
-						<ul id="bgRunList" class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownOption">
-						</ul>
 					</div>
 				</div>
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right;">
 					<div id="streamRateBg">
-						<span class="label label-success"><span id="taskRunTips">Runing:0</span></span>
-						<span class="label label-success"><span id="taskBgTips">Background:0</span></span>
+						<span class="label label-danger"><span id="taskErrorTips">Error:0</span></span>
+						<span class="label label-warning"><span id="taskAbortTips">Abort:0</span></span>
+						<span class="label label-success"><span id="taskFinishedTips">Finished:0</span></span>
 					</div>
 				</div>
 			</div>
@@ -146,11 +123,7 @@
 
 			$('#ipValue').html(DEV_IP)
 
-			updateRunList();
 			updateTaskList();
-			intervalRrefreshTime1 = setInterval(function() {
-	       		updateTaskList();
-			},10000);
 
 		});
 
@@ -257,10 +230,10 @@
 
 		function updateTaskList()
 		{
-			// showTips("refreshing...");
+			showTips("refreshing...");
 			console.log("updateTaskList()");
-			// var url = DEV_IP + "/getHistoryTasks"
-			var url = DEV_IP + "/getAllTasks"
+			var url = DEV_IP + "/getHistoryTasks"
+			// var url = DEV_IP + "/getAllTasks"
 			console.log("updateTaskList() -- url:" + url)
 			$.get(url, "", function(result){
 				//callback(result);
@@ -272,7 +245,9 @@
 				var newHtml = ""
 				var tmpObj;
 				var tmpHtml;
-				var cntBackground = 0;
+				var cntError = 0;
+				var cntAbort = 0;
+				var cntFinished = 0;
 				var cntRunning = 0;
 				for(var i = aryData.length-1; i >= 0; i--)
 				{
@@ -280,11 +255,14 @@
 					console.log("---> " + JSON.stringify(tmpObj));
 					tName = tmpObj.name;
 					tStatus = tmpObj.status;
-					if(tStatus == "background"){
-						cntBackground++;
+					if(tStatus == "error"){
+						cntError++;
 					}
-					if(tStatus == "running"){
-						cntRunning++;
+					if(tStatus == "abort"){
+						cntAbort++;
+					}
+					if(tStatus == "finished"){
+						cntFinished++;
 					}
 					tParams = tmpObj.params;
 					tStart = tmpObj.tm_start;
@@ -305,9 +283,11 @@
 					newHtml += tmpHtml
 					index -= 1;
 				}
-				$("#taskBgTips").html("Background:" + cntBackground);
-				$("#taskRunTips").html("Running:" + cntRunning);
+				$("#taskErrorTips").html("Error:" + cntError);
+				$("#taskAbortTips").html("Abort:" + cntAbort);
+				$("#taskFinishedTips").html("Finished:" + cntFinished);
 				$("#indexlist_bg").html(newHtml);
+				showTips("refresh end~~", "success", 3000);
   			});
 		}
 
@@ -316,75 +296,11 @@
 			window.open(DEV_IP + "/web/log.html?name=" + name + "&cmd=" + cmd); 
 		}
 
-		function clickAbort(name, cmd, params){
-			console.log("clickAbort() --- cmd:" + cmd);
-			showAbortDialog(name, cmd, params)
-		}
-
-		function showAbortDialog(name, cmd, params)
-		{
-			console.log("showAbortDialog() - " + name);
-
-			//MARK - modal 模态框，每次点击之后，都要设置为off，且不能点击空白关闭和键盘关闭，因为会出现点击后调用多次的问题；
-			$('#abortClose').click(function(){
-				dismissAbortDialog();
-			});
-
-			$('#abortNo').click(function(){
-				dismissAbortDialog();
-			});
-
-			$('#abortYES').click(function(){
-				dismissAbortDialog();
-				var url = DEV_IP + "/abort"
-				console.log("abortYES() -- url:" + url)
-
-				var paramObj = new Object();
-				paramObj.cmd = cmd;
-				var jsonStr = JSON.stringify(paramObj);
-
-				showTips("closing " + name + "...");
-				$.post(url, jsonStr, function(result){
-					console.log("result:" + JSON.stringify(result));
-					if(result.state == "error"){
-						showTips(result.msg, "danger", 3000);
-					}else if(result.state == "done"){
-						showTips(name +" aborted!", "success");
-						setTimeout(function(){
-							updateTaskList();
-						}, 1000);
-						
-					}
-	  			});
-				
-			});
-
-			var abortInfo = name + ", " + cmd;
-			if(params.length > 0){
-				abortInfo += ", " + params;
-			}
-			$('#abortInfo').html(abortInfo);
-
-			//不允许 点击空白处关闭，键盘关闭； 因为会积累重复提交的情况
-			$('#modalAbort').modal({backdrop: 'static', keyboard: false});
-			//代码调用 显示模态框的方法
-			$('#modalAbort').modal("show");
-		}
-
-		function dismissAbortDialog()
-		{
-			console.log("dismissAbortDialog");
-			$('#abortClose').off();
-			$('#abortNo').off();
-			$('#abortYES').off();
-			$('#modalAbort').modal("hide");
-		}
-
 		function generateListItem(index, name, status, params, start, end, time, cmd)
 		{
 
 			var result = "";
-			result += "<div class=\"panel panel-primary\">";
+			result += "<div class=\"panel panel-default\">";
 			result += 	"<div class=\"panel-heading\">";
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: left;\">";
@@ -393,7 +309,7 @@
 			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: right;\">";
 			result +=   			"<div style=\"margin-top: 3px;\">";
 			result +=   				"<button class=\"btn btn-warning\" type=\"button\" onclick=\"clickLog('" + name + "', " + cmd + ")\" title='查看LOG'><span class=\"glyphicon glyphicon-file\"></span></button>&nbsp;";
-			result +=   				"<button class=\"btn btn-danger\" type=\"button\" onclick=\"clickAbort('" + name + "', " + cmd + ",'" + params + "')\" title='终止程序'><span class=\"glyphicon glyphicon-off\"></span></button>&nbsp;";
+			result +=   				"<button class=\"btn btn-primary\" type=\"button\" onclick=\"showRunDialog('" + name  + "','" + params + "')\" title='重启程序'><span class=\"glyphicon glyphicon-refresh\"></span></button>&nbsp;";
 			//result +=   				"<button class=\"btn btn-default\" type=\"button\" onclick=\"\"><span class=\"glyphicon glyphicon-chevron-down\"></span></button>";
 			result +=   			"</div>";
 			result += 			"</div>";
@@ -405,9 +321,11 @@
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
 			result +=   			"<h4>";
-			result +=   				"<span class=\"label label-primary\" >状态:</span>&nbsp;";
-			if(status == "background" || status == "running"){
+			result +=   				"<span class=\"label label-default\" >状态:</span>&nbsp;";
+			if(status == "finished"){
 			result +=   				"<span class=\"label label-success\" >" + status + "</span>";
+			}else if (status == "error"){
+			result +=   				"<span class=\"label label-danger\" >" + status + "</span>";
 			}else{
 			result +=   				"<span class=\"label label-warning\" >" + status + "</span>";	
 			}
@@ -418,7 +336,7 @@
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
 			result +=   			"<h4>";
-			result +=   				"<span class=\"label label-primary\" >参数:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >参数:</span>&nbsp;";
 			result +=   				"<span class=\"label label-default\" >" + params + "</span>";
 			result +=   			"<h4>";
 			result += 			"</div>";
@@ -427,7 +345,7 @@
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
 			result +=   			"<h4>";
-			result +=   				"<span class=\"label label-primary\" >开始:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >开始:</span>&nbsp;";
 			result +=   				"<span class=\"label label-default\" >" + start + "</span>";
 			result +=   			"<h4>";
 			result += 			"</div>";
@@ -437,7 +355,7 @@
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
 			result +=   			"<h4>";
-			result +=   				"<span class=\"label label-primary\" >结束:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >结束:</span>&nbsp;";
 			result +=   				"<span class=\"label label-default\" >" + end + "</span>";
 			result +=   			"<h4>";
 			result += 			"</div>";
@@ -447,7 +365,7 @@
 			result += 		"<div class=\"row\">";
 			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
 			result +=   			"<h4>";
-			result +=   				"<span class=\"label label-primary\" >运行:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >运行:</span>&nbsp;";
 			result +=   				"<span class=\"label label-default\" >" + time + "</span>";
 			result +=   			"<h4>";
 			result += 			"</div>";
@@ -458,51 +376,12 @@
 			return result;
 		}
 
-		function updateRunList(){
-			var url = DEV_IP + "/cmd";
-			console.log("updateRunList() -- url:" + url)
-			$.get(url, "", function(result){
-				//callback(result);
-				console.log("result:" + JSON.stringify(result))
-				var aryFiles = result.files;
-				var tmpName;
-				var tmpSize;
-				var result = "";
-				for(var i = aryFiles.length-1; i >= 0; i--){
-					tmpSize = aryFiles[i].size;
-					if(tmpSize < 0){
-						continue;
-					}
-					tmpName = aryFiles[i].name;
-					if(tmpName.lastIndexOf(".py") < 0){
-						continue;
-					}
-					console.log("[" + i + "] - " + tmpName);
-					result += generateRunListItem(tmpName);
-				}
-				//添加个横线，加入特殊的python
-				result += "<li role=\"separator\" class=\"divider\"></li>"
-				result += generateRunListItem("Center.py");
-
-				$("#bgRunList").html(result);
-			});
-		}
-
-		function generateRunListItem(name){
-			return "<li><a href=\"javascript:void(0)\" onclick=\"onClickRunListItem('" + name + "')\">" + name + "</a></li>";
-		}
-
-		function onClickRunListItem(name){
-			console.log("onClickRunListItem() - " + name);
-			showRunDialog(name);
-		}
-
-		function showRunDialog(name)
+		function showRunDialog(name, params)
 		{
 			console.log("showRunDialog()");
 			
 			$("#runTitle").html("Run - " + name);
-       		$("#runParams").val("");
+       		$("#runParams").val(params);
 
        		$('#modalRun').on('hidden.bs.modal', function (e) {
 				console.log("hide modalRun----------");
@@ -554,6 +433,7 @@
 					showTips("run " + name +" end~~~", "success");
 					setTimeout(function(){
 						updateTaskList();
+						window.open(DEV_IP + "/web/index.html"); 
 					}, 1000);
 				}
   			});

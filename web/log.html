@@ -117,13 +117,16 @@
 		function findLogFile(name, cmd){
 			console.log("findLogFile() --- name:" + name + " cmd:" + cmd);
 			// var url = DEV_IP + "/getHistoryTasks"
-			var url = DEV_IP + "/cmd/logs"
+			var url = DEV_IP + "/logs"
 			console.log("findLogFile() -- url:" + url)
 
 			$.get(url, "", function(result){
 				console.log("result:" + JSON.stringify(result));
 				var aryFiles = result.files;
 				var tail = "_" + cmd + "_" + name + ".log";
+				if(name.lastIndexOf("Guard.py") >= 0){
+					tail = "_" + 0 + "_" + name + ".log";
+				}
 				console.log("tail:" + tail);
 				var isHas = 0;
 				var tmpObj;
@@ -156,7 +159,8 @@
 		}
 
 		function refreshOnce(){
-			var url = DEV_IP + "/cmd/logs/" + logName;
+			var url = DEV_IP + "/logs/" + logName;
+			
 			if(logPath != ""){
 				url = DEV_IP + logPath;
 			}
@@ -168,11 +172,12 @@
 		}
 
 		function updateLog(name){
-			var url = DEV_IP + "/cmd/logs/" + name;
+			var url = DEV_IP + "/logs/" + name;
+			console.log("name -------- " + name)
 			if(logPath != ""){
 				url = DEV_IP + logPath;
 			}
-			console.log("update first time~~~");
+			console.log("update first time~~~ url:" + url);
 			$.get(url, "", function(result){
 				updateLogUI(result);
 			});	
@@ -222,6 +227,12 @@
 		function onClickDownload(){
 			if(isPC()){
 				var url = DEV_IP + "/cmd/logs/" + logName + "?download";
+				if(name == "Center.py"){
+					url = DEV_IP + "/cmd/Center/logs/" + logName + "?download";
+				}
+				if(name == "Guard.py"){
+					url = DEV_IP + "/logs/" + logName + "?download";
+				}
 				if(logPath != ""){
 					url = DEV_IP + logPath + "?download";
 				}

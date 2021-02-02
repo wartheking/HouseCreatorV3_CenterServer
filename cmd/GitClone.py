@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # coding:utf-8
 import logging
-import os, time, sys, platform, traceback, threading, urllib.request
+import os, time, sys, platform, traceback, threading, urllib.request, json
+import pyautogui
 
 ##############
 #Logger start
@@ -21,15 +22,17 @@ class Logger:
             return "/"
 
     def checkDirs(self):
-        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
-        pathLogDir = pathDirNow + self.getPathSeperater() + self.LOG_DIR_NAME
+        pathLogDir = self.getLogDirPath()
         isExists = os.path.exists(pathLogDir)
         if not isExists:
             os.makedirs(pathLogDir) 
             print(pathLogDir + ' 创建成功')
 
     def getLogDirPath(self):
-        return os.path.abspath(os.path.join(sys.argv[0], "..")) + self.getPathSeperater()  +  self.LOG_DIR_NAME
+        pathDirNow = os.path.abspath(os.path.join(sys.argv[0], ".."))
+        #同其它的一样吧，统一放在根目录，log放同一个地方 加上个 /../../来返回上一级
+        pathLogDir = pathDirNow + self.getPathSeperater() + ".." + self.getPathSeperater() + self.LOG_DIR_NAME
+        return pathLogDir
 
     def closeCheckLog(self):
         self.checkLog = 0
@@ -121,6 +124,12 @@ class Logger:
 #默认方法 start
 ##############
 
+def getPathSeperater():
+    if platform.platform().find("Windows") >= 0:
+        return "\\"
+    else:
+        return "/"
+
 def GETMYPID():
     print("GETMYPID() - argv:" + str(sys.argv))
     pid = 0
@@ -160,10 +169,31 @@ log = LOGGER.logger
 #实例测试 start
 ##############
 
+CFG_FILENAME = "git.config"
+
 class Template:
+
     def mainfunc(self):
         try:
-            log.info("mainfunc ----> " + 123)
+            aryRepo = []
+            configPath = os.path.abspath(os.path.join(sys.argv[0], "..")) + getPathSeperater() + CFG_FILENAME
+            file = open(configPath, "r")
+            jsonStr = file.read()
+            jobj = json.loads(jsonStr)
+            for obj in jobj:
+                if isinstance(obj, str):
+                    aryRepo.append(obj)
+            log.info("ready handle git options:" + str(aryRepo))
+            for repoStr in aryRepo:
+                cmdStr = ""
+                cmdStr += "cd /d " + repoStr + " && git pull && "
+                cmdStr = cmdStr[0:(len(cmdStr) - 3)]
+                log.info("handle start run cmd: " + str(cmdStr))
+                f = os.popen(cmdStr)
+                data = f.read()
+                f.close()
+                lenData = len(data)
+                log.info("handle return data:" + str(data) + " dataLen:" + str(lenData))
         except:
             log.info(traceback.format_exc())
 
@@ -174,6 +204,7 @@ class Template:
         # while True:
         #     time.sleep(1)
         #     log.info("--->")
+
         time.sleep(1)
         RUNEND(JTAG_PID_STATUS_FINISHED)
         log.info("python end--->" + str(__file__))

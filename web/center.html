@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+	<title>Center</title>
+</head>
+<body>
+	<!-- 导航栏 开始 -->
+	<nav class="navbar navbar-default navbar-fixed-top" style="z-index: 100;">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="#" class="navbar-brand logo"><img src="img/logo.jpg" width="162px" height="50px" alt="altalt"></a>
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+					<!-- 三根线 -->
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+			</div>
+			<div class="collapse navbar-collapse" id="navbar-collapse">
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="index.html"><span class="glyphicon glyphicon-home"></span> 首页</a>
+					</li>
+					<li>
+						<a href="history.html"><span class="glyphicon glyphicon-time"></span> 历史</a>
+					</li>
+					<li>
+						<a href="file.html"><span class="glyphicon glyphicon-file"></span> 文件</a>
+					</li>
+					<li class="active">
+						<a href="center.html"><span class="glyphicon glyphicon-blackboard"></span> 中控</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- 导航栏 结束 -->
+
+	<!-- 标题 开始-->
+	<nav class="navbar navbar-default navbar-fixed-top navbar_path nav_index" style="z-index: 99; background: #fff; padding-top: 20px;">
+		<div class="container">
+			<div class="row" style="text-align: left;">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<span id="ipValueTips" class="label label-default" style="font-size: 15px;">Center</span>
+					<span id="ipValue" class="label label-default" style="font-size: 15px;">Connecting...</span>
+				</div>
+			</div>
+			<div id="alertTips" class="alert alert-warning fade in hidden" style="margin-top: 10px;"></div>
+		</div>
+	</nav>
+	<!-- 标题 结束 -->
+
+	<!-- 程序列表列表 开始 -->
+	<div id="indexlist_bg" class="container">
+		  
+	</div>
+	<!-- 文件列表 结束 -->
+
+	<!-- 底部 开始 -->
+	<footer id="footer_index" class="navbar-fixed-bottom">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: left;">
+					<div class="dropup" id="btnsBg">
+						<button id="btnRefresh" class="btn btn-primary" type="button" onclick="getCenterConfig()"><span class="glyphicon glyphicon-refresh"></span></button>
+						<!-- <button class="btn btn-info dropdown-toggle" type="button" id="dropdownOption" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="spanOption">Run</span>&nbsp;&nbsp;<span class="caret"></span></button>
+						<ul id="bgRunList" class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownOption">
+						</ul> -->
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="text-align: right;">
+					<div id="streamRateBg">
+						<span class="label label-success"><span id="devAllTips">all:0</span></span>
+						<span class="label label-success"><span id="devLightTips">light:0</span></span>
+						<span class="label label-success"><span id="devDatafactoryTips">datafactory:0</span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+	<!-- 底部 结束 -->
+
+	<!-- 先让网页显示出来，再加载js -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="IP.js"></script>
+	<script type="text/javascript">
+
+		var gIPsAllGroup = [];
+		var gIPsLight = [];
+		var gIPsDataFactory = [];
+
+		$(window).load(function() {
+		 	//footer_index 居中
+			$('#btnsBg').css('margin-top', (($('#footer_index').height() - $('#btnsBg').height()) * 0.5) + 'px');
+			$('#streamRateBg').css('margin-top', (($('#footer_index').height() - $('#streamRateBg').height()) * 0.5) + 'px');
+			//5px 适配，button自带margin
+
+			//album_bg
+			$('#indexlist_bg').css('margin-bottom', $('#footer_index').height() + 'px')
+
+			$("#ipValue").html(DEV_CENTER_IP)
+
+			getCenterConfig();
+			// updateRunList();
+			// updateTaskList();
+			// checkUE4();
+			// checkCenter();
+			intervalRrefreshTime1 = setInterval(function() {
+	  //      		updateTaskList();
+	  //      		checkUE4();
+	  //      		checkCenter();
+	  			getCenterConfig();
+			},1000);
+
+		});
+
+		$(window).resize(function() {
+			console.log("---------resize()------");
+			//footer_capture 居中
+			$('#btnsBg').css('margin-top', (($('#footer_index').height() - $('#btnsBg').height()) * 0.5) + 'px');
+			$('#streamRateBg').css('margin-top', (($('#footer_index').height() - $('#streamRateBg').height()) * 0.5) + 'px');
+
+			//album_bg
+			$('#indexlist_bg').css('margin-bottom', $('#footer_index').height() + 'px')
+
+		});
+
+		function getCenterConfig(){
+			var url = DEV_CENTER_IP + "/getConfig";
+			$.get(url, "", function(result){
+				console.log("result:" + JSON.stringify(result))
+				if(result.state == "done"){
+					var tmpAll = result.params.all;
+					gIPsAllGroup = result.params.all;
+					gIPsLight = result.params.light;
+					gIPsDataFactory = result.params.datafactory;
+					$("#devAllTips").html("all:" + gIPsAllGroup.length);
+					$("#devLightTips").html("light:" + gIPsLight.length);
+					$("#devDatafactoryTips").html("datafactory:" + gIPsDataFactory.length);
+					console.log("gIPsAllGroup:" + JSON.stringify(gIPsAllGroup));
+					console.log("gIPsLight:" + gIPsLight);
+					console.log("gIPsDataFactory:" + gIPsDataFactory);
+				}
+
+				$("#ipValue").attr("class", "label label-success");
+				$("#ipValueTips").attr("class", "label label-success");
+				checkCenter();
+
+			}).fail(function () {
+               console.log("can not getconfig!!!");
+               showTips("Can not find Center!!!", "danger", 3000);
+               $("#ipValue").attr("class", "label label-default");
+               $("#ipValueTips").attr("class", "label label-default");
+           });
+		}
+
+		function checkCenter(){
+			var url = DEV_CENTER_IP + "/check";
+			$.get(url, "", function(result){
+				console.log("result:" + JSON.stringify(result))
+				clearTaskList();
+				var allResult = result.msg;
+				var newHtml = "";
+
+				var cntNum = 0;
+				var objCheck;
+				var tmpIP = "";
+				var tmpTaskType = "";
+				for(var i = 0; i < gIPsAllGroup.length; i++){
+					objCheck = allResult[cntNum];
+					tmpTaskType = "all";
+					newHtml += generateAllItem(i, tmpTaskType, objCheck, gIPsAllGroup[i]);
+					cntNum++;
+				}
+
+				for(var i = 0; i < gIPsLight.length; i++){
+					objCheck = allResult[cntNum];
+					tmpTaskType = "light";
+					newHtml += generateNormalItem(i, tmpTaskType, objCheck, gIPsLight[i]);
+					cntNum++;
+				}
+
+				for(var i = 0; i < gIPsDataFactory.length; i++){
+					objCheck = allResult[cntNum];
+					tmpTaskType = "datafactory";
+					newHtml += generateNormalItem(i, tmpTaskType, objCheck, gIPsDataFactory[i]);
+					cntNum++;
+				}
+
+				$("#indexlist_bg").html(newHtml);
+			}).fail(function () {
+               console.log("check found eror!!!");
+           });
+		}
+
+		function clearTaskList()
+		{
+			console.log("clearTaskList()");
+			$("#indexlist_bg").html("");
+		}
+
+		function generateAllItem(index, taskType, objAll, ipGroup)
+		{
+			console.log("generateAllItem() objAll:" + JSON.stringify(objAll) + " ipGroup:" + JSON.stringify(ipGroup) + " taskType:" + taskType);
+			var name = objAll.name;
+			var state = objAll.state;
+			var progress = objAll.progress;
+			var result = "";
+			result += "<div class=\"panel panel-primary\">";
+			//头部，显示 taskType, state, progress
+			result += 	"<div class=\"panel-heading\">";
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: left;\">";
+			result +=   			"<h5>" + taskType + " - " + (index+1) + "</h5>";
+			result += 			"</div>";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: right;\">";
+			result +=   			"<div style=\"margin-top: 3px;\">";
+			result +=   			"<h4>";
+
+			if(state == "error"){
+			result +=   				"<span class=\"label label-danger\" >" + state + "</span>";
+			}else if(state == "done"){
+			result +=   				"<span class=\"label label-success\" >" + state + "</span>";
+			}else{
+			result +=   				"<span class=\"label label-warning\" >" + state + "</span>";
+			}
+			result +=   			"</h4>";
+			result +=   			"</div>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 	"</div>";
+			// body内容
+			result += 	"<div class=\"panel-body\">";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >名称:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + name + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >进度:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + progress + "%</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+			//每个子机器状态
+			var params = objAll.params;
+			var ips = ipGroup.SER_IPS;
+
+			var tmpObj;
+			var IP;
+
+			for(var i = 0; i < params.length; i++){
+			tmpObj = params[i];
+			IP = ips[i];
+			state = tmpObj.state;
+			progress = 0;
+			if(tmpObj.progress){
+			progress = tmpObj.progress;
+			}
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<a class=\"label label-success\" target=\"_blank\" href=\"" + tranIP2GuardIP(IP) + "\">" + IP + "</a>&nbsp;";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >状态:</span>&nbsp;";
+			if(state == "error"){
+			result +=   				"<span class=\"label label-danger\" >" + state + "</span>";
+			}else if(state == "done"){
+			result +=   				"<span class=\"label label-success\" >" + state + "</span>";
+			}else{
+			result +=   				"<span class=\"label label-warning\" >" + state + "</span>";
+			}
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >进度:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + progress + "%</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+			}
+
+			result += 	"</div>";
+			result += "</div>";
+			return result;
+		}
+
+		function generateNormalItem(index, taskType, obj, ip)
+		{
+			console.log("generateNormalItem() obj:" + JSON.stringify(obj) + " ip:" + ip);
+			var name = obj.name;
+			var state = obj.state;
+			var progress = obj.progress;
+			var result = "";
+			result += "<div class=\"panel panel-primary\">";
+			//头部，显示 taskType, state, progress
+			result += 	"<div class=\"panel-heading\">";
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: left;\">";
+			result +=   			"<h5>" + taskType + " - " + (index+1) + "</h5>";
+			result += 			"</div>";
+			result += 			"<div class=\"col-lg-6 col-md-6 col-sm-6 col-xs-6\" style=\"text-align: right;\">";
+			result +=   			"<div style=\"margin-top: 3px;\">";
+			result +=   			"<h4>";
+
+			if(state == "error"){
+			result +=   				"<span class=\"label label-danger\" >" + state + "</span>";
+			}else if(state == "done"){
+			result +=   				"<span class=\"label label-success\" >" + state + "</span>";
+			}else{
+			result +=   				"<span class=\"label label-warning\" >" + state + "</span>";
+			}
+			result +=   			"</h4>";
+			result +=   			"</div>";
+			result += 			"</div>";
+			result += 		"</div>";
+			result += 	"</div>";
+			// body内容
+			result += 	"<div class=\"panel-body\">";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<a class=\"label label-success\" target=\"_blank\" href=\"" + tranIP2GuardIP(ip) + "\">" + ip + "</a>&nbsp;";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >名称:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + name + "</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 		"<div class=\"row\">";
+			result += 			"<div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\" style=\"text-align: left;\">";
+			result +=   			"<h4>";
+			result +=   				"<span class=\"label label-primary\" >进度:</span>&nbsp;";
+			result +=   				"<span class=\"label label-default\" >" + progress + "%</span>";
+			result +=   			"<h4>";
+			result += 			"</div>";
+			result += 		"</div>";
+
+			result += 	"</div>";
+			result += "</div>";
+			return result;
+		}
+
+		function tranIP2GuardIP(ipStr){
+			var pos = ipStr.lastIndexOf(":");
+			if(pos >= 0){
+				var rtnIp = ipStr.substring(0, pos);
+				rtnIp += ":9000";
+				return rtnIp;
+			}else{
+				console.log("trans error!!! ipStr:" + ipStr + " pos:" + pos)
+				return ipStr
+			}
+
+			
+		}
+
+
+		function isAndroid() {
+		    var userAgentInfo = navigator.userAgent;
+		    //alert(userAgentInfo);
+		    var Agents = ["Android"];
+		    var flag = false;
+		    for (var v = 0; v < Agents.length; v++) {
+		        if (userAgentInfo.indexOf(Agents[v]) > 0) {
+		            flag = true;
+		            break;
+		        }
+		    }
+		    return flag;
+		}
+
+		var showTipsTimer;
+		function showTips(msg, level="warning", timeout=3000)
+		{
+			console.log("showTips:" + msg);
+
+			//clear timer
+			clearTimeout(showTipsTimer);
+			var btnHtml = "<button type=\"button\" class=\"close\" onclick=\"closeTips('" + level + "')\"><span aria-hidden=\"true\">&times;</span></button>";
+			$("#alertTips").html(btnHtml + msg);
+			var classAttr = "alert alert-" + level + " fade in";
+			$("#alertTips").attr("class", classAttr);
+
+			showTipsTimer = setTimeout(function(){
+				console.log("showTips timeout ----");
+				var classAttr = "alert alert-" + level + " fade out hidden";
+				$("#alertTips").attr("class", classAttr);
+				clearTimeout(showTipsTimer);
+			}, timeout);
+
+		}
+
+		function closeTips(level)
+		{
+			console.log("closeTips ----");
+			var classAttr = "alert alert-" + level + " fade out hidden";
+			$("#alertTips").attr("class", classAttr);
+			clearTimeout(showTipsTimer);
+		}
+
+	</script>
+</body>
+</html>
