@@ -30,6 +30,7 @@ JTAG_TASKTYPE_ALL = "all"
 JTAG_TASKTYPE_LIGHT = "light"
 JTAG_TASKTYPE_DATAFACTORY = "datafactory"
 JTAG_TASKTYPE_FIXMODEL = "fixmodel"
+JTAG_TASKTYPE_MODELPREVIEW = "modelPreview"
 JTAG_MAP   = "map"
 JTAG_ANGLE = "angle"
 JTAG_IDS = "ids"
@@ -374,6 +375,30 @@ class CenterCtrl:
 
             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
             return rtnMsg
+        
+        elif mTaskType == JTAG_TASKTYPE_MODELPREVIEW:
+            #用light机器来执行
+            #要加上all的数量
+            mIndex = jConfigAllLen
+            #遍历 light 群
+            for ipStr in jConfigLight:
+                tName, tTaskType, tState, tTaskId, tRatio, tPostfix, tStateStr = self.getCheckStateFromFile(mIndex)
+                if tState == JTAG_STATE_DONE or tState == "":
+                    #done状态或者初始化状态就可以开始任务
+                    self.log.info("handle_SendReqToServers() find 'light' machine is ok index:" + str(mIndex))
+                    return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                elif tState == JTAG_STATE_ERROR:
+                    #错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
+                    if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
+                        #server err, 跳过吧
+                        mIndex += 1
+                        continue
+                    else:
+                        self.log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
+                        return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                else:
+                    mIndex += 1
+                    continue
 
     #send 'all' request to servers one by one
     def handle_SendReqToServers_all(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix):
@@ -532,8 +557,20 @@ class CenterCtrl:
                         self.log.info("content json data postfix not find error!!!")
                         result = -1
                         break
+                
+                if mTaskType == JTAG_TASKTYPE_MODELPREVIEW:
+                    #check taskId
+                    if (JTAG_TASKID in jobj.keys()):
+                        mTaskId = jobj[JTAG_TASKID]
+                        mTaskId, result = self.checkTaskId(mTaskId)
+                        if result < 0:
+                            break
+                    else:
+                        self.log.info("content json data taskId not find error!!!")
+                        result = -1
+                        break
 
-                if mTaskType != JTAG_TASKTYPE_DATAFACTORY:
+                if mTaskType != JTAG_TASKTYPE_DATAFACTORY and mTaskType != JTAG_TASKTYPE_MODELPREVIEW:
                     #check map
                     if(JTAG_MAP in jobj.keys()):
                         mMap  = jobj[JTAG_MAP]
@@ -643,7 +680,7 @@ class CenterCtrl:
         if not isinstance(taskType, str):
             self.log.info("taskType is not str error!!!")
             result = -1
-        elif taskType != JTAG_TASKTYPE_ALL and taskType != JTAG_TASKTYPE_LIGHT and taskType != JTAG_TASKTYPE_DATAFACTORY:
+        elif taskType != JTAG_TASKTYPE_ALL and taskType != JTAG_TASKTYPE_LIGHT and taskType != JTAG_TASKTYPE_DATAFACTORY and taskType != JTAG_TASKTYPE_MODELPREVIEW:
             self.log.info("taskType not right error!!!")
             result = -1
         else:
@@ -1240,7 +1277,7 @@ class CenterCtrl:
                     else:
                         #tasktype all 才要判断 name是否是空
                         #tasktype datafactory 也要判断name有没有问题，敬然说name是标识，taskId只是存个文件夹
-                        if mTaskType == JTAG_TASKTYPE_ALL or mTaskType == JTAG_TASKTYPE_DATAFACTORY :
+                        if mTaskType == JTAG_TASKTYPE_ALL or mTaskType == JTAG_TASKTYPE_DATAFACTORY or mTaskType == JTAG_TASKTYPE_MODELPREVIEW:
                             self.log.info("getCheckState() read json not find name!!!")
                             result = -1
                             break
@@ -1307,7 +1344,12 @@ class CenterCtrl:
                 resultStr += tStateStr
                 resultStr += ","
             else:
+                #这里是获取 light 的 check信息
                 if mTaskType == JTAG_TASKTYPE_LIGHT and tTaskId == mTaskId and tTaskType == mTaskType:
+                    resultStr += tStateStr
+                    resultStr += ","
+                #这里是获取 modelpreview 的 check信息
+                if mTaskType == JTAG_TASKTYPE_MODELPREVIEW and tName == mName:
                     resultStr += tStateStr
                     resultStr += ","
             mIndex += 1
