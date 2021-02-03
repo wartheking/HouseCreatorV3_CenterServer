@@ -256,8 +256,8 @@ class CenterCtrl:
     gIsHandlingPro = 0
 
     def handleRecv_pro(self, path, contentData):
-        if self.gIsHandlingPro == 1:
-            self.log.info("req pro but isHandlingPro return isBusy error!!!")
+        if self.gIsHandlingPro == 1 or self.gIsConfiging == 1:
+            self.log.info("req pro but isHandlingPro return isBusy gIsHandlingPro:" + str(self.gIsHandlingPro) + " gIsConfiging:" + str(self.gIsConfiging) +  " error!!!")
             response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
         else:
             self.gIsHandlingPro = 1
@@ -399,6 +399,8 @@ class CenterCtrl:
                 else:
                     mIndex += 1
                     continue
+             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
+            return rtnMsg
 
     #send 'all' request to servers one by one
     def handle_SendReqToServers_all(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix):
@@ -807,7 +809,7 @@ class CenterCtrl:
 
     def handleRecv_config(self, path, contentData):
         isBusy = self.checkHasServerBusy()
-        if isBusy:
+        if isBusy or self.gIsConfiging == 1:
             response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
         else:
             result = self.setConfigsFromJContent(contentData)
@@ -1004,9 +1006,12 @@ class CenterCtrl:
             self.log.info(traceback.format_exc())
         #self.log.info("getSerIpsAndSerAngles -- mSerIps:" + str(mSerIps) + " mSerAngles:" + str(mSerAngles))
         return mSerIps, mSerAngles
+    
+    gIsConfiging = 0
 
     #/config
     def setConfigsFromJContent(self, jContent):
+        self.gIsConfiging = 1
         result = 0
         try:
             jobj = json.loads(jContent)
@@ -1087,6 +1092,7 @@ class CenterCtrl:
                 file = open(FILE_CFG_PATH, "w")
                 file.write(jContent)
                 file.close()
+                self.initAryStatus()
             else:
                 self.log.info("config json data ok but write file error!!!")
                 result = -1
@@ -1095,6 +1101,7 @@ class CenterCtrl:
             self.log.info("setConfigsFromJContent() error!!!")
             self.log.info(traceback.format_exc())
         self.log.info("setConfigsFromJContent -- result:" + str(result))
+        self.gIsConfiging = 0
         return result
 
     ##############################################################
@@ -1118,6 +1125,7 @@ class CenterCtrl:
 
     #每秒检查状态
     def checkStatePreSec(self):
+        self.cntCheck = 0
         while self.gCheckPrec:
             # self.log.info("checkStatePreSec")
             self.checkState()
@@ -1127,6 +1135,8 @@ class CenterCtrl:
     #结束检查
     def endCheckStatePreSec(self):
         self.gCheckPrec = 0
+
+    PRINT_ALLCHECK_TM = 10
 
     #检查所有功能机状态
     def checkState(self):
@@ -1152,6 +1162,11 @@ class CenterCtrl:
         for ipStr in jConfigDatafactory:
             self.checkStatePreSec_datafactoryitem(mIndex, ipStr)
             mIndex += 1
+
+        self.cntCheck += 1
+        if self.cntCheck >= self.PRINT_ALLCHECK_TM:
+            self.cntCheck = 0
+            self.log.info(str(self.PRINT_ALLCHECK_TM) + "sec check print:" + str(self.ARY_STATUS))
     
     def checkStatePreSec_allitem(self, index, jobj):
         #self.log.info("handle_CheckStatePreSec_allitem() [" + str(index) +"]")
@@ -1463,7 +1478,7 @@ class CenterCtrl:
     ##############################################################
     def handleRecv_bye(self, path, contentData):
         isBusy = self.checkHasServerBusy()
-        if isBusy:
+        if isBusy or (self.gIsConfiging == 1):
             response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
         else:
             response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_DONE + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BYE + "\"}"
@@ -1479,6 +1494,10 @@ class CenterCtrl:
     ##############################################################
 
     def handleRecv_fixmodel(self, path, contentData):
+        if self.gIsConfiging == 1:
+            response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
+            return response_body
+        
         mName, mTaskId, result = self.getFixModelInfosFromJContent(contentData)
         if result < 0:
             response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\", \"" + JTAG_TASKID + "\":\"" + mTaskId + "\", \"" + JTAG_TASKTYPE + "\":\"" + JTAG_TASKTYPE_FIXMODEL + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
@@ -1559,6 +1578,9 @@ class CenterCtrl:
     ##############################################################
 
     def handleRecv_syncmodel(self, path, contentData):
+        if self.gIsConfiging == 1:
+            response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
+            return response_body
         mVersion, result = self.getSyncDownloadModelInfosFromJContent(contentData)
         if result < 0:
             response_body = "{\"" + JTAG_NAME + "\":\""+ str(path) + "\", \"" + JTAG_VERSION + "\":\"" + mVersion + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\", \"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
