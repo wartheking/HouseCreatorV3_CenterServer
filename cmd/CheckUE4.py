@@ -177,8 +177,9 @@ TM_WAIT_OPENUE4 = 90
 URL_CHECK = "http://127.0.0.1:8000/check"
 
 #通过URL请求启动UE4
-URL_OPENUE4 = "http://127.0.0.1:9000/execute"
+URL_GUARD = "http://127.0.0.1:9000/execute"
 URL_OPENUE4_DATA = "{\"name\":\"StartUE4.py\", \"params\":[]}"
+URL_KILLUE4_DATA = "{\"name\":\"KillUE4.py\", \"params\":[]}"
 
 class CheckUE4:
 
@@ -214,7 +215,7 @@ class CheckUE4:
         ret = 0
         try:
             dataStrBytes = URL_OPENUE4_DATA.encode("utf-8")
-            f = urllib.request.urlopen(URL_OPENUE4, dataStrBytes, timeout=30)
+            f = urllib.request.urlopen(URL_GUARD, dataStrBytes, timeout=30)
             log.info("handleOpenUE4() ---------- " + str(f.read().decode("utf-8")))
             f.close()
         except:
@@ -224,9 +225,25 @@ class CheckUE4:
         log.info("handleOpenUE4() ret:" + str(ret))
         return ret
 
+    def handleKillUE4(self):
+        ret = 0
+        try:
+            dataStrBytes = URL_KILLUE4_DATA.encode("utf-8")
+            f = urllib.request.urlopen(URL_GUARD, dataStrBytes, timeout=30)
+            log.info("handleKillUE4() ---------- " + str(f.read().decode("utf-8")))
+            f.close()
+        except:
+            ret = -1
+            log.info("handleKillUE4() error!!!")
+            log.info(traceback.format_exc())
+        log.info("handleKillUE4() ret:" + str(ret))
+        return ret
+
     def __init__(self, name=__name__):
         log.info('init CheckUE4()')
         RUNEND(JTAG_PID_STATUS_BACKGROUND)
+        log.info('kill ue4 first~~')
+        self.handleKillUE4()
         log.info('check ue4 after 5sec~')
         time.sleep(5)
         self.checkPreTM()

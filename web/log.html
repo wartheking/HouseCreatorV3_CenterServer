@@ -124,7 +124,7 @@
 				console.log("result:" + JSON.stringify(result));
 				var aryFiles = result.files;
 				var tail = "_" + cmd + "_" + name + ".log";
-				if(name.lastIndexOf("Guard.py") >= 0){
+				if(name == "Guard.py"){
 					tail = "_" + 0 + "_" + name + ".log";
 				}
 				console.log("tail:" + tail);

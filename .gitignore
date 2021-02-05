@@ -8,3 +8,5 @@ data/
 logs/
 cmd/logs/
 web/IP.js
+cmd/ue4.config
+cmd/git.config

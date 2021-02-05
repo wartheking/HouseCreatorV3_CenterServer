@@ -4,7 +4,7 @@
 
 import psutil
 import pyautogui
-import time, os, threading, platform, json, traceback, socket, sys
+import time, os, threading, platform, json, traceback, socket, sys, GPUtil
 import urllib.request
 
 URL_PATH_EXECUTE = "/execute"
@@ -47,6 +47,8 @@ JTAG_PID_STATUS_ABORT = "abort"
 #异常的和finished的就会自动关掉窗口（pid）
 PID_TM_MAX = 10
 TAG_GUARD = "Guard.py"
+TAG_RESTARTGUARD = "RestartGuard.py"
+TAG_STARTUE4 = "StartUE4.py"
 
 class GuardCtrl:
 
@@ -189,18 +191,21 @@ class GuardCtrl:
 
     def checkHasRunningPro(self):
         ret = 0
+        name = ""
         if len(self.gAryPids) <= 1:
             #仅有一个Guard
             ret = 0
         else:
+            name = ""
             for tmpObj in self.gAryPids:
-                if tmpObj[JTAG_PID_NAME] == TAG_GUARD:
+                name = tmpObj[JTAG_PID_NAME]
+                if name == TAG_GUARD:
                     continue
                 else:
                     if tmpObj[JTAG_PID_STATUS] == JTAG_PID_STATUS_RUNNING:
                         ret = 1
                         break
-        return ret 
+        return ret, name
 
     #执行程序
     #ret=0  执行正常
@@ -211,7 +216,9 @@ class GuardCtrl:
         if self.gIsRunningPyFile == 1:
             self.log.info("executePyFile() find gIsRunningPyFile == 1")
             ret = -1
-        elif self.checkHasRunningPro() == 1:
+            return ret
+        retCheck , name = self.checkHasRunningPro()
+        if retCheck == 1:
             self.log.info("executePyFile() find checkHasRunningPro == 1")
             ret = -1
         else:
@@ -523,6 +530,9 @@ class GuardCtrl:
             tmpName = tmpObj[JTAG_PID_NAME]
             if tmpName == TAG_GUARD:
                 continue
+            elif tmpName == TAG_RESTARTGUARD:
+                #保护一下
+                continue
             else:
                 tmpObj[JTAG_PID_STATUS] = JTAG_PID_STATUS_ABORT
         return self.genRtnMsg(path, JTAG_STATE_DONE)
@@ -532,7 +542,63 @@ class GuardCtrl:
             #self.log.info("newthread_checkPreSec()")
             time.sleep(1)
             self.updateAryPids()
+            self.printPCInfoPreSec()
     
+    def printPCInfoPreSec(self):
+        self.GetGpuInfo()
+        self.GetCpuInfo()
+        self.GetMemoryInfo()
+
+    def GetGpuInfo(self):
+        gpulist = []
+        # 获取多个GPU的信息，存在列表里
+        Gpus = GPUtil.getGPUs()
+        for gpu in Gpus:
+            gpu_memoryTotal = round((gpu.memoryTotal) /1024)
+            gpu_memoryUsed = round((gpu.memoryUsed) /1024,2)
+            gpu_memoryUtil = round((gpu.memoryUtil) * 100 ,2)
+            gpulist.append([gpu.id, gpu_memoryTotal, gpu_memoryUsed, gpu_memoryUtil]) #GPU序号，GPU总量，GPU使用量，gpu使用占比
+            self.log.info("GPU信息:[序号:" + str(gpu.id) + "],[GPU总量:" + str(gpu_memoryTotal) + "],[GPU使用量:" + str(gpu_memoryUsed) + "],[GPU使用率:" + str(gpu_memoryUtil) + "]")
+        return gpulist
+    
+    def GetCpuInfo(self):
+        cpu_count = psutil.cpu_count(logical=False)  #1代表单核CPU，2代表双核CPU
+        xc_count = psutil.cpu_count()                #线程数，如双核四线程
+        cpu_slv = round((psutil.cpu_percent(1)), 2)  # cpu使用率
+        mList = [cpu_count, xc_count, cpu_slv] # 核数，线程数，cpu使用率
+        self.log.info("CPU信息:[核数:" + str(cpu_count) + "],[线程数:" + str(xc_count) + "],[CPU使用率:" + str(cpu_slv) + "]")
+        return mList
+    
+    def GetDiskInfo(self):
+        mList = psutil.disk_partitions()  # 磁盘列表
+        ilen = len(mList)  # 磁盘分区个数
+        i = 0
+        retlist1 = []
+        retlist2 = []
+        while i < ilen:
+            if str(mList[i].fstype) != "":
+                diskinfo = psutil.disk_usage(mList[i].device)
+                total_disk = round((float(diskinfo.total) / 1024 / 1024 / 1024), 2)  # 总大小
+                used_disk = round((float(diskinfo.used) / 1024 / 1024 / 1024), 2)  # 已用大小
+                free_disk = round((float(diskinfo.free) / 1024 / 1024 / 1024), 2)  # 剩余大小
+                syl_disk = diskinfo.percent # 占用率
+                retlist1 = [i, mList[i].device, total_disk, used_disk, free_disk, syl_disk]  # 序号，磁盘名称，总大小， 已用大小，剩余大小，占用率
+                retlist2.append(retlist1)
+                self.log.info("硬盘信息:[序号:" + str(i) + "],[磁盘名称:" + str(mList[i].device) + "],[总大:" + str(total_disk) + "],[已用大小:" + str(used_disk) + "],[剩余大小:" + str(free_disk) + "],[Disk占用率:" + str(syl_disk) + "]")
+            i = i + 1
+        return retlist2
+    
+    def GetMemoryInfo(self):
+        memory = psutil.virtual_memory()
+        total_nc = round((float(memory.total) / 1024 / 1024 / 1024), 2)  # 总内存
+        used_nc = round((float(memory.used) / 1024 / 1024 / 1024), 2)  # 已用内存
+        free_nc = round((float(memory.free) / 1024 / 1024 / 1024), 2)  # 空闲内存
+        syl_nc = round((float(memory.used) / float(memory.total) * 100), 2)  # 内存使用率
+ 
+        ret_list = [total_nc, used_nc, free_nc, syl_nc] # 总内存， 已用内存 ，空闲内存 ，内存使用率
+        self.log.info("内存信息:[总内存:" + str(total_nc) + "],[已用:" + str(used_nc) + "],[空闲:" + str(free_nc) + "],[内存使用率:" + str(syl_nc) + "]")
+        return ret_list
+
     def getAllAryPids(self):
         aryPidsNow = []
         for tmpObj in self.gAryPids:
@@ -543,25 +609,37 @@ class GuardCtrl:
         return aryPidsNow
 
     def updateAryPids(self):
+        aryCmds = []
+        aryPys  = []
         if not self.gIsRunningPyFile:
-            aryCmds = self.getAllPidCmd()
-            aryPys = self.getAllPidPy()
-            aryPidsNow = self.getAllAryPids()
-            aryDontKnowPid = []
-            for pid in aryCmds:
-                if not pid in aryPidsNow:
-                    aryDontKnowPid.append(pid)
-            for pid in aryPys:
-                if not pid in aryPidsNow:
-                    aryDontKnowPid.append(pid)
-            if len(aryDontKnowPid) > 0:
-                self.log.info("find dont know pid!!! - " + str(aryDontKnowPid))
-                self.killCmds(aryDontKnowPid)
+            ret, name = self.checkHasRunningPro()
+            if ret == 1 and name == TAG_RESTARTGUARD:
+                #保护一下
+                self.log.info("restarting guard, wont kill dont know cmd!!!")
+            else:
+                aryCmds = self.getAllPidCmd()
+                aryPys = self.getAllPidPy()
+                aryPidsNow = self.getAllAryPids()
+                aryDontKnowPid = []
+                for pid in aryCmds:
+                    if not pid in aryPidsNow:
+                        aryDontKnowPid.append(pid)
+                for pid in aryPys:
+                    if not pid in aryPidsNow:
+                        aryDontKnowPid.append(pid)
+                if len(aryDontKnowPid) > 0:
+                    self.log.info("find dont know pid!!! - " + str(aryDontKnowPid))
+                    self.killCmds(aryDontKnowPid)
 
         if len(self.gAryPids) <= 1:
             #无事退朝
             pass
         else:
+            #怕忘记初始化了
+            if len(aryCmds) <= 0:
+                aryCmds = self.getAllPidCmd()
+            if len(aryPys) <= 0:
+                aryPys = self.getAllPidPy()
             isHasKill = 0
             for tmpObj in self.gAryPids:
                 if TAG_GUARD == tmpObj[JTAG_PID_NAME]:
@@ -580,7 +658,7 @@ class GuardCtrl:
                         self.addToHistoryTask(tmpObj)
                         isHasKill = 1
                         
-                    elif mStatus == JTAG_PID_STATUS_RUNNING and not ((mPy in aryPys) and (mCmd in aryCmds) ):
+                    elif (mStatus == JTAG_PID_STATUS_RUNNING or mStatus == JTAG_PID_STATUS_BACKGROUND) and not ((mPy in aryPys) and (mCmd in aryCmds) ):
                         #程序在跑，当时cmd.exe 和 python.exe 仅存在其中一个，肯定有问题，关吧
                         self.log.info("find " + mStatus + " pid but py or cmd not exist, closing~~~ " + str(tmpObj))
                         time.sleep(1)

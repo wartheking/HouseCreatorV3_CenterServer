@@ -248,6 +248,7 @@ class StartUE4:
                     else:
                         ret = os.path.exists(ue4editor)
                         if not ret:
+                            ret = -1
                             log.info("【错误】!!!ue4editor路径不存在，请查看config文件:[" + str(ue4editor) + "]")
                             break
                 else:
@@ -264,6 +265,7 @@ class StartUE4:
                     else:
                         ret = os.path.exists(projet)
                         if not ret:
+                            ret = -1
                             log.info("【错误】!!!project路径不存在，请查看config文件:[" + str(projet) + "]")
                             break
                 else:
@@ -296,6 +298,7 @@ class StartUE4:
 
     #windows命令行启动UE4
     def cmdOpenUE4Editor(self):
+        ret = 0
         if platform.platform().find("Windows") >= 0:
             try:
                 ret, ue4editor, project, mapfile = self.getUE4Config()
@@ -304,10 +307,13 @@ class StartUE4:
                 else:
                     os.system("\"" + ue4editor + "\" " + project + " " + mapfile)
             except:
+                ret = -1
                 log.info("open software cmd run error!!!")
                 log.info(traceback.format_exc())
         else:
+            ret = -1
             log.info("not windows platform open software error!!!")
+        return ret
     
     #处理打开UE4
     def openUE4Editor(self):
@@ -360,10 +366,14 @@ class StartUE4:
     def __init__(self, name=__name__):
         log.info('init startUE4()')
         self.findAndKillUE4()
-        self.cmdOpenUE4Editor()
         log.info('start startUE4()')
-        self.openUE4Editor()
-        RUNEND(JTAG_PID_STATUS_FINISHED)
+        ret = self.cmdOpenUE4Editor()
+        log.info('start startUE4() ret = ' + str(ret))
+        if ret < 0:
+            RUNEND(JTAG_PID_STATUS_ERROR)
+        else:
+            self.openUE4Editor()
+            RUNEND(JTAG_PID_STATUS_FINISHED)
 try:
     tmp = StartUE4()
 except:

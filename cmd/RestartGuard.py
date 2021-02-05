@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # coding:utf-8
 import logging
-import os, time, sys, platform, traceback, threading, urllib.request, json
-import pyautogui
+import os, time, sys, platform, traceback, threading, urllib.request, psutil, pyautogui
 
 ##############
 #Logger start
@@ -124,12 +123,6 @@ class Logger:
 #默认方法 start
 ##############
 
-def getPathSeperater():
-    if platform.platform().find("Windows") >= 0:
-        return "\\"
-    else:
-        return "/"
-
 def GETMYPID():
     print("GETMYPID() - argv:" + str(sys.argv))
     pid = 0
@@ -169,76 +162,82 @@ log = LOGGER.logger
 #实例测试 start
 ##############
 
-CFG_FILENAME = "git.config"
+#通过URL请求启动UE4
+URL_ABORTALL = "http://127.0.0.1:9000/abortAll"
 
 class Template:
 
-    def mainfunc(self):
+    def getPathSeperater(self):
+        if platform.platform().find("Windows") >= 0:
+            return "\\"
+        else:
+            return "/"
+
+    def keyboardInput(self, strEnter):
+        log.info("输入" + str(strEnter) +"-start!")
+        tmInterval = 0.01
+        pyautogui.typewrite(message=strEnter,interval=tmInterval)
+        tmWait = tmInterval * len(strEnter) + 0.1
+        time.sleep(tmWait)
+        log.info("输入" + str(strEnter) +"-end!")
+
+    def keyboardEnter(self):
+        #回车
+        log.info("回车-start!")
+        pyautogui.press('enter')
+        log.info("回车-end!")
+
+    def handleAbortAll(self):
         ret = 0
         try:
-            aryRepo = []
-            configPath = os.path.abspath(os.path.join(sys.argv[0], "..")) + getPathSeperater() + CFG_FILENAME
-            file = open(configPath, "r")
-            jsonStr = file.read()
-            jobj = json.loads(jsonStr)
-            for obj in jobj:
-                if isinstance(obj, object):
-                    aryRepo.append(obj)
-            log.info("ready handle git options:" + str(aryRepo))
-            aryOptions = []
-            for repoObj in aryRepo:
-                path = ""
-                if "path" in repoObj.keys():
-                    path  = repoObj["path"]
-                else:
-                    log.info("config files error, find no path!!!")
-                    ret = -1
-                    return ret
-                aryCmds = []
-                aryCmdsStr = "cd /d " + path + " && "
-                if "cmds" in repoObj.keys():
-                    aryCmds = repoObj["cmds"]
-                    if isinstance(aryCmds, list):
-                        for cmdStr in aryCmds:
-                            if isinstance(cmdStr, str):
-                                aryCmdsStr += cmdStr + " && "
-                            else:
-                                log.info("config files error, find cmd not string!!!")
-                                ret = -1
-                                return ret 
-                    else:
-                        log.info("config files error, find cmds not list!!!")
-                        ret = -1
-                        return ret   
-                else:
-                    log.info("config files error, find no cmds!!!")
-                    ret = -1
-                    return ret  
-                
-                aryCmdsStr = aryCmdsStr[0:(len(aryCmdsStr) - 3)]
-                aryOptions.append(aryCmdsStr)
+            f = urllib.request.urlopen(URL_ABORTALL, timeout=30)
+            log.info("handleAbortAll() ---------- " + str(f.read().decode("utf-8")))
+            f.close()
+        except:
+            ret = -1
+            log.info("handleAbortAll() error!!!")
+            log.info(traceback.format_exc())
+        log.info("handleAbortAll() ret:" + str(ret))
+        return ret
 
-            for cmdRun in aryOptions:
-                log.info("handle start run cmd: " + str(cmdRun))
-                f = os.popen(cmdRun)
-                data = f.read()
-                f.close()
-                lenData = len(data)
-                log.info("handle return data:" + str(data) + " dataLen:" + str(lenData))
-                
-            return ret
+    def mainfunc(self):
+        try:
+            if platform.platform().find("Windows") >= 0:
+
+                #先AbortAll一下
+                self.handleAbortAll()
+                time.sleep(3)
+
+                #最小化
+                log.info("最小化-start!")
+                pyautogui.hotkey('winleft', 'd')
+                log.info("最小化-end!")
+
+                log.info("打开运行-start!")
+                pyautogui.hotkey('winleft', 'r')
+                log.info("打开运行-end!")
+                #输入cmd
+                self.keyboardInput("cmd")
+                self.keyboardEnter()
+                rootPath = os.path.abspath(os.path.join(sys.argv[0], ".."))
+                #特殊处理，为了兼容
+                tmpPath = rootPath + self.getPathSeperater() + ".." + self.getPathSeperater()
+                pyName = "Guard.py"
+
+                #输入 python执行命令
+                cmdPython = "cd /d " + tmpPath + " && python " + pyName
+                self.keyboardInput(cmdPython)
+                self.keyboardEnter()
         except:
             log.info(traceback.format_exc())
-            return -1
 
     def __init__(self, name=__name__):
         log.info("python start--->" + str(__file__) + " pid:" + str(PID))
-        ret = self.mainfunc()
-        time.sleep(1)
-        if ret >= 0:
-            RUNEND(JTAG_PID_STATUS_FINISHED)
-        else:
-            RUNEND(JTAG_PID_STATUS_ERROR)
+        self.mainfunc()
+        #给时间重启Guard，如果重启不了 10秒后也当作完成，接着Guard会自动删掉其它多余的程序
+        time.sleep(5)
+        #能到这里就是说明没有重启成功，直接返回error
+        RUNEND(JTAG_PID_STATUS_ERROR)
         log.info("python end--->" + str(__file__))
 try:
     tmp = Template()
