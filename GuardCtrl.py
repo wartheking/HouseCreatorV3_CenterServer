@@ -558,7 +558,7 @@ class GuardCtrl:
             gpu_memoryUsed = round((gpu.memoryUsed) /1024,2)
             gpu_memoryUtil = round((gpu.memoryUtil) * 100 ,2)
             gpulist.append([gpu.id, gpu_memoryTotal, gpu_memoryUsed, gpu_memoryUtil]) #GPU序号，GPU总量，GPU使用量，gpu使用占比
-            self.log.info("GPU信息:[序号:" + str(gpu.id) + "],[GPU总量:" + str(gpu_memoryTotal) + "],[GPU使用量:" + str(gpu_memoryUsed) + "],[GPU使用率:" + str(gpu_memoryUtil) + "]")
+            self.log.info("GPU:[NO:" + str(gpu.id) + "],[总:" + str(gpu_memoryTotal) + "],[用:" + str(gpu_memoryUsed) + "],[用:" + str(gpu_memoryUtil) + "%]")
         return gpulist
     
     def GetCpuInfo(self):
@@ -566,7 +566,7 @@ class GuardCtrl:
         xc_count = psutil.cpu_count()                #线程数，如双核四线程
         cpu_slv = round((psutil.cpu_percent(1)), 2)  # cpu使用率
         mList = [cpu_count, xc_count, cpu_slv] # 核数，线程数，cpu使用率
-        self.log.info("CPU信息:[核数:" + str(cpu_count) + "],[线程数:" + str(xc_count) + "],[CPU使用率:" + str(cpu_slv) + "]")
+        self.log.info("CPU:[核:" + str(cpu_count) + "],[线程:" + str(xc_count) + "],[用:" + str(cpu_slv) + "%]")
         return mList
     
     def GetDiskInfo(self):
@@ -596,7 +596,7 @@ class GuardCtrl:
         syl_nc = round((float(memory.used) / float(memory.total) * 100), 2)  # 内存使用率
  
         ret_list = [total_nc, used_nc, free_nc, syl_nc] # 总内存， 已用内存 ，空闲内存 ，内存使用率
-        self.log.info("内存信息:[总内存:" + str(total_nc) + "],[已用:" + str(used_nc) + "],[空闲:" + str(free_nc) + "],[内存使用率:" + str(syl_nc) + "]")
+        self.log.info("内存:[总:" + str(total_nc) + "],[用:" + str(used_nc) + "],[闲:" + str(free_nc) + "],[比:" + str(syl_nc) + "%]")
         return ret_list
 
     def getAllAryPids(self):
@@ -684,9 +684,9 @@ class GuardCtrl:
             #     self.log.info("updateAryPids() end~ update history:" + str(self.gAryPidsHistory))
 
     #调试用
-    gAryAutoStart = []
+    #gAryAutoStart = []
     #带中控的
-    #gAryAutoStart = [{"url":"http://127.0.0.1:9000/execute","params":"{\"name\":\"/Center/Center.py\", \"params\":[]}"}, {"url":"http://127.0.0.1:9000/execute","params":"{\"name\":\"CheckUE4.py\", \"params\":[]}"}]
+    gAryAutoStart = [{"url":"http://127.0.0.1:9000/execute","params":"{\"name\":\"/Center/Center.py\", \"params\":[]}"}, {"url":"http://127.0.0.1:9000/execute","params":"{\"name\":\"CheckUE4.py\", \"params\":[]}"}]
     #不带中控的
     # gAryAutoStart = [{"url":"http://127.0.0.1:9000/execute","params":"{\"name\":\"CheckUE4.py\", \"params\":[]}"}]
 
