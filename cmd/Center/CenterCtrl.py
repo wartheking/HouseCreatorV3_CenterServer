@@ -47,6 +47,7 @@ JTAG_SERANGLES = "SER_ANGLES"
 JTAG_SIMPLEMODEL = "simpleModel"
 JTAG_PROGRESS = "progress"
 JTAG_VERSION = "version"
+JTAG_PARAMS1 = "params1"
 JTAG_MSG   = "msg"
 JTAG_MSG_BUSY = "isBusy"
 JTAG_MSG_BYE  = "byebye"
@@ -261,13 +262,13 @@ class CenterCtrl:
             response_body = "{\"" + JTAG_NAME + "\":\""+ path + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_BUSY + "\"}"
         else:
             self.gIsHandlingPro = 1
-            mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, result = self.getInfosFromJContent(contentData)
+            mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1, result = self.getInfosFromJContent(contentData)
             #params error
             if result != 0:
                 response_body = "{\"" + JTAG_NAME + "\":\""+ str(mName) + "\",\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\",\"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_PARAMSERR + "\"}"
                 self.gIsHandlingPro = 0
             else:
-                response_body = self.handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+                response_body = self.handle_SendReqToServers(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
                 if response_body.find(JTAG_STATE_ERROR) >= 0:
                     #包含错误的话，直接返回吧
                     self.gIsHandlingPro = 0
@@ -280,7 +281,7 @@ class CenterCtrl:
         return response_body
 
     #find non-busy servers and send req
-    def handle_SendReqToServers(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix):
+    def handle_SendReqToServers(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1):
 
         self.log.info("handle_SendReqToServers()")
 
@@ -306,7 +307,7 @@ class CenterCtrl:
                     #done状态或者初始化状态就可以开始任务
                     self.log.info("handle_SendReqToServers() find 'all' machine is ok index:" + str(mIndex))
                     mSerIps, mSerAngles = self.getSerIpsAndSerAngles(jobj)
-                    return self.handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix)
+                    return self.handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mParams1)
                 elif tState == JTAG_STATE_ERROR:
                     #错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -316,7 +317,7 @@ class CenterCtrl:
                     else:
                         self.log.info("handle_SendReqToServers() find 'all' machine is error, but is ok index:" + str(mIndex))
                         mSerIps, mSerAngles = self.getSerIpsAndSerAngles(jobj)
-                        return self.handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix)
+                        return self.handle_SendReqToServers_all(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mParams1)
                 else:
                     mIndex += 1
                     continue
@@ -333,7 +334,7 @@ class CenterCtrl:
                 if tState == JTAG_STATE_DONE or tState == "":
                     #done状态或者初始化状态就可以开始任务
                     self.log.info("handle_SendReqToServers() find 'light' machine is ok index:" + str(mIndex))
-                    return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                    return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 elif tState == JTAG_STATE_ERROR:
                     #错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -342,7 +343,7 @@ class CenterCtrl:
                         continue
                     else:
                         self.log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
-                        return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                        return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 else:
                     mIndex += 1
                     continue
@@ -359,7 +360,7 @@ class CenterCtrl:
                 if tState == JTAG_STATE_DONE or tState == "":
                     #done状态或者初始化状态就可以开始任务
                     self.log.info("handle_SendReqToServers() find 'datafactory' machine is ok index:" + str(mIndex))
-                    return self.handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                    return self.handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 elif tState == JTAG_STATE_ERROR:
                     #错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -368,7 +369,7 @@ class CenterCtrl:
                         continue
                     else:
                         log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
-                        return self.handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                        return self.handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 else:
                     mIndex += 1
                     continue
@@ -386,7 +387,7 @@ class CenterCtrl:
                 if tState == JTAG_STATE_DONE or tState == "":
                     #done状态或者初始化状态就可以开始任务
                     self.log.info("handle_SendReqToServers() find 'light' machine is ok index:" + str(mIndex))
-                    return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                    return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 elif tState == JTAG_STATE_ERROR:
                     #错误状态的，server error 不能执行； 不是server error的可以执行（这些是有流程操作错误，最终还是完成了）
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
@@ -395,7 +396,7 @@ class CenterCtrl:
                         continue
                     else:
                         self.log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
-                        return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix)
+                        return self.handle_SendReqToServers_light(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 else:
                     mIndex += 1
                     continue
@@ -403,7 +404,7 @@ class CenterCtrl:
             return rtnMsg
 
     #send 'all' request to servers one by one
-    def handle_SendReqToServers_all(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix):
+    def handle_SendReqToServers_all(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mSerIps, mSerAngles, mTaskId, mRatio, mPostfix, mParams1):
         cntServs = len(mSerIps)
         mIndex = -1
         rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
@@ -415,7 +416,7 @@ class CenterCtrl:
                     mIndex += 1
                     #self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + " position:" + str(mSerAngles[mIndex]))
                     mAngle = mSerAngles[mIndex]
-                    dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+                    dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
                     dataStrBytes = dataStr.encode('utf-8')
                     #self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]--dataStr:" + dataStr)
                     url = ipStr + URL_PATH_PRO
@@ -434,11 +435,11 @@ class CenterCtrl:
         return rtnMsg
 
     #send 'light' request to server
-    def handle_SendReqToServers_light(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix):
+    def handle_SendReqToServers_light(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1):
         rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
         try:
             #log.info("handle_SendReqToServers_light() ip:" + ipStr)
-            dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+            dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
             dataStrBytes = dataStr.encode('utf-8')
             #log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
             url = ipStr + URL_PATH_PRO
@@ -451,15 +452,16 @@ class CenterCtrl:
                 
         except Exception:
             self.log.info("handle_SendReqToServers_light():" + "ip:" + ipStr + " request error!!!!")
+            self.log.info(traceback.format_exc())
                     
         return rtnMsg
 
     #send 'datafactory' request to server
-    def handle_SendReqToServers_datafactory(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix):
+    def handle_SendReqToServers_datafactory(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1):
         rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
         try:
             #log.info("handle_SendReqToServers_light() ip:" + ipStr)
-            dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix)
+            dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
             dataStrBytes = dataStr.encode('utf-8')
             #log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
             url = ipStr + URL_PATH_PRO
@@ -487,6 +489,7 @@ class CenterCtrl:
         mTaskId = ""
         mRatio = ""
         mPostfix = ""
+        mParams1 = ""
         result = 0
         while(1):
             try:
@@ -572,6 +575,17 @@ class CenterCtrl:
                         result = -1
                         break
 
+                    #check params1
+                    if (JTAG_PARAMS1 in jobj.keys()):
+                        mParams1 = jobj[JTAG_PARAMS1]
+                        mParams1, result = self.checkParams1(mParams1)
+                        if result < 0:
+                            break
+                    else:
+                        self.log.info("content json data mParams1 not find error!!!")
+                        result = -1
+                        break
+
                 if mTaskType != JTAG_TASKTYPE_DATAFACTORY and mTaskType != JTAG_TASKTYPE_MODELPREVIEW:
                     #check map
                     if(JTAG_MAP in jobj.keys()):
@@ -621,11 +635,11 @@ class CenterCtrl:
                 result = -1
                 self.log.info("conntent json data error!!!")
                 break
-        self.log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix) + " result:" + str(result))
-        return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, result
+        self.log.info("getInfosFromJContent -- name:" + str(mName) + " map:" + str(mMap) + " angle:" + str(mAngle) + " ids:" + str(mIds) + " resolution:" + str(mResolution) + " quality:" + str(mQuality) + " taskType:" + str(mTaskType) + " taskId:" + str(mTaskId) + " ratio:" + str(mRatio) + " postfix:" + str(mPostfix) + " params1:" + str(mParams1) + " result:" + str(result))
+        return mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1, result
 
     #get jsonstr with all params
-    def getJStrWithParams(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix):
+    def getJStrWithParams(self, mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1):
         rtnStr = "{"
         rtnStr += "\"" + JTAG_NAME + "\":\"" + mName + "\","
         rtnStr += "\"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\","
@@ -636,7 +650,13 @@ class CenterCtrl:
         rtnStr += "\"" + JTAG_QUALITY + "\":" + str(mQuality) + ","
         rtnStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
         rtnStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
-        rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\""
+        rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
+        if isinstance(mParams1, object):
+            mParams1 = str(mParams1)
+            mParams1 = mParams1.replace("'", "\"")
+            rtnStr += "\"" + JTAG_PARAMS1 + "\":" + mParams1
+        else:
+            rtnStr += "\"" + JTAG_PARAMS1 + "\":\"" + str(mParams1) + "\""
         rtnStr += "}"
         return rtnStr
 
@@ -798,6 +818,14 @@ class CenterCtrl:
             result = 0
         return postfix, result
 
+    def checkParams1(self, params1):
+        result = -1
+        if not isinstance(params1, object):
+            log.info("params1 is not jobj error!!!")
+            result = -1
+        else:
+            result = 0
+        return params1, result
 
     ##############################################################
     #/pro end
