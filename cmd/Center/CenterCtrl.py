@@ -651,12 +651,18 @@ class CenterCtrl:
         rtnStr += "\"" + JTAG_TASKID + "\":\"" + mTaskId + "\","
         rtnStr += "\"" + JTAG_RATIO + "\":\"" + mRatio + "\","
         rtnStr += "\"" + JTAG_POSTFIX + "\":\"" + mPostfix + "\","
-        if isinstance(mParams1, object):
-            mParams1 = str(mParams1)
-            mParams1 = mParams1.replace("'", "\"")
-            rtnStr += "\"" + JTAG_PARAMS1 + "\":" + mParams1
-        else:
+        if isinstance(mParams1, str):
             rtnStr += "\"" + JTAG_PARAMS1 + "\":\"" + str(mParams1) + "\""
+        else:
+            #判断是不是obj
+            try:
+                mParams1 = str(mParams1)
+                mParams1 = mParams1.replace("'", "\"")
+                jobj = json.loads(mParams1)
+                rtnStr += "\"" + JTAG_PARAMS1 + "\":" + mParams1
+            except:
+                self.log.info("getJStrWithParams() --- mParams1 不是字符串也不是 json, 直接往后加了!!!")
+                rtnStr += "\"" + JTAG_PARAMS1 + "\":" + mParams1
         rtnStr += "}"
         return rtnStr
 
