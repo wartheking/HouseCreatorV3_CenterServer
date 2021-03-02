@@ -5,6 +5,9 @@ import socket, sys, os, json
 import uuid, random, re, time, traceback, threading
 import urllib.request
 from light import *
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
 DIR_PATH = os.path.abspath(os.path.join(sys.argv[0], "..")) + "/SerFiles"
 FILE_PATH = DIR_PATH + "/CenterStatus.txt"
@@ -298,8 +301,8 @@ class CenterCtrl:
         jConfigDatafactoryLen = len(jConfigDatafactory)
 
         mIndex = 0
-
         if mTaskType == JTAG_TASKTYPE_ALL:
+            hasServerErr = 0
             #遍历 all 群
             for jobj in jConfigAll:
                 tName, tTaskType ,tState, tTaskId, tRatio, tPostfix, tStateStr = self.getCheckStateFromFile(mIndex)
@@ -313,6 +316,7 @@ class CenterCtrl:
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
                         #server err, 跳过吧
                         mIndex += 1
+                        hasServerErr = 1
                         continue
                     else:
                         self.log.info("handle_SendReqToServers() find 'all' machine is error, but is ok index:" + str(mIndex))
@@ -322,10 +326,19 @@ class CenterCtrl:
                     mIndex += 1
                     continue
                 
+            #如果运行到最后，没机器运行任务，且发现有机器server error了就返回server error
+            #同理没有配置到机器的也报error吧
+            if hasServerErr == 1 or jConfigAllLen <= 0:
+                if hasServerErr == 1:
+                    self.log.info("发现all机群有server error!!!!")
+                if jConfigAllLen <= 0:
+                    self.log.info("发现all机群没有配置 server error!!!!")
+                rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
             return rtnMsg
 
         elif mTaskType == JTAG_TASKTYPE_LIGHT:
+            hasServerErr = 0
             #要加上all的数量
             mIndex = jConfigAllLen
             #遍历 light 群
@@ -340,6 +353,7 @@ class CenterCtrl:
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
                         #server err, 跳过吧
                         mIndex += 1
+                        hasServerErr = 1
                         continue
                     else:
                         self.log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
@@ -348,10 +362,19 @@ class CenterCtrl:
                     mIndex += 1
                     continue
 
+            #如果运行到最后，没机器运行任务，且发现有机器server error了就返回server error
+            #同理没有配置到机器的也报error吧
+            if hasServerErr == 1 or jConfigLightLen <= 0:
+                if hasServerErr == 1:
+                    self.log.info("发现light机群有server error!!!!")
+                if jConfigLightLen <= 0:
+                    self.log.info("发现light机群没有配置 server error!!!!")
+                rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
             return rtnMsg
 
         elif mTaskType == JTAG_TASKTYPE_DATAFACTORY:
+            hasServerErr = 0
             #要加上all + light的数量
             mIndex = jConfigAllLen + jConfigLightLen
             #遍历 datafactory 群
@@ -366,6 +389,7 @@ class CenterCtrl:
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
                         #server err, 跳过吧
                         mIndex += 1
+                        hasServerErr = 1
                         continue
                     else:
                         log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
@@ -373,11 +397,19 @@ class CenterCtrl:
                 else:
                     mIndex += 1
                     continue
-
+            #如果运行到最后，没机器运行任务，且发现有机器server error了就返回server error
+            #同理没有配置到机器的也报error吧
+            if hasServerErr == 1 or jConfigDatafactoryLen <= 0:
+                if hasServerErr == 1:
+                    self.log.info("发现datafactory机群有server error!!!!")
+                if jConfigDatafactoryLen <= 0:
+                    self.log.info("发现datafactory机群没有配置 server error!!!!")
+                rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
             return rtnMsg
         
         elif mTaskType == JTAG_TASKTYPE_MODELPREVIEW:
+            hasServerErr = 0
             #用light机器来执行
             #要加上all的数量
             mIndex = jConfigAllLen
@@ -393,6 +425,7 @@ class CenterCtrl:
                     if tStateStr.find(JTAG_MSG_SERVERERR) >= 0:
                         #server err, 跳过吧
                         mIndex += 1
+                        hasServerErr = 1
                         continue
                     else:
                         self.log.info("handle_SendReqToServers() find 'light' machine is error, but is ok index:" + str(mIndex))
@@ -400,7 +433,15 @@ class CenterCtrl:
                 else:
                     mIndex += 1
                     continue
-             #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
+            #如果运行到最后，没机器运行任务，且发现有机器server error了就返回server error
+            #同理没有配置到机器的也报error吧
+            if hasServerErr == 1 or jConfigLightLen <= 0:
+                if hasServerErr == 1:
+                    self.log.info("发现light机群有server error!!!!")
+                if jConfigLightLen <= 0:
+                    self.log.info("发现light机群没有配置 server error!!!!")
+                rtnMsg = "{\"" + JTAG_NAME + "\":\"" + mName + "\", \"" + JTAG_TASKTYPE + "\":\"" + mTaskType + "\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
+            #如果遍历到最后了也没有机器可以运行这次任务，就返回默认的结果 isBusy
             return rtnMsg
 
     #send 'all' request to servers one by one
@@ -1225,7 +1266,7 @@ class CenterCtrl:
                     mStateStr += ","
                 f.close()
             except :
-                self.log.info("[" + str(mIndex) + "]: check all dev state error!!!")
+                self.log.info("[" + str(mIndex) + " " + str(ipStr) + "]: check all dev state error!!!")
                 self.log.info(traceback.format_exc())
                 errMsg = "{\"" + JTAG_NAME + "\":\"\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
                 if mIndex == (cntServs - 1):
@@ -1234,6 +1275,8 @@ class CenterCtrl:
                 else:
                     mStateStr += errMsg
                     mStateStr += ","
+
+                self.sendCheckErrMail(ipStr, self.genSendMailMsg(ipStr, JTAG_TASKTYPE_ALL, self.MAIL_ERR_MSG_CHECKERR))
 
         #self.log.info("all>>>[" + str(index) + "]combine str:" + mStateStr)
         self.setStausStrToStatusAry(index, mStateStr)
@@ -1250,11 +1293,12 @@ class CenterCtrl:
             mStateStr += "]"
             f.close()
         except :
-            self.log.info("[" + str(index) + "]: check light dev state error!!!!")
+            self.log.info("[" + str(index) + " " + str(ip) + "]: check light dev state error!!!!")
             self.log.info(traceback.format_exc())
             errMsg = "{\"" + JTAG_NAME + "\":\"\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
             mStateStr += errMsg
             mStateStr += "]"
+            self.sendCheckErrMail(ip, self.genSendMailMsg(ip, JTAG_TASKTYPE_LIGHT, self.MAIL_ERR_MSG_CHECKERR))
 
         #self.log.info("light>>>[" + str(index) + "]combine str:" + mStateStr)
         self.setStausStrToStatusAry(index, mStateStr)
@@ -1271,11 +1315,12 @@ class CenterCtrl:
             mStateStr += "]"
             f.close()
         except :
-            self.log.info("[" + str(index) + "]: check datafactory state error!!!!")
+            self.log.info("[" + str(index) + " " + str(ip) + "]: check datafactory state error!!!!")
             self.log.info(traceback.format_exc())
             errMsg = "{\"" + JTAG_NAME + "\":\"\", \"" + JTAG_STATE + "\":\"" + JTAG_STATE_ERROR + "\",\"" + JTAG_MSG + "\":\"" + JTAG_MSG_SERVERERR + "\"}"
             mStateStr += errMsg
             mStateStr += "]"
+            self.sendCheckErrMail(ip, self.genSendMailMsg(ip, JTAG_TASKTYPE_DATAFACTORY, self.MAIL_ERR_MSG_CHECKERR))
 
         #self.log.info("datafactory>>>[" + str(index) + "]combine str:" + mStateStr)
         self.setStausStrToStatusAry(index, mStateStr)
@@ -1782,7 +1827,76 @@ class CenterCtrl:
     #handle http recv end
     ##############################################################
 
+    ##############################################################
+    #handle send error email start 
+    ##############################################################
 
+    MAIL_ERR_MSG_CHECKERR = "Server check ERROR!!!"
+
+    def genSendMailMsg(self, ip, taskType, msg):
+        return (str(ip) + " '" + str(taskType) + "' " + str(msg))
+
+    #同样的邮件内容，间隔时间，要大于下面这个值才会发第二次，不然邮箱都爆了
+    SEND_MAIL_SEP = 10 * 60
+
+    #K-V K：发的内容content， V：发的时候的秒数（time.time()）
+    #用于，如果发送时间间隔大于SEND_MAIL_SEP，才重复发邮件
+    gCheckErrMailHistory = {}
+
+    def sendCheckErrMail(self, ip, content):
+        needSend = 0
+        if content in self.gCheckErrMailHistory.keys():
+            oldTime = self.gCheckErrMailHistory[content]
+            nowTime = time.time()
+            self.log.info("rptest --- nowTime:" + str(nowTime) + " oldTime:" + str(oldTime) + " sep:" + str(nowTime - oldTime))
+            if (nowTime - oldTime) > self.SEND_MAIL_SEP:
+                needSend = 1
+            else:
+                needSend = 0
+        else:
+            needSend = 1
+
+        if needSend == 1:
+            self.gCheckErrMailHistory[content] = time.time()
+            t = threading.Thread(target=self.newthread_sendCheckErrMail, args=(ip, content,))
+            t.start()
+    
+    def newthread_sendCheckErrMail(self, ip, content):
+        self.log.info("send chek error mail>>" + str(ip) + ">>" + str(content))
+        try:
+            # 第三方 SMTP 服务
+            #设置服务器
+            mail_host="smtp.163.com"
+            #用户名  
+            mail_user="18813863320@163.com"
+            #口令  
+            mail_pass="sunchip123"
+            sender = '18813863320@163.com'
+            # receivers = ['356852346@qq.com', '1522631439@qq.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+            receivers = ['356852346@qq.com', 'wartheking@163.com']  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+            
+            message = MIMEText(content, 'plain', 'utf-8')
+            message['from'] = "18813863320@163.com"
+            #发给多人，在这里加邮箱
+            # message['to'] =  "356852346@qq.com,1522631439@qq.com"
+            message['to'] =  "356852346@qq.com,wartheking@163.com"
+            subject = "UE4 Server warning!!!" + " - " + str(ip)
+            message['Subject'] = Header(subject, 'utf-8')
+
+            smtpObj = smtplib.SMTP() 
+            smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
+            code, resp = smtpObj.login(mail_user, mail_pass)
+            self.log.info("code:" + str(code) + " resp:" + str(resp))
+            smtpObj.sendmail(sender, receivers, message.as_string())
+            self.log.info("发送邮件成功-content:" + str(content))
+        except smtplib.SMTPException:
+            self.log.info("Error: 无法发送邮件-content:" + str(content))
+            self.log.info(traceback.format_exc())
+
+    ##############################################################
+    #handle send error email end
+    ##############################################################
+ 
     def __init__(self, log=None):
         #init log
         self.log = log
