@@ -1,0 +1,56 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# 创建的文件:04.03.2021 15:53:59
+
+newmtl 05___Default
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-21\3d66Mat-1058288-maps-1.jpg
+	map_Kd F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-21\3d66Mat-1058288-maps-1.jpg
+
+newmtl 04___Default
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-21\3d66Mat-1058288-maps-1.jpg
+	map_Kd F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-21\3d66Mat-1058288-maps-1.jpg
+
+newmtl 01___Default
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-17\3d66Mat-803293-maps-1.jpg
+	map_Kd F:\mx_sxzConver\MX\bailimoxing\ABC-mx\ABC\ABC-17\3d66Mat-803293-maps-1.jpg
+
+newmtl 07___Default
+	Ns 10.0000
+	Ni 1.5000
+	d 0.5000
+	Tr 0.5000
+	Tf 0.5000 0.5000 0.5000 
+	illum 2
+	Ka 0.0431 0.0235 0.0196
+	Kd 0.0431 0.0235 0.0196
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
