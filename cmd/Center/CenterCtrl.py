@@ -392,7 +392,7 @@ class CenterCtrl:
                         hasServerErr = 1
                         continue
                     else:
-                        log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
+                        self.log.info("handle_SendReqToServers() find 'datafactory' machine is error, but is ok index:" + str(mIndex))
                         return self.handle_SendReqToServers_datafactory(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, ipStr, mTaskId, mRatio, mPostfix, mParams1)
                 else:
                     mIndex += 1
