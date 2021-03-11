@@ -1707,14 +1707,19 @@ class CenterCtrl:
     def newthread_SendReqToServers_SyncDownloadModel(self, path, aryResults, index, ip, dataStrBytes):
         self.log.info("newthread_SendReqToServers_syncmodel() path:" + str(path) + " index:" + str(index) + " ip:" + str(ip) + " dataStrBytes:" + str(dataStrBytes))
         url = ip + path
-        f = urllib.request.urlopen(url, dataStrBytes, timeout=310)
-        rtnMsg = f.read().decode('utf-8')
-        f.close()
-        self.log.info("newthread_SendReqToServers_SyncDownloadModel() path:" + str(path) + " index:" + str(index) + " rtn:" + rtnMsg)
-        if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
+        try:
+            f = urllib.request.urlopen(url, dataStrBytes, timeout=50)
+            rtnMsg = f.read().decode('utf-8')
+            f.close()
+            self.log.info("newthread_SendReqToServers_SyncDownloadModel() path:" + str(path) + " index:" + str(index) + " rtn:" + rtnMsg)
+            if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
+                aryResults[index] = "error"
+            else:
+                aryResults[index] = "done"
+        except:
+            self.log.info("newthread_SendReqToServers_SyncDownloadModel() error!!! path:" + str(path) + " index:" + str(index) + " ip:" + str(ip) + " dataStrBytes:" + str(dataStrBytes))
             aryResults[index] = "error"
-        else:
-            aryResults[index] = "done"
+            self.log.info(traceback.format_exc())
         
     def handle_SendReqToServers_SyncDownloadModel(self, path, version, mContent):
         self.log.info("handle_SendReqToServers_SyncDownloadModel() version:" + str(version) + " content:" + str(mContent) )
@@ -1772,7 +1777,7 @@ class CenterCtrl:
             cntError = 0
             isRtnEnd = 0
             while isRtnEnd == 0:
-                self.log.info("handle_SendReqToServers_SyncDownloadModel() " + str(path) + " check:" + str(aryResults))
+                self.log.info("handle_SendReqToServers_SyncDownloadModel() " + str(path) + " version:" + str(version) + " check:" + str(aryResults))
                 cntError = 0
                 mIndex = 0
                 for tmpResult in aryResults:
