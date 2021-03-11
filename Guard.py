@@ -106,10 +106,10 @@ class Logger:
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
         # 创建一个handler，用于将日志输出到控制台
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        ch.setFormatter(self.formatter)
-        self.logger.addHandler(ch)
+        # ch = logging.StreamHandler()
+        # ch.setLevel(logging.DEBUG)
+        # ch.setFormatter(self.formatter)
+        # self.logger.addHandler(ch)
         self.checkLog = 1
         t = threading.Thread(target=self.checkLogFile)
         t.start()

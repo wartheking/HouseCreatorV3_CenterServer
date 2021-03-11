@@ -459,18 +459,18 @@ class CenterCtrl:
                     mAngle = mSerAngles[mIndex]
                     dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
                     dataStrBytes = dataStr.encode('utf-8')
-                    #self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]--dataStr:" + dataStr)
+                    self.log.info("handle_SendReqToServers_all()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr))
                     url = ipStr + URL_PATH_PRO
-                    f = urllib.request.urlopen(url, dataStrBytes)
+                    f = urllib.request.urlopen(url, dataStrBytes, timeout=30)
                     rtnMsg = f.read().decode('utf-8')
-                    #self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "] rtn:" + rtnMsg)
+                    self.log.info("handle_SendReqToServers_all()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr) + " rtn:" + str(rtnMsg))
                     f.close()
                     if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
-                        self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + "[" + rtnMsg + "] find rtn error!!!!")
+                        self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + str(ipStr) + "[" + str(rtnMsg) + "] find rtn error!!!!")
                         break
                     time.sleep(0.1)
                 except Exception:	
-                    self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + ipStr + " request error!!!!")
+                    self.log.info("handle_SendReqToServers_all()[" + str(mIndex) + "]:" + "ip:" + str(ipStr) + " request error!!!!")
                     self.log.info(traceback.format_exc())
                     break
         return rtnMsg
@@ -482,17 +482,17 @@ class CenterCtrl:
             #log.info("handle_SendReqToServers_light() ip:" + ipStr)
             dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
             dataStrBytes = dataStr.encode('utf-8')
-            #log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
+            self.log.info("handle_SendReqToServers_light()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr))
             url = ipStr + URL_PATH_PRO
-            f = urllib.request.urlopen(url, dataStrBytes)
+            f = urllib.request.urlopen(url, dataStrBytes, timeout=30)
             rtnMsg = f.read().decode('utf-8')
-            #log.info("handle_SendReqToServers_light() rtn:" + rtnMsg)
+            self.log.info("handle_SendReqToServers_light()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr) + " rtn:" + str(rtnMsg))
             f.close()
             if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
-                self.log.info("handle_SendReqToServers_light():" + "ip:" + ipStr + "[" + rtnMsg + "] find rtn error!!!!")
+                self.log.info("handle_SendReqToServers_light():" + "ip:" + str(ipStr) + "[" + str(rtnMsg) + "] find rtn error!!!!")
                 
         except Exception:
-            self.log.info("handle_SendReqToServers_light():" + "ip:" + ipStr + " request error!!!!")
+            self.log.info("handle_SendReqToServers_light():" + "ip:" + str(ipStr) + " request error!!!!")
             self.log.info(traceback.format_exc())
                     
         return rtnMsg
@@ -504,17 +504,17 @@ class CenterCtrl:
             #log.info("handle_SendReqToServers_light() ip:" + ipStr)
             dataStr = self.getJStrWithParams(mName, mTaskType, mMap, mAngle, mIds, mResolution, mQuality, mTaskId, mRatio, mPostfix, mParams1)
             dataStrBytes = dataStr.encode('utf-8')
-            #log.info("handle_SendReqToServers_light()--dataStr:" + dataStr)
+            self.log.info("handle_SendReqToServers_datafactory()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr))
             url = ipStr + URL_PATH_PRO
-            f = urllib.request.urlopen(url, dataStrBytes)
+            f = urllib.request.urlopen(url, dataStrBytes, timeout=30)
             rtnMsg = f.read().decode('utf-8')
-            #log.info("handle_SendReqToServers_light() rtn:" + rtnMsg)
+            self.log.info("handle_SendReqToServers_datafactory()-- ip:" + str(ipStr) + " dataStr:" + str(dataStr) + " rtn:" + str(rtnMsg))
             f.close()
             if rtnMsg.find(JTAG_STATE_ERROR) >= 0:
-                self.log.info("handle_SendReqToServers_datafactory():" + "ip:" + ipStr + "[" + rtnMsg + "] find rtn error!!!!")
+                self.log.info("handle_SendReqToServers_datafactory():" + "ip:" + str(ipStr) + "[" + str(rtnMsg) + "] find rtn error!!!!")
                 
         except Exception:
-            self.log.info("handle_SendReqToServers_datafactory():" + "ip:" + ipStr + " request error!!!!")
+            self.log.info("handle_SendReqToServers_datafactory():" + "ip:" + str(ipStr) + " request error!!!!")
                     
         return rtnMsg
 
